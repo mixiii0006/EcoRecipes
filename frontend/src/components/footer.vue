@@ -1,6 +1,6 @@
 <template>
   <footer class="footer">
-    <p>&copy; 2025 To-Do List App. All rights reserved.</p>
+    <p>© 2024 EcoRecipes. All rights reserved.</p>
   </footer>
 </template>
 
@@ -12,10 +12,11 @@ export default {
 
 <style scoped>
 .footer {
-  background-color: #333;
+  background-color: #2e7d32;
   color: white;
+  padding: 1rem 2rem;
   text-align: center;
-  padding: 1rem;
-  margin-top: auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 0.9rem;
 }
 </style>

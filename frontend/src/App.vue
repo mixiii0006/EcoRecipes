@@ -4,7 +4,7 @@
     <Navbar />
     
     <!-- Main Content -->
-    <TodoList />
+    <router-view />
     
     <!-- Footer -->
     <Footer />
@@ -12,15 +12,13 @@
 </template>
 
 <script>
-import Navbar from './components/Navbar.vue'; // Import Navbar component
-import Footer from './components/Footer.vue'; // Import Footer component
-import TodoList from './views/TodoList.vue';  // Import TodoList view
+import Navbar from './components/navbar.vue'; // Import Navbar component
+import Footer from './components/footer.vue'; // Import Footer component
 
 export default {
   components: {
     Navbar,
-    Footer,
-    TodoList
+    Footer
   }
 };
 </script>
