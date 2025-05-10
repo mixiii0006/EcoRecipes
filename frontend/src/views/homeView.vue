@@ -18,8 +18,8 @@
         <div class="main-content">
           <header class="header">
             <input type="text" placeholder="Search the menu" class="search-input" />
-            <button>Input</button>
-            <button>Scan</button>
+            <button class="action-btn" @click="handleInputClick">Input</button>
+            <button class="action-btn" @click="handleScanClick">Scan</button>
             
           </header>
 
@@ -115,7 +115,17 @@ export default {
           }
         }
       });
-    }
+    },
+    handleInputClick() {
+      // Redirect to the input ingredients page or process input data
+      this.$router.push("/input-ingredients"); // Assuming you're using Vue Router
+    },
+
+    // Handle the "Scan" button click
+    handleScanClick() {
+      // You can implement scan functionality here if needed
+      this.$router.push("/scan-ingredients");
+    },
   }
 };
 </script>
@@ -198,6 +208,15 @@ export default {
   border-radius: 8px;
   border: 1px solid #ccc;
   width: 60%;
+}
+
+.action-btn {
+  background: linear-gradient(to bottom, #235f3a, #73b06f);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
 }
 
 .user-box {

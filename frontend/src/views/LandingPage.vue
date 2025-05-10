@@ -1,5 +1,8 @@
 <template>
   <div class="landing-page">
+    <!-- Navbar Component -->
+    <navbar />
+
     <section class="hero">
       <div class="hero-text">
         <h1>Satu Resep, Satu langkah untuk Bumi.</h1>
@@ -160,6 +163,7 @@
     </section>
   </div>
 </template>
+
 
 <script>
 export default {
