@@ -38,6 +38,7 @@ export default {
   margin-bottom: 0.25rem;
   font-weight: 600;
   color: #2e7d32; /* green accent */
+  align-items: left;
 }
 
 .form-input {

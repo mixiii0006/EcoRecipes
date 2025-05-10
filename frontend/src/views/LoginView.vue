@@ -117,11 +117,13 @@ export default {
 .form-card h2 {
   margin-bottom: 0.5rem;
   font-weight: 700;
+  align-items: justify;
 }
 
 .form-card p {
   margin-bottom: 2rem;
   color: #666;
+  align-items: justify;
 }
 
 .form-options {
