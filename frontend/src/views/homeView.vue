@@ -1,19 +1,80 @@
 <template>
-  <div class="home-view">
-    <main class="main-content">
-      <h2>Welcome, {{ username }}</h2>
-      <nav class="nav-links">
-        <router-link to="/search" class="nav-link">Search</router-link>
-        <a href="#" @click.prevent="handleLogout" class="nav-link">Logout</a>
+  <div class="home-container">
+    <!-- Sidebar Kiri -->
+    <aside class="sidebar">
+      <h1 class="logo">EcoRecipes</h1>
+      <nav class="menu">
+        <router-link to="/home" class="menu-item">Home</router-link>
+        <router-link to="/search" class="menu-item">Search</router-link>
+        <router-link to="/recipes" class="menu-item">Recipes</router-link>
+        <a href="#" @click.prevent="handleLogout" class="menu-item logout">Logout</a>
       </nav>
-      <section class="content-placeholder">
-        <p>This is your home page. Use the search or logout options above.</p>
-      </section>
+    </aside>
+
+    <!-- Konten Utama -->
+    <main class="main-section">
+      <div class="main-layout">
+        <!-- Konten Tengah -->
+        <div class="main-content">
+          <header class="header">
+            <input type="text" placeholder="Search the menu" class="search-input" />
+            <button>Input</button>
+            <button>Scan</button>
+            
+          </header>
+
+          <!-- Hero -->
+          <section class="hero">
+            <div class="hero-text">
+              <h2>Makan Apa Hari Ini??</h2>
+              <p>Siap sedia wawasan dengan bahan lokal. Satu masakanmu mendekatkan keberlanjutan di setiap hidangan.</p>
+              <p><strong>Main Ingredients:</strong> Ayam, Sayur, Cabai, Bawang</p>
+            </div>
+            <img src="https://source.unsplash.com/featured/?food" alt="Dish" class="hero-img" />
+          </section>
+
+          <!-- Rekomendasi -->
+          <section class="recommendations">
+            <h3>Recommendations</h3>
+            <div class="recipe-grid">
+              <div class="recipe-card" v-for="n in 6" :key="n">
+                <img src="https://source.unsplash.com/160x160/?indonesian-food" alt="Food" />
+                <h4>Sate Ayam</h4>
+                <p>★★★★☆</p>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Sidebar Kanan -->
+        <aside class="right-sidebar">
+          <div class="user-box">
+              <span class="username">{{ username }}</span>
+            </div>
+          <!-- Grafik Pie -->
+          <div class="nutrition-card">
+            <canvas id="nutritionChart"></canvas>
+          </div>
+
+          <!-- Top User -->
+          <div class="top-users">
+            <h4>Top User</h4>
+            <ul>
+              <li v-for="n in 4" :key="n" class="top-user">
+                <img src="https://source.unsplash.com/32x32/?person" alt="User Avatar" />
+                <span>Natasya Salsabila</span>
+              </li>
+            </ul>
+          </div>
+        </aside>
+      </div>
     </main>
   </div>
 </template>
 
 <script>
+import Chart from 'chart.js/auto';
+
 export default {
   name: 'HomeView',
   data() {
@@ -24,67 +85,206 @@ export default {
   created() {
     this.username = localStorage.getItem('username') || '';
   },
+  mounted() {
+    this.renderPieChart();
+  },
   methods: {
     handleLogout() {
       localStorage.removeItem('token');
       localStorage.removeItem('username');
       this.$router.push('/');
+    },
+    renderPieChart() {
+      const ctx = document.getElementById('nutritionChart');
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Protein', 'Carbs', 'Fat', 'Fiber'],
+          datasets: [{
+            label: 'Nutrient Composition',
+            data: [30, 40, 20, 10],
+            backgroundColor: ['#42A5F5', '#66BB6A', '#FFA726', '#AB47BC']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
     }
   }
 };
 </script>
 
 <style scoped>
-.home-view {
+.home-container {
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Sidebar Kiri */
+.sidebar {
+  width: 220px;
+  background-color: #2e7d32;
+  color: white;
+  padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background-color: #f9f9f9;
-  color: #2e7d32;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  justify-content: flex-start;
-  align-items: stretch;
-  text-align: left;
-  padding: 2rem;
+  align-items: center;
 }
 
-.main-content {
-  /* max-width: 400px; Removed to allow full width */
-  width: 100%;
-  padding: 2rem;
-  border-radius: 8px;
-  background: white;
-  box-shadow: 0 0 10px rgba(46, 125, 50, 0.2);
-}
-
-h2 {
-  margin-bottom: 1rem;
-}
-
-.nav-links {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
+.logo {
+  font-size: 1.8rem;
+  font-weight: bold;
   margin-bottom: 2rem;
 }
 
-.nav-link {
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  background-color: #2e7d32;
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+.menu {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-.nav-link:hover {
+.menu-item {
+  padding: 1rem;
+  margin: 0.25rem 0;
+  color: white;
+  text-decoration: none;
+  text-align: center;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.menu-item:hover {
   background-color: #1b5e20;
 }
 
-.content-placeholder {
-  font-size: 1.1rem;
-  color: #555;
+.logout {
+  margin-top: auto;
+  background-color: #d32f2f;
+}
+
+/* Main Layout */
+.main-section {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f4f4f4;
+  overflow-y: auto;
+}
+
+.main-layout {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.main-content {
+  flex: 3;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-input {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 60%;
+}
+
+.user-box {
+  background-color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+/* Hero Section */
+.hero {
+  display: flex;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.hero-img {
+  width: 200px;
+  border-radius: 10px;
+}
+
+/* Recommendations */
+.recommendations {
+  margin-top: 2rem;
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.recipe-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.recipe-card img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+/* Sidebar Kanan */
+.right-sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.nutrition-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.top-users {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.top-users h4 {
+  margin-bottom: 0.5rem;
+}
+
+.top-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.top-user img {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
 }
 </style>
