@@ -2,24 +2,50 @@
   <div class="auth-container">
     <div class="left-panel">
       <h1>Satu Resep, Satu langkah untuk Bumi.</h1>
-      <p>Masukkan bahan makanan yang kamu miliki, dan temukan resep rendah emisi yang membantu melindungi bumi.</p>
+      <p>
+        Masukkan bahan makanan yang kamu miliki, dan temukan resep rendah emisi
+        yang membantu melindungi bumi.
+      </p>
     </div>
     <div class="right-panel">
       <div class="form-card">
         <h2>Welcome Back</h2>
         <p>Login to your account!</p>
         <form @submit.prevent="handleLogin">
-          <FormInput label="Name" v-model="name" placeholder="Enter your name" required />
-          <FormInput label="Email" type="email" v-model="email" placeholder="Enter your email" required />
-          <FormInput label="Password" type="password" v-model="password" placeholder="Enter your password" required />
+          <FormInput
+            id="name"
+            label="Name"
+            v-model="name"
+            placeholder="Enter your name"
+            required
+          />
+          <FormInput
+            id="email"
+            label="Email"
+            type="email"
+            v-model="email"
+            placeholder="Enter your email"
+            required
+          />
+          <FormInput
+            id="password"
+            label="Password"
+            type="password"
+            v-model="password"
+            placeholder="Enter your password"
+            required
+          />
           <div class="form-options">
-            <label><input type="checkbox" v-model="rememberMe" /> Remember Me</label>
+            <label
+              ><input type="checkbox" v-model="rememberMe" /> Remember Me</label
+            >
             <a href="#" class="forgot-password">Forgot Password?</a>
           </div>
           <Button type="submit">Login</Button>
         </form>
         <p class="register-link">
-          Don't have an account? <router-link to="/register">Register Here</router-link>
+          Don't have an account?
+          <router-link to="/register">Register Here</router-link>
         </p>
       </div>
     </div>
@@ -27,40 +53,40 @@
 </template>
 
 <script>
-import FormInput from '../components/FormInput.vue';
-import Button from '../components/Button.vue';
-import axios from 'axios';
+import FormInput from "../components/FormInput.vue";
+import Button from "../components/Button.vue";
+import axios from "axios";
 
 export default {
-  name: 'LoginView',
+  name: "LoginView",
   components: {
     FormInput,
-    Button
+    Button,
   },
   data() {
     return {
-      name: '',
-      email: '',
-      password: '',
-      rememberMe: false
+      name: "",
+      email: "",
+      password: "",
+      rememberMe: false,
     };
   },
   methods: {
     async handleLogin() {
       try {
-        const response = await axios.post('/api/login', {
-          name: this.name,
+        const response = await axios.post("http://localhost:3000/api/login", {
+          username: this.name,
           email: this.email,
-          password: this.password
+          password: this.password,
         });
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('username', this.name);
-        this.$router.push('/home');
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("username", response.data.username);
+        this.$router.push("/home");
       } catch (error) {
-        alert('Login failed. Please check your credentials.');
+        alert("Login failed. Please check your credentials.");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -68,12 +94,12 @@ export default {
 .auth-container {
   display: flex;
   min-height: 100vh;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .left-panel {
   flex: 1;
-  background: url('/images/landing-bg.jpg') no-repeat center center/cover;
+  background: url("/images/landing-bg.jpg") no-repeat center center/cover;
   color: white;
   padding: 4rem;
   display: flex;
@@ -108,7 +134,7 @@ export default {
   background: white;
   padding: 3rem;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
   text-align: center;
