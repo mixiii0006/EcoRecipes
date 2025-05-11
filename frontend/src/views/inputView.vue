@@ -1,6 +1,7 @@
 <template>
   <div class="input-ingredients">
-   <Sidebar />
+    <!-- Sidebar (komponen terpisah) -->
+    <Sidebar />
 
     <!-- Main Content Area -->
     <main class="main-content">
@@ -20,9 +21,9 @@
         <button class="submit-btn">Submit</button>
       </div>
 
-      <!-- Combined Section (3:1 Ratio for Recommendations and Right Section) -->
+      <!-- Recommendations + Right Section -->
       <section class="combined-section">
-        <!-- Recommendations Section (3 Parts) -->
+        <!-- Recommendations Section -->
         <div class="recommendations-wrapper">
           <section class="recommendations">
             <h3>Recommendations</h3>
@@ -40,7 +41,7 @@
           </section>
         </div>
 
-        <!-- Right Section (1 Part) - Card for Recent Search & Statistics -->
+        <!-- Right Section -->
         <section class="right-section">
           <div class="card">
             <section class="recent-search">
@@ -67,22 +68,23 @@
 
 <script>
 import RecipeCard from "../components/RecipeCard.vue";
+import Sidebar from "../components/Sidebar.vue";
 
 export default {
   name: "InputIngredients",
   components: {
     RecipeCard,
+    Sidebar,
   },
   data() {
     return {
-      ingredients: "", // Text input for ingredients
-      results: [], // Array of recipe results (to be filled by API call or dummy data)
-      recentSearches: ["Siomay Bandung", "Sop Ikan", "Nasi Goreng"], // Recent searches
-      carbonStats: 25, // Example carbon stats
+      ingredients: "",
+      results: [],
+      recentSearches: ["Siomay Bandung", "Sop Ikan", "Nasi Goreng"],
+      carbonStats: 25,
     };
   },
   methods: {
-    // Simulate fetching recommendations
     fetchRecommendations() {
       this.results = [
         {
@@ -113,17 +115,15 @@ export default {
     },
     handleScanClick() {
       this.$router.push("/scan-ingredients");
-    }
+    },
   },
   created() {
-    // Simulate fetching data when the page is created
     this.fetchRecommendations();
   },
 };
 </script>
 
 <style scoped>
-/* Layout */
 .input-ingredients {
   display: flex;
   height: 100vh;
@@ -131,66 +131,27 @@ export default {
   background-color: #f8f8f8;
 }
 
-.logo {
-  font-family: "Georgia", serif;
-  font-size: 1.6rem;
-  margin-bottom: 2rem;
-}
+/* Sidebar handled separately */
 
-.menu ul {
-  list-style: none;
-  padding: 0;
-}
-
-.menu li {
-  margin: 1rem 0;
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.logout-btn {
-  background: linear-gradient(to bottom, #235f3a, #73b06f);
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border-radius: 25px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* Main Content */
 .main-content {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
-  width: 75%; /* Adjust width for the main content */
   display: flex;
   flex-direction: column;
   margin-left: 270px;
 }
 
-.input-title {
-  font-size: 1.6rem;
+/* Header */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1.5rem;
 }
 
-.input-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.ingredients-input {
-  width: 98%;
-  padding: 1rem;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
+.input-title {
+  font-size: 1.6rem;
 }
 
 .scan-btn {
@@ -203,18 +164,44 @@ export default {
   font-size: 1rem;
 }
 
-/* Header Section for h2 and scan button */
-.header-section {
+/* INPUT SECTION */
+.input-section {
+  width: 100%;
+  padding: 1.5rem;
+  margin-inline: auto;     /* Tengah secara horizontal */
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   display: flex;
-  align-items: center; /* Align items vertically */
-  justify-content: space-between; /* Space between h2 and button */
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  box-sizing: border-box;  /* Pastikan padding masuk dalam total width */
 }
 
-.header-section .input-title {
-  margin-right: 20px; /* Space between h2 and button */
+.ingredients-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  resize: vertical;
 }
 
-/* Combined Section (3:1 Ratio for Recommendations and Right Section) */
+.submit-btn {
+  align-self: center;
+  background: linear-gradient(to bottom, #235f3a, #73b06f);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+
+}
+
+/* Combined Section */
 .combined-section {
   display: flex;
   gap: 1.5rem;
@@ -234,11 +221,10 @@ export default {
 
 .recipe-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* Adjust size of cards */
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1.5rem;
 }
 
-/* Right Section (1 Part) - Card for Recent Search & Statistics */
 .right-section {
   flex: 1;
   display: flex;
@@ -255,11 +241,12 @@ export default {
 }
 
 .card1 {
-  background-color:#2e7d32;
+  background-color: #2e7d32;
   padding: 1.5rem;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   flex: 1;
+  color: white;
 }
 
 .recent-search h4 {
@@ -282,26 +269,18 @@ export default {
   font-size: 0.9rem;
 }
 
-.statistics {
-  margin-top: 1rem;
-  color: white;
-  
+.statistics h4 {
+  margin-bottom: 0.5rem;
 }
 
 .statistics div {
   font-size: 1rem;
   font-weight: bold;
-  color: #2e7d32;
 }
 
-.submit-btn {
-   background: linear-gradient(to bottom, #235f3a, #73b06f);
-  color: white;
-  border: none ;
-  padding: 0.8rem 1.5rem;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 1rem;
+@media (max-width: 600px) {
+  .input-section {
+    padding: 1rem;
+  }
 }
-
 </style>
