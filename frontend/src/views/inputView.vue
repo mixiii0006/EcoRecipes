@@ -1,17 +1,6 @@
 <template>
   <div class="input-ingredients">
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-      <h1 class="logo">EcoRecipes</h1>
-      <nav class="menu">
-        <ul>
-          <li><i class="icon">🏠</i> Dashboard</li>
-          <li><i class="icon">🔍</i> Search</li>
-          <li><i class="icon">📋</i> Recipes</li>
-        </ul>
-      </nav>
-      <button class="logout-btn"><i>⬅</i> Logout</button>
-    </aside>
+   <Sidebar />
 
     <!-- Main Content Area -->
     <main class="main-content">
@@ -142,16 +131,6 @@ export default {
   background-color: #f8f8f8;
 }
 
-.sidebar {
-  background-color: #ffffff;
-  border-right: 2px solid #e0e0e0;
-  width: 220px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
 .logo {
   font-family: "Georgia", serif;
   font-size: 1.6rem;
@@ -190,6 +169,7 @@ export default {
   width: 75%; /* Adjust width for the main content */
   display: flex;
   flex-direction: column;
+  margin-left: 270px;
 }
 
 .input-title {

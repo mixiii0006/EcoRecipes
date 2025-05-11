@@ -1,13 +1,10 @@
 <template>
   <div class="app">
     <!-- Navbar -->
-    <Navbar />
     
     <!-- Main Content -->
-    <router-view />
-    
-    <!-- Footer -->
-    <Footer />
+    <router-view /> 
+
   </div>
 </template>
 

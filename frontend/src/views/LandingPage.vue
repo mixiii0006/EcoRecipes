@@ -1,7 +1,7 @@
 <template>
   <div class="landing-page">
     <!-- Navbar Component -->
-    <navbar />
+    <Navbar/>
 
     <section class="hero">
       <div class="hero-text">
@@ -166,8 +166,12 @@
 
 
 <script>
+import Navbar from '../components/navbar.vue'; 
 export default {
   name: "LandingPage",
+  components: {
+    Navbar
+  },
   data() {
     return {
       foodItems: [
@@ -201,6 +205,7 @@ export default {
   display: flex;
   flex-direction: column;
 }
+
 
 .hero {
   flex: 1;

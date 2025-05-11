@@ -1,15 +1,6 @@
 <template>
   <div class="home-container">
-    <!-- Sidebar Kiri -->
-    <aside class="sidebar">
-      <h1 class="logo">EcoRecipes</h1>
-      <nav class="menu">
-        <router-link to="/home" class="menu-item">Home</router-link>
-        <router-link to="/search" class="menu-item">Search</router-link>
-        <router-link to="/recipes" class="menu-item">Recipes</router-link>
-        <a href="#" @click.prevent="handleLogout" class="menu-item logout">Logout</a>
-      </nav>
-    </aside>
+    <Sidebar />
 
     <!-- Konten Utama -->
     <main class="main-section">
@@ -20,7 +11,6 @@
             <input type="text" placeholder="Search the menu" class="search-input" />
             <button class="action-btn" @click="handleInputClick">Input</button>
             <button class="action-btn" @click="handleScanClick">Scan</button>
-            
           </header>
 
           <!-- Hero -->
@@ -48,9 +38,10 @@
 
         <!-- Sidebar Kanan -->
         <aside class="right-sidebar">
-          <div class="user-box">
-              <span class="username">{{ username }}</span>
-            </div>
+          <router-link to="/profile" class="user-box">
+            <span class="username">{{ username }}</span>
+          </router-link>
+
           <!-- Grafik Pie -->
           <div class="nutrition-card">
             <canvas id="nutritionChart"></canvas>
@@ -73,47 +64,49 @@
 </template>
 
 <script>
-import Chart from 'chart.js/auto';
+import Chart from "chart.js/auto";
 
 export default {
-  name: 'HomeView',
+  name: "HomeView",
   data() {
     return {
-      username: ''
+      username: "",
     };
   },
   created() {
-    this.username = localStorage.getItem('username') || '';
+    this.username = localStorage.getItem("username") || "";
   },
   mounted() {
     this.renderPieChart();
   },
   methods: {
     handleLogout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      this.$router.push('/');
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      this.$router.push("/");
     },
     renderPieChart() {
-      const ctx = document.getElementById('nutritionChart');
+      const ctx = document.getElementById("nutritionChart");
       new Chart(ctx, {
-        type: 'pie',
+        type: "pie",
         data: {
-          labels: ['Protein', 'Carbs', 'Fat', 'Fiber'],
-          datasets: [{
-            label: 'Nutrient Composition',
-            data: [30, 40, 20, 10],
-            backgroundColor: ['#42A5F5', '#66BB6A', '#FFA726', '#AB47BC']
-          }]
+          labels: ["Protein", "Carbs", "Fat", "Fiber"],
+          datasets: [
+            {
+              label: "Nutrient Composition",
+              data: [30, 40, 20, 10],
+              backgroundColor: ["#42A5F5", "#66BB6A", "#FFA726", "#AB47BC"],
+            },
+          ],
         },
         options: {
           responsive: true,
           plugins: {
             legend: {
-              position: 'bottom'
-            }
-          }
-        }
+              position: "bottom",
+            },
+          },
+        },
       });
     },
     handleInputClick() {
@@ -126,7 +119,7 @@ export default {
       // You can implement scan functionality here if needed
       this.$router.push("/scan-ingredients");
     },
-  }
+  },
 };
 </script>
 
@@ -134,20 +127,11 @@ export default {
 .home-container {
   display: flex;
   height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f4f4f4;
 }
 
 /* Sidebar Kiri */
-.sidebar {
-  width: 220px;
-  background-color: #2e7d32;
-  color: white;
-  padding: 1.5rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .logo {
   font-size: 1.8rem;
   font-weight: bold;
@@ -185,6 +169,7 @@ export default {
   padding: 2rem;
   background-color: #f4f4f4;
   overflow-y: auto;
+  margin-left: 270px;
 }
 
 .main-layout {
@@ -223,7 +208,7 @@ export default {
   background-color: white;
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Hero Section */
@@ -259,7 +244,7 @@ export default {
   border-radius: 12px;
   padding: 1rem;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .recipe-card img {
@@ -279,7 +264,7 @@ export default {
   background: white;
   border-radius: 12px;
   padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
@@ -287,7 +272,7 @@ export default {
   background: white;
   border-radius: 12px;
   padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .top-users h4 {
@@ -306,4 +291,15 @@ export default {
   width: 32px;
   height: 32px;
 }
+
+.user-box {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  font-weight: bold;
+}
+.user-box:hover {
+  text-decoration: underline;
+}
+
 </style>

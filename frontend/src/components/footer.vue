@@ -15,7 +15,8 @@ export default {
   background-color: #2e7d32;
   color: white;
   padding: 1rem 2rem;
-  text-align: center;
+  padding-right: 40px;
+  text-align: right;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 0.9rem;
 }

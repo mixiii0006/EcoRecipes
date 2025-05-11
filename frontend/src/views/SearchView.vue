@@ -1,29 +1,12 @@
 <template>
   <div class="eco-recipes">
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-      <h1 class="logo">EcoRecipes</h1>
-      <nav class="menu">
-        <ul>
-          <li><i class="icon">🏠</i> Dashboard</li>
-          <li><i class="icon">🔍</i> Search</li>
-          <li><i class="icon">📋</i> Recipes</li>
-        </ul>
-      </nav>
-      <button class="logout-btn"><i>⬅</i> Logout</button>
-    </aside>
+    <Sidebar />
 
     <!-- Main Content Area -->
     <main class="main-content">
       <!-- Top Search Bar & Buttons -->
       <div class="top-bar">
-        <input
-          type="text"
-          v-model="query"
-          @input="handleSearch"
-          placeholder="search the menu"
-          class="search-input"
-        />
+        <input type="text" v-model="query" @input="handleSearch" placeholder="search the menu" class="search-input" />
         <div class="top-buttons">
           <!-- Button Input -->
           <button class="action-btn" @click="handleInputClick">📤 Input</button>
@@ -60,21 +43,14 @@
       <!-- Recipe Recommendations -->
       <section class="recommendations">
         <h3>Recommendations</h3>
-        <div class="recipe-grid">
-          <RecipeCard
-            v-for="item in results"
-            :key="item.id"
-            :image="item.image"
-            :name="item.name"
-            :duration="item.duration"
-            :carbon="item.carbon"
-            :rating="item.rating"
-          />
+        <div class="recipe-grid" v-if="results.length > 0">
+          <RecipeCard v-for="item in results" :key="item.id" :image="item.image" :name="item.name" :duration="item.duration" :carbon="item.carbon" :rating="item.rating" />
         </div>
-        <p v-if="searched && results.length === 0" class="no-results">No results found.</p>
+        <p v-else class="no-results">No results found.</p>
       </section>
     </main>
   </div>
+  <Footer />
 </template>
 
 <script>
@@ -105,9 +81,7 @@ export default {
         return;
       }
       try {
-        const response = await axios.get(
-          `http://localhost:3000/api/search?q=${encodeURIComponent(this.query)}`
-        );
+        const response = await axios.get(`http://localhost:3000/api/search?q=${encodeURIComponent(this.query)}`);
         this.results = response.data;
         this.searched = true;
       } catch (error) {
@@ -140,15 +114,7 @@ export default {
   font-family: "Poppins", sans-serif;
   background-color: #f8f8f8;
 }
-.sidebar {
-  background-color: #ffffff;
-  border-right: 2px solid #e0e0e0;
-  width: 220px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
+
 .logo {
   font-family: "Georgia", serif;
   font-size: 1.6rem;
@@ -181,6 +147,7 @@ export default {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+  margin-left: 270px;
 }
 .top-bar {
   display: flex;
@@ -196,7 +163,7 @@ export default {
 .top-buttons {
   display: flex;
   gap: 1rem;
-} 
+}
 
 .action-btn {
   background: linear-gradient(to bottom, #235f3a, #73b06f);
@@ -248,10 +215,43 @@ export default {
 }
 
 /* Recipe Cards */
-.recommendations h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+.recommendations {
+  margin-top: 2rem;
 }
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.recipe-card {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.recipe-img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.recipe-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+}
+
+.recipe-info {
+  font-size: 0.9rem;
+  color: #555;
+}
+
 .recipe-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
