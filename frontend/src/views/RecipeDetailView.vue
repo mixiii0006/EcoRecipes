@@ -91,18 +91,24 @@ export default {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  margin-left: 270px;
+  margin-left: 300px;
 }
 
 /* Header Title */
 .recipe-header {
+  height: 70px;
+  padding-left: 1rem;
   background: linear-gradient(to right, #235f3a, #73b06f);
   color: white;
   border-radius: 12px;
-  padding: 1rem 2rem;
   margin-bottom: 2rem;
-  font-size: 1.6rem;
-  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.recipe-header h2 {
+  margin: 0;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 /* Recipe Layout */

@@ -11,7 +11,13 @@
 
       <!-- Ingredients Scan Section -->
       <div class="scan-section">
-        <textarea v-model="ingredients" placeholder="Scan your ingredients here" rows="5" class="ingredients-scan"></textarea>
+        <div class="image-grid">
+          <div v-for="(image, index) in images" :key="index" class="image-card" @click="triggerCamera(index)">
+            <input type="file" accept="image/*" capture="environment" class="hidden-input" :ref="'input' + index" @change="handleImage(index, $event)" />
+            <img v-if="image" :src="image" alt="Scanned" />
+            <img v-else src="https://via.placeholder.com/150" alt="Add Image Icon" class="placeholder-icon" />
+          </div>
+        </div>
         <button class="submit-btn">Submit</button>
       </div>
 
@@ -22,7 +28,9 @@
           <section class="recommendations">
             <h3>Recommendations</h3>
             <div class="recipe-grid">
-              <RecipeCard v-for="item in results" :key="item.id" :image="item.image" :name="item.name" :duration="item.duration" :carbon="item.carbon" :rating="item.rating" />
+              <router-link v-for="item in results" :key="item.id" :to="{ name: 'RecipeView', params: { id: item.id } }" class="card-link">
+                <RecipeCard :image="item.image" :name="item.name" :duration="item.duration" :carbon="item.carbon" :rating="item.rating" />
+              </router-link>
             </div>
           </section>
         </div>
@@ -64,7 +72,7 @@ export default {
   name: "ScanIngredients",
   components: {
     RecipeCard,
-    Sidebar
+    Sidebar,
   },
   data() {
     return {
@@ -72,7 +80,20 @@ export default {
       results: [], // Array of recipe results (to be filled by API call or dummy data)
       recentSearches: ["Siomay Bandung", "Sop Ikan", "Nasi Goreng"], // Recent searches
       carbonStats: 25, // Example carbon stats
+
+      images: [null, null, null, null], // 4 slot
     };
+  },
+  methods: {
+    triggerCamera(index) {
+      this.$refs[`input${index}`][0].click();
+    },
+    handleImage(index, event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.images[index] = URL.createObjectURL(file);
+      }
+    },
   },
   methods: {
     // Simulate fetching recommendations
@@ -180,6 +201,42 @@ export default {
   resize: vertical;
 }
 
+.image-grid {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.image-card {
+  width: 120px;
+  height: 150px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: border 0.2s ease;
+}
+
+.image-card:hover {
+  border-color: #73b06f;
+}
+
+.image-card img {
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+}
+
+.hidden-input {
+  display: none;
+}
+
 .submit-btn {
   align-self: center;
   background: linear-gradient(to right, #235f3a, #73b06f);
@@ -254,7 +311,7 @@ export default {
   font-weight: bold;
   margin-top: 1rem;
   margin-bottom: 1rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 .recent-search-list {
@@ -274,7 +331,7 @@ export default {
   border-style: none;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 1rem;
 }
 
