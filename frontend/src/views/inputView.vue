@@ -12,12 +12,7 @@
 
       <!-- Ingredients Input Section -->
       <div class="input-section">
-        <textarea
-          v-model="ingredients"
-          placeholder="ex : I have one and a half kilos of chicken, ... "
-          rows="5"
-          class="ingredients-input"
-        ></textarea>
+        <textarea v-model="ingredients" placeholder="ex : I have one and a half kilos of chicken, ... " rows="5" class="ingredients-input"></textarea>
         <button class="submit-btn">Submit</button>
       </div>
 
@@ -28,15 +23,7 @@
           <section class="recommendations">
             <h3>Recommendations</h3>
             <div class="recipe-grid">
-              <RecipeCard
-                v-for="item in results"
-                :key="item.id"
-                :image="item.image"
-                :name="item.name"
-                :duration="item.duration"
-                :carbon="item.carbon"
-                :rating="item.rating"
-              />
+              <RecipeCard v-for="item in results" :key="item.id" :image="item.image" :name="item.name" :duration="item.duration" :carbon="item.carbon" :rating="item.rating" />
             </div>
           </section>
         </div>
@@ -45,18 +32,22 @@
         <section class="right-section">
           <div class="card">
             <section class="recent-search">
-              <h4>Recent Search</h4>
+              <h3>Recent Search</h3>
               <div class="recent-search-list">
-                <button v-for="search in recentSearches" :key="search" class="recent-search-item">
-                  {{ search }}
-                </button>
+                <div v-for="search in recentSearches" :key="search" class="recent-search-item">
+                  <span>{{ search }}</span>
+                  <button class="delete-btn" @click="deleteSearch(search)">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <!-- Gunakan Font Awesome -->
+                  </button>
+                </div>
               </div>
             </section>
           </div>
 
           <div class="card1">
             <section class="statistics">
-              <h4>Statistic</h4>
+              <h3>Statistic</h3>
               <div>Jejak Karbon: {{ carbonStats }}%</div>
             </section>
           </div>
@@ -155,7 +146,7 @@ export default {
 }
 
 .scan-btn {
-  background: linear-gradient(to bottom, #235f3a, #73b06f);
+  background: linear-gradient(to right, #235f3a, #73b06f);
   color: white;
   border: none;
   padding: 0.8rem 1.5rem;
@@ -168,7 +159,7 @@ export default {
 .input-section {
   width: 100%;
   padding: 1.5rem;
-  margin-inline: auto;     /* Tengah secara horizontal */
+  margin-inline: auto; /* Tengah secara horizontal */
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
@@ -176,7 +167,7 @@ export default {
   flex-direction: column;
   gap: 1rem;
   margin-bottom: 2rem;
-  box-sizing: border-box;  /* Pastikan padding masuk dalam total width */
+  box-sizing: border-box; /* Pastikan padding masuk dalam total width */
 }
 
 .ingredients-input {
@@ -191,14 +182,13 @@ export default {
 
 .submit-btn {
   align-self: center;
-  background: linear-gradient(to bottom, #235f3a, #73b06f);
+  background: linear-gradient(to right, #235f3a, #73b06f);
   color: white;
   border: none;
   padding: 0.8rem 1.5rem;
   border-radius: 12px;
   cursor: pointer;
   font-size: 1rem;
-
 }
 
 /* Combined Section */
@@ -214,15 +204,24 @@ export default {
 
 .recommendations {
   background-color: #fff;
-  padding: 1rem;
+  padding: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.recommendations h3 {
+  padding-left: 1rem;
+}
+
 .recipe-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
 }
 
 .right-section {
@@ -234,47 +233,71 @@ export default {
 
 .card {
   background-color: #ffffff;
-  padding: 1.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   flex: 1;
 }
 
 .card1 {
-  background-color: #2e7d32;
-  padding: 1.5rem;
+  background: linear-gradient(to bottom, #235f3a, #73b06f);
+  padding: 1rem;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   flex: 1;
   color: white;
 }
 
-.recent-search h4 {
-  font-size: 1.2rem;
+.recent-search h3 {
+  font-weight: bold;
+  margin-top: 1rem;
   margin-bottom: 1rem;
+  font-family: 'Poppins', sans-serif;
 }
 
 .recent-search-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 1rem;
 }
 
 .recent-search-item {
-  background: linear-gradient(to bottom, #235f3a, #73b06f);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
+  padding: 0px;
+  color: black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f4f4f4;
+  padding: 0.75rem 1rem;
+  border-style: none;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
 }
 
-.statistics h4 {
+.delete-btn {
+  background: none;
+  border: none;
+  color: #2e7d32;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  color: #1b5e20;
+}
+
+.statistics h3 {
+  font-weight: ;
+  margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
 .statistics div {
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: bold;
 }
 
