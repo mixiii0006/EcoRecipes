@@ -6,6 +6,8 @@ import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
 import SearchView from '../views/SearchView.vue';
 import ProfileView from '../views/profileView.vue';
+import InputIngredients from "../views/InputView.vue";
+import ScanIngredients from "../views/ScanView.vue";
 
 const routes = [
   {
@@ -37,7 +39,17 @@ const routes = [
     path: '/profile',
     name: 'Profile',
     component: ProfileView
-  }
+  },
+    {
+      path: "/input-ingredients",
+      name: "InputIngredients",
+      component: InputIngredients,
+    },
+    {
+      path: "/scan-ingredients",
+      name: "ScanIngredients",
+      component: ScanIngredients,
+    },
 ];
 
 const router = createRouter({

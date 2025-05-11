@@ -22,6 +22,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'Navbar',
   data() {
@@ -57,14 +58,17 @@ export default {
 
 <style scoped>
 .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   background-color: #2e7d32;
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  position: sticky;
-  top: 0;
   width: 100%;
   z-index: 1000;
 }
+
 
 .nav-container {
   display: flex;
