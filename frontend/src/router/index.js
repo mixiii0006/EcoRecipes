@@ -8,6 +8,8 @@ import SearchView from '../views/SearchView.vue';
 import ProfileView from '../views/profileView.vue';
 import InputIngredients from "../views/InputView.vue";
 import ScanIngredients from "../views/ScanView.vue";
+import RecipeView from "../views/RecipeDetailView.vue";
+
 
 const routes = [
   {
@@ -49,6 +51,11 @@ const routes = [
       path: "/scan-ingredients",
       name: "ScanIngredients",
       component: ScanIngredients,
+    },
+    {
+      path: "/recipe/:id",
+      name: "RecipeView",
+      component: RecipeView,
     },
 ];
 

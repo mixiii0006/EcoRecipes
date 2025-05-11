@@ -291,7 +291,7 @@ export default {
 }
 
 .statistics h3 {
-  font-weight: ;
+  font-weight: bold;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }

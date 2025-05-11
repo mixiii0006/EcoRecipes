@@ -23,7 +23,9 @@
           <section class="recommendations">
             <h3>Recommendations</h3>
             <div class="recipe-grid">
-              <RecipeCard v-for="item in results" :key="item.id" :image="item.image" :name="item.name" :duration="item.duration" :carbon="item.carbon" :rating="item.rating" />
+              <router-link v-for="item in results" :key="item.id" :to="{ name: 'RecipeView', params: { id: item.id } }" class="card-link">
+                <RecipeCard :image="item.image" :name="item.name" :duration="item.duration" :carbon="item.carbon" :rating="item.rating" />
+              </router-link>
             </div>
           </section>
         </div>
@@ -254,7 +256,7 @@ export default {
   font-weight: bold;
   margin-top: 1rem;
   margin-bottom: 1rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 .recent-search-list {
@@ -274,7 +276,7 @@ export default {
   border-style: none;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 1rem;
 }
 
@@ -291,7 +293,7 @@ export default {
 }
 
 .statistics h3 {
-  font-weight: ;
+  font-weight: bold;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
