@@ -43,8 +43,8 @@ export default {
 
 .form-input {
   padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
   font-size: 1rem;
   transition: border-color 0.3s ease;
 }

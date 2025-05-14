@@ -1,7 +1,7 @@
 <template>
   <div class="landing-page">
     <!-- Navbar Component -->
-    <Navbar/>
+    <Navbar />
 
     <section class="hero">
       <div class="hero-text">
@@ -10,17 +10,23 @@
           Masukkan bahan makanan yang kamu miliki, dan temukan resep rendah
           emisi yang membantu melindungi bumi.
         </p>
-        <button class="btn btn-primary">Input Here</button>
+        <button class="btn btn-primary" @click="goToLogin">Input Here</button>
       </div>
     </section>
 
     <section class="carousel-section">
-      <div class="carousel">
-        <div class="carousel-item" v-for="item in foodItems" :key="item.name">
-          <img :src="item.image" :alt="item.name" />
-          <div class="item-info">
-            <h3>{{ item.name }}</h3>
-            <p>1kg = {{ item.co2 }} CO<sub>2</sub>e</p>
+      <div class="carousel" ref="carouselRef">
+        <div class="carousel-track" ref="trackRef">
+          <div
+            class="carousel-item"
+            v-for="(item, index) in duplicatedItems"
+            :key="index"
+          >
+            <img :src="item.image" :alt="item.name" />
+            <div class="item-info">
+              <h3>{{ item.name }}</h3>
+              <p>1kg = {{ item.co2 }} CO<sub>2</sub>e</p>
+            </div>
           </div>
         </div>
       </div>
@@ -103,74 +109,82 @@
         Inilah alasan kamu bisa percaya pada kami.
       </p>
       <div class="choose-us-card-container">
-        <div class="choose-us-card">
-          <img
-            src="/images/icon-fast.png"
-            alt="Cepat dan Mudah"
-            class="choose-us-icon"
-          />
-          <h3 class="choose-us-heading">Cepat dan Mudah</h3>
-          <p class="choose-us-desc">
-            Cukup masukkan bahan<br />
-            → Dapatkan resep<br />
-            → Lihat estimasi emisi
-          </p>
+        <div class="top-row">
+          <div class="choose-us-card">
+            <img
+              src="/images/icon-fast.png"
+              alt="Cepat dan Mudah"
+              class="choose-us-icon"
+            />
+            <h3 class="choose-us-heading">Cepat dan Mudah</h3>
+            <p class="choose-us-desc">
+              Cukup masukkan bahan<br />
+              ↓ <br>Dapatkan resep<br />
+              ↓ <br>Lihat estimasi emisi
+            </p>
+          </div>
+          <div class="choose-us-card">
+            <img
+              src="/images/icon-recommend.png"
+              alt="Rekomendatif"
+              class="choose-us-icon"
+            />
+            <h3 class="choose-us-heading">Rekomendatif</h3>
+            <p class="choose-us-desc">
+              Dapatkan alternatif bahan makanan dan resep yang lebih rendah
+              emisi.
+            </p>
+          </div>
+          <div class="choose-us-card">
+            <img
+              src="/images/icon-eco.png"
+              alt="Ramah Lingkungan"
+              class="choose-us-icon"
+            />
+            <h3 class="choose-us-heading">Ramah Lingkungan</h3>
+            <p class="choose-us-desc">
+              Bantu kurangi emisi karbon dari dapurmu.
+            </p>
+          </div>
         </div>
-        <div class="choose-us-card">
-          <img
-            src="/images/icon-recommend.png"
-            alt="Rekomendatif"
-            class="choose-us-icon"
-          />
-          <h3 class="choose-us-heading">Rekomendatif</h3>
-          <p class="choose-us-desc">
-            Dapatkan alternatif bahan makanan dan resep yang lebih rendah emisi.
-          </p>
-        </div>
-        <div class="choose-us-card">
-          <img
-            src="/images/icon-eco.png"
-            alt="Ramah Lingkungan"
-            class="choose-us-icon"
-          />
-          <h3 class="choose-us-heading">Ramah Lingkungan</h3>
-          <p class="choose-us-desc">Bantu kurangi emisi karbon dari dapurmu.</p>
-        </div>
-        <div class="choose-us-card">
-          <img
-            src="/images/icon-data.png"
-            alt="Berdasarkan Data"
-            class="choose-us-icon"
-          />
-          <h3 class="choose-us-heading">Berdasarkan Data</h3>
-          <p class="choose-us-desc">
-            Sistem kami menggunakan data terpercaya tentang emisi karbon dari
-            makanan.
-          </p>
-        </div>
-        <div class="choose-us-card">
-          <img
-            src="/images/icon-ml.png"
-            alt="Didukung Machine Learning"
-            class="choose-us-icon"
-          />
-          <h3 class="choose-us-heading">Didukung Machine Learning</h3>
-          <p class="choose-us-desc">
-            Rekomendasi resep berdasarkan data dan pola terbaik.
-          </p>
+        <div class="bottom-row">
+          <div class="choose-us-card">
+            <img
+              src="/images/icon-data.png"
+              alt="Berdasarkan Data"
+              class="choose-us-icon"
+            />
+            <h3 class="choose-us-heading">Berdasarkan Data</h3>
+            <p class="choose-us-desc">
+              Sistem kami menggunakan data terpercaya tentang emisi karbon dari
+              makanan.
+            </p>
+          </div>
+          <div class="choose-us-card">
+            <img
+              src="/images/icon-ml.png"
+              alt="Didukung Machine Learning"
+              class="choose-us-icon"
+            />
+            <h3 class="choose-us-heading">Didukung Machine Learning</h3>
+            <p class="choose-us-desc">
+              Rekomendasi resep berdasarkan data dan pola terbaik.
+            </p>
+          </div>
         </div>
       </div>
     </section>
+
+    <Footer />
   </div>
 </template>
 
-
 <script>
-import Navbar from '../components/navbar.vue'; 
+import Navbar from "../components/navbar.vue";
 export default {
   name: "LandingPage",
   components: {
-    Navbar
+    Navbar,
   },
   data() {
     return {
@@ -192,7 +206,47 @@ export default {
         { name: "Apel", image: "/images/apple.png", co2: "0,4 kg" },
         { name: "Pisang", image: "/images/banana.png", co2: "0,5 kg" },
       ],
+      scrollInterval: null,
     };
+  },
+  computed: {
+    allFoodItems() {
+      return [...this.foodItems, ...this.moreFoodItems];
+    },
+    duplicatedItems() {
+      // Gandakan untuk efek looping
+      return [...this.allFoodItems, ...this.allFoodItems];
+    },
+  },
+  mounted() {
+    this.startCarouselAutoscroll();
+  },
+  beforeUnmount() {
+    clearInterval(this.scrollInterval);
+  },
+  methods: {
+    goToLogin() {
+      this.$router.push('/login')
+    },
+    startCarouselAutoscroll() {
+      const carousel = this.$refs.carouselRef;
+      const track = this.$refs.trackRef;
+
+      const scrollSpeed = 1;
+      const intervalTime = 16;
+      const halfScroll = track.scrollWidth / 2;
+
+      this.scrollInterval = setInterval(() => {
+        if (!carousel || !track) return;
+
+        if (carousel.scrollLeft >= halfScroll) {
+          // Langsung reset tanpa animasi
+          carousel.scrollLeft = 0;
+        } else {
+          carousel.scrollLeft += scrollSpeed;
+        }
+      }, intervalTime);
+    },
   },
 };
 </script>
@@ -200,25 +254,30 @@ export default {
 <style scoped>
 .landing-page {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #2e7d32;
+  color: #235f3a;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #f9f9f9;
 }
 
-
 .hero {
-  flex: 1;
+  height: calc(
+    100vh - 70px
+  ); /* Gunakan calc untuk menghitung tinggi penuh dikurangi tinggi navbar */
   display: flex;
   align-items: center;
   padding: 0 4rem;
-  background: url("/images/landing-bg.jpg") no-repeat center center/cover;
-  color: #f5f5dc;
-  min-height: 700px;
+  background: url("/images/landing-bg.jpg") no-repeat center center;
+  background-size: cover;
+  color: #f9f9f9;
+  margin-top: 70px; /* Sesuaikan dengan tinggi navbar yang fixed */
+  box-sizing: border-box;
 }
 
 .hero-text {
   max-width: 600px;
+  margin-left: 80px;
 }
 
 .hero-text h1 {
@@ -233,8 +292,8 @@ export default {
 }
 
 .btn-primary {
-  background-color: #f5f5dc;
-  color: #2e7d32;
+  background-color: #f9f9f9;
+  color: #235f3a;
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 20px;
@@ -248,27 +307,38 @@ export default {
 }
 
 .carousel-section {
-  background: #f5f5dc;
-  padding: 1rem 2rem;
-  color: #2e7d32;
+  padding: 2rem 0;
+  color: #235f3a;
+  overflow: hidden;
 }
 
 .carousel {
   display: flex;
-  overflow-x: auto;
+  overflow-x: hidden;
+  scroll-behavior: auto;
   gap: 1rem;
   padding-bottom: 1rem;
-  scroll-behavior: smooth;
+  scrollbar-width: none;
+  max-width: 100%; /* pastikan ini ada */
+  white-space: nowrap;
+  position: relative;
+}
+
+.carousel::-webkit-scrollbar {
+  display: none;
 }
 
 .carousel-item {
   background: white;
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(46, 125, 50, 0.2);
-  min-width: 140px;
+  min-width: 150px;
+  min-height: 100px;
   text-align: center;
   padding: 1rem;
   flex-shrink: 0;
+  flex: 0 0 auto;
+  margin-right: 1rem;
 }
 
 .carousel-item img {
@@ -276,70 +346,84 @@ export default {
   margin-bottom: 0.5rem;
 }
 
+.carousel-track {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .item-info h3 {
   margin: 0.5rem 0 0.25rem 0;
   font-weight: 700;
-  color: #2e7d32;
+  color: #235f3a;
 }
 
 .item-info p {
   margin: 0;
   font-weight: 600;
-  color: #2e7d32;
+  color: #235f3a;
 }
 
 .carbon-footprint {
-  padding: 2rem;
-  text-align: left;
-  font-weight: 700;
+  padding: 0 4rem;
+  text-align: center;
   font-size: 1.25rem;
-  color: #2e7d32;
+  color: #235f3a;
 }
 
 .carbon-content {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-top: 1rem;
-  gap: 2rem;
   flex-wrap: wrap;
+  justify-content:space-around;
+  align-items: flex-start;
+  margin-top: 2.5rem;
+  gap: 2rem;
 }
 
 .carbon-text {
   max-width: 600px;
   text-align: left;
-  color: #2e7d32;
+  color: #235f3a;
 }
 
 .carbon-text h3 {
+  font-size: 1.25rem;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
 }
 
 .carbon-text p {
+  font-size: 1rem;
   margin-bottom: 1rem;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .carbon-chart img {
-  max-width: 400px;
+  max-width: 450px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(46, 125, 50, 0.2);
+  align-self: center;
 }
 
 .carbon-note {
   margin-top: 1rem;
-  background: #2e7d32;
-  color: #f5f5dc;
-  padding: 1rem;
-  border-radius: 8px;
-  font-weight: 600;
+  background: #235f3a;
+  color: #f9f9f9;
+  padding: 0.5rem;
+  border-radius: 10px;
+  font-weight: 500;
   font-size: 1rem;
+  width: 90%;
+  justify-self: center;
 }
 
 .how-it-works {
   text-align: center;
-  background-color: #f5f5dc;
   padding: 2rem;
 }
 
@@ -349,29 +433,27 @@ export default {
   flex-wrap: wrap;
   gap: 1.5rem;
   margin-top: 2rem;
+  padding: 2rem 0;
+  align-items: s;
 }
 
 .step-card {
   background-color: #f9f9f9;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   padding: 1.5rem;
-  width: 280px;
+  width: 250px;
   text-align: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .step-card:hover {
   transform: translateY(-5px);
 }
 
-.step-card.active {
-  background-color: #2e7d32;
-  color: #fff;
-}
-
 .step-card img {
   width: 60px;
+  height: 60px;
   margin-bottom: 1rem;
 }
 
@@ -385,22 +467,29 @@ export default {
   line-height: 1.4;
 }
 
+.step-card.active {
+  background-color: #235f3a;
+  color: #fff;
+  transform: scale(1.15);
+  box-shadow: 0 6px 20px rgba(46, 125, 50, 0.3);
+  z-index: 1;
+}
+
 .why-choose-us {
   text-align: center;
   padding: 3rem 1rem;
-  background-color: #f5f5dc;
 }
 
 .choose-us-card-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
+  margin: 40px;
 }
 
 .choose-us-card {
-  background-color: #2e7d32;
+  background-color: #235f3a;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
@@ -411,6 +500,25 @@ export default {
 
 .choose-us-card:hover {
   transform: translateY(-5px);
+}
+
+.top-row,
+.bottom-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.top-row {
+  margin-bottom: 40px;
+  z-index: 1;
+}
+
+.bottom-row {
+  z-index: 0;
+  position: relative;
 }
 
 .choose-us-icon {
@@ -430,5 +538,143 @@ export default {
   font-size: 0.95rem;
   color: #fff;
   line-height: 1.5;
+}
+
+@media (max-width: 1024px) {
+  .hero-text h1 {
+    font-size: 2.5rem;
+  }
+
+  .carousel-item {
+    min-width: 130px;
+  }
+
+  .step-card,
+  .choose-us-card {
+    width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    display: flex;
+    flex-direction: column;
+    padding: 20rem 2rem;
+    text-align: left;
+  }
+
+  .hero-text {
+    margin: 0;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .hero-text p {
+    font-size: 1rem;
+  }
+
+  .carbon-footprint {
+    padding: 1rem;
+  }
+
+  .carbon-content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .carbon-chart img {
+    max-width: 80%;
+  }
+
+  .how-it-works-card {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .step-card, .choose-us-card {
+    width: 80%;
+  }
+
+  .choose-us-card-container {
+    margin: 20px;
+  }
+
+  .top-row,
+  .bottom-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .bottom-row {
+    max-width: 75%;
+    min-width: 70%;
+  }
+
+  .carousel-item {
+    min-width: 120px;
+  }
+
+  .btn-primary {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    display: flex;
+    flex-direction: column;
+    padding: 15rem 2rem;
+    text-align: left;
+  }
+
+  .hero-text {
+    margin: 0;
+  }
+
+  .hero-text h1 {
+    font-size: 1.75rem;
+  }
+
+  .hero-text p {
+    font-size: 0.95rem;
+  }
+
+  .carbon-text h3 {
+    font-size: 1rem;
+  }
+
+  .carbon-text p {
+    font-size: 0.9rem;
+  }
+
+  .choose-us-heading {
+    font-size: 1rem;
+  }
+
+  .choose-us-desc {
+    font-size: 0.85rem;
+  }
+
+  .btn-primary {
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .step-card.active {
+    transform: scale(1.1);
+  }
+
+  .step-card h3,
+  .choose-us-heading {
+    font-size: 1rem;
+  }
+
+  .step-card p,
+  .choose-us-desc {
+    font-size: 0.85rem;
+  }
 }
 </style>

@@ -1,158 +1,169 @@
 <template>
-  <nav class="navbar">
-    <div class="nav-container">
-      <router-link to="/" class="logo">EcoRecipes</router-link>
+  <header>
+    <nav class="navbar">
+      <div class="navbar-brand">
+        <h1 class="logo-text">EcoRecipes</h1>
+      </div>
 
-      <button class="burger" @click="toggleMenu">
+      <button class="burger" @click="toggleMenu" aria-label="Toggle navigation">
         <span :class="{ open: isMenuOpen }"></span>
         <span :class="{ open: isMenuOpen }"></span>
         <span :class="{ open: isMenuOpen }"></span>
       </button>
 
-      <ul :class="['nav-links', { open: isMenuOpen }]">
-        <li v-if="isAuthenticated"><router-link to="/home">Home</router-link></li>
-        <li v-if="isAuthenticated"><router-link to="/search">Search</router-link></li>
-        <li v-if="!isAuthenticated"><router-link to="/login">Login</router-link></li>
-        <li v-if="!isAuthenticated"><router-link to="/register">Register</router-link></li>
-        <li v-if="isAuthenticated"><router-link to="/profile">Profile</router-link></li>
-        <li v-if="isAuthenticated"><a href="#" @click.prevent="handleLogout">Logout</a></li>
+      <ul class="navbar-actions" :class="{ open: isMenuOpen }">
+        <li>
+          <router-link to="/login" class="btn login-btn">Login</router-link>
+        </li>
+        <li>
+          <router-link to="/register" class="btn register-btn">Register</router-link>
+        </li>
       </ul>
-    </div>
-  </nav>
+    </nav>
+  </header>
 </template>
 
 <script>
-
 export default {
   name: 'Navbar',
   data() {
     return {
-      isAuthenticated: false,
       isMenuOpen: false,
     };
   },
-  created() {
-    this.checkAuth();
-  },
   methods: {
-    checkAuth() {
-      this.isAuthenticated = !!localStorage.getItem('token');
-    },
-    handleLogout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      this.isAuthenticated = false;
-      this.$router.push('/');
-    },
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen;
-    }
+    },
   },
-  watch: {
-    $route() {
-      this.checkAuth();
-    }
-  }
 };
 </script>
 
 <style scoped>
+/* Navbar wrapper */
 .navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background-color: #2e7d32;
+  background: linear-gradient(to right, #235f3a, #73b06f); /* hijau */
   color: white;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  width: 100%;
-  z-index: 1000;
-}
-
-
-.nav-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0.5rem 1rem;
-  flex-wrap: wrap;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 10px 20px; /* Tambahkan padding untuk navbar */
 }
 
-.logo {
-  font-weight: 700;
+/* Brand/Logo */
+.logo-text {
+  margin: 0;
   font-size: 1.5rem;
+  font-weight: bold;
   color: white;
-  text-decoration: none;
-  margin-right: 1rem;
 }
 
-/* Burger menu */
+.navbar-brand {
+  margin-left: 20px;
+}
+
+/* Nav Actions */
+.navbar-actions {
+  display: flex;
+  list-style: none;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  margin-right: 60px;
+  height: 60px; /* Tetapkan tinggi tetap */
+  align-items: center; /* Rata tengah vertikal */
+}
+
+/* Buttons */
+.btn {
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  display: inline-block;
+  transition: all 0.3s ease; /* Tambahkan transisi untuk efek yang lebih halus */
+}
+
+.login-btn, .register-btn {
+  background-color: white;
+  color: #2e7d32;
+  padding: 8px 16px; /* Tetapkan padding awal */
+  font-size: 16px; /* Tetapkan ukuran font awal */
+  position: relative; /* Tambahkan position relative */
+  justify-content: center; /* Rata tengah horizontal */
+  width: 100px; /* Lebar tetap untuk tombol */
+  box-sizing: border-box; /* Pastikan padding tidak mengubah ukuran total */
+}
+
+.login-btn:hover, .register-btn:hover {
+  font-size: 18px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Tambahkan bayangan saat hover */
+  /* Hapus perubahan padding agar ukuran tidak berubah */
+  transform: scale(1.05); /* Efek sedikit membesar tanpa mengubah dimensi navbar */
+}
+
+/* Burger menu default hidden */
 .burger {
   display: none;
   flex-direction: column;
-  justify-content: space-between;
-  height: 18px;
-  width: 25px;
+  gap: 5px;
   background: none;
   border: none;
   cursor: pointer;
 }
 
 .burger span {
+  width: 25px;
   height: 3px;
-  width: 100%;
-  background: white;
-  transition: 0.3s ease;
+  background-color: white;
+  border-radius: 2px;
+  transition: all 0.3s ease;
 }
 
-.nav-links {
-  list-style: none;
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-left: auto;
+.burger span.open:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
 }
-
-.nav-links li a {
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
+.burger span.open:nth-child(2) {
+  opacity: 0;
 }
-
-.nav-links li a:hover {
-  color: #a5d6a7;
+.burger span.open:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .burger {
     display: flex;
+    margin-right: 50px;
   }
 
-  .nav-links {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    background-color: #2e7d32;
-    padding: 1rem;
+  .navbar {
+    padding: 1.5rem;
+  }
+
+  .navbar-actions {
     display: none;
+    flex-direction: column;
+    background-color: #2e7d32;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 100%;
+    padding: 1rem;
   }
 
-  .nav-links.open {
+  .navbar-actions.open {
     display: flex;
   }
 
-  .nav-links li {
-    width: 100%;
+  .navbar-actions li {
     margin: 0.5rem 0;
-  }
-
-  .nav-links li a {
-    display: block;
-    width: 100%;
   }
 }
 </style>
