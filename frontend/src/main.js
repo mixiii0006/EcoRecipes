@@ -13,3 +13,4 @@ app.component('Sidebar', Sidebar);
 app.component('Footer', Footer);
 app.use(router); 
 app.mount('#app'); 
+

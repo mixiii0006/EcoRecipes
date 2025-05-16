@@ -26,7 +26,7 @@
         <!-- Recommendations Section (3 Parts) -->
         <div class="recommendations-wrapper">
           <section class="recommendations">
-            <h3>Recommendations</h3>
+            <h3>Recommendations 1</h3>
             <div class="recipe-grid">
               <router-link v-for="item in results" :key="item.id" :to="{ name: 'RecipeView', params: { id: item.id } }" class="card-link">
                 <RecipeCard :image="item.image" :name="item.name" :duration="item.duration" :carbon="item.carbon" :rating="item.rating" />
