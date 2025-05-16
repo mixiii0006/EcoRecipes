@@ -12,27 +12,10 @@
       <!-- Ingredients Scan Section -->
       <div class="scan-section">
         <div class="image-grid">
-          <div
-            v-for="(image, index) in images"
-            :key="index"
-            class="image-card"
-            @click="triggerCamera(index)"
-          >
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              class="hidden-input"
-              :ref="'input' + index"
-              @change="handleImage(index, $event)"
-            />
+          <div v-for="(image, index) in images" :key="index" class="image-card" @click="triggerCamera(index)">
+            <input type="file" accept="image/*" capture="environment" class="hidden-input" :ref="'input' + index" @change="handleImage(index, $event)" />
             <img v-if="image" :src="image" alt="Scanned" />
-            <img
-              v-else
-              src="https://via.placeholder.com/150"
-              alt="Add Image Icon"
-              class="placeholder-icon"
-            />
+            <img v-else src="https://via.placeholder.com/150" alt="Add Image Icon" class="placeholder-icon" />
           </div>
         </div>
         <button class="submit-btn">Submit</button>
@@ -45,19 +28,8 @@
           <section class="recommendations">
             <h3>Recommendations</h3>
             <div class="recipe-grid">
-              <router-link
-                v-for="item in results"
-                :key="item.id"
-                :to="{ name: 'RecipeView', params: { id: item.id } }"
-                class="card-link"
-              >
-                <RecipeCard
-                  :image="item.image"
-                  :name="item.name"
-                  :duration="item.duration"
-                  :carbon="item.carbon"
-                  :rating="item.rating"
-                />
+              <router-link v-for="item in results" :key="item.id" :to="{ name: 'RecipeView', params: { id: item.id } }" class="card-link">
+                <RecipeCard :image="item.image" :name="item.name" :duration="item.duration" :carbon="item.carbon" :rating="item.rating" />
               </router-link>
             </div>
           </section>
@@ -69,11 +41,7 @@
             <section class="recent-search">
               <h3>Recent Search</h3>
               <div class="recent-search-list">
-                <div
-                  v-for="search in recentSearches"
-                  :key="search"
-                  class="recent-search-item"
-                >
+                <div v-for="search in recentSearches" :key="search" class="recent-search-item">
                   <span>{{ search }}</span>
                   <button class="delete-btn" @click="deleteSearch(search)">
                     <i class="fa-solid fa-trash-can"></i>
