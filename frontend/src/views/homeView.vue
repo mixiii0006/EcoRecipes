@@ -3,24 +3,54 @@
     <Sidebar />
 
     <!-- Konten Utama -->
-    <main class="main-section">
+    <main
+      :class="[
+        'main-section',
+        { 'main-section-mobile': isMobile && isMenuOpen },
+      ]"
+    >
       <div class="main-layout">
         <!-- Konten Tengah -->
         <div class="main-content">
           <header class="header">
-            <input type="text" placeholder="Search the menu" class="search-input" />
-            <button class="action-btn" @click="handleInputClick">Input</button>
-            <button class="action-btn" @click="handleScanClick">Scan</button>
+            <div class="header-left">
+              <input
+                type="text"
+                placeholder="Search the menu"
+                class="search-input"
+              />
+            </div>
           </header>
 
           <!-- Hero -->
-          <section class="hero">
-            <div class="hero-text">
-              <h2>Makan Apa Hari Ini??</h2>
-              <p>Siap sedia wawasan dengan bahan lokal. Satu masakanmu mendekatkan keberlanjutan di setiap hidangan.</p>
-              <p><strong>Main Ingredients:</strong> Ayam, Sayur, Cabai, Bawang</p>
+          <!-- Hero Carousel -->
+          <section class="hero-carousel">
+            <div class="carousel-slide">
+              <div
+                class="carousel-item"
+                v-for="(item, index) in carouselItems"
+                :key="index"
+                :class="{ active: currentIndex === index }"
+              >
+                <div class="hero-text">
+                  <h2>{{ item.title }}</h2>
+                  <p>{{ item.description }}</p>
+                  <p>
+                    <strong>Main Ingredients:</strong> {{ item.ingredients }}
+                  </p>
+                </div>
+                <img :src="item.image" alt="Dish Image" class="hero-img" />
+              </div>
             </div>
-            <img src="https://source.unsplash.com/featured/?food" alt="Dish" class="hero-img" />
+          </section>
+
+          <section class="action-buttons">
+            <button class="big-btn full-width" @click="handleInputClick">
+              Input
+            </button>
+            <button class="big-btn full-width" @click="handleScanClick">
+              Scan
+            </button>
           </section>
 
           <!-- Rekomendasi -->
@@ -28,7 +58,10 @@
             <h3>Recommendations</h3>
             <div class="recipe-grid">
               <div class="recipe-card" v-for="n in 6" :key="n">
-                <img src="https://source.unsplash.com/160x160/?indonesian-food" alt="Food" />
+                <img
+                  src="https://source.unsplash.com/160x160/?indonesian-food"
+                  alt="Food"
+                />
                 <h4>Sate Ayam</h4>
                 <p>★★★★☆</p>
               </div>
@@ -52,7 +85,10 @@
             <h4>Top User</h4>
             <ul>
               <li v-for="n in 4" :key="n" class="top-user">
-                <img src="https://source.unsplash.com/32x32/?person" alt="User Avatar" />
+                <img
+                  src="https://source.unsplash.com/32x32/?person"
+                  alt="User Avatar"
+                />
                 <span>Natasya Salsabila</span>
               </li>
             </ul>
@@ -71,6 +107,34 @@ export default {
   data() {
     return {
       username: "",
+      currentIndex: 0,
+      carouselInterval: null,
+      isMobile: false,
+      isMenuOpen: false, // Menambahkan status isMenuOpen
+      chartInstance: null,
+      carouselItems: [
+        {
+          title: "Makan Apa Hari Ini??",
+          description:
+            "Siap sedia wawasan dengan bahan lokal. Satu masakanmu mendekatkan keberlanjutan di setiap hidangan.",
+          ingredients: "Ayam, Sayur, Cabai, Bawang",
+          image: "https://source.unsplash.com/featured/?food",
+        },
+        {
+          title: "Inspirasi Masakan Nusantara",
+          description:
+            "Ciptakan sajian lezat dari dapurmu dengan bumbu tradisional Indonesia.",
+          ingredients: "Ikan, Serai, Kunyit, Daun Jeruk",
+          image: "https://source.unsplash.com/featured/?indonesian-food",
+        },
+        {
+          title: "Menu Sehat Hari Ini",
+          description:
+            "Masakan sehat dan lezat bisa dimulai dari bahan lokal berkualitas.",
+          ingredients: "Tahu, Tempe, Brokoli, Wortel",
+          image: "https://source.unsplash.com/featured/?healthy-food",
+        },
+      ],
     };
   },
   created() {
@@ -78,6 +142,18 @@ export default {
   },
   mounted() {
     this.renderPieChart();
+    this.startCarousel();
+    this.checkMobile();
+    window.addEventListener("resize", () => {
+      this.checkMobile();
+      if (this.chartInstance) {
+        this.chartInstance.resize();
+      }
+    });
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.checkMobile);
+    clearInterval(this.carouselInterval);
   },
   methods: {
     handleLogout() {
@@ -87,7 +163,7 @@ export default {
     },
     renderPieChart() {
       const ctx = document.getElementById("nutritionChart");
-      new Chart(ctx, {
+      this.chartInstance = new Chart(ctx, {
         type: "pie",
         data: {
           labels: ["Protein", "Carbs", "Fat", "Fiber"],
@@ -110,14 +186,18 @@ export default {
       });
     },
     handleInputClick() {
-      // Redirect to the input ingredients page or process input data
-      this.$router.push("/input-ingredients"); // Assuming you're using Vue Router
+      this.$router.push("/input-ingredients");
     },
-
-    // Handle the "Scan" button click
     handleScanClick() {
-      // You can implement scan functionality here if needed
       this.$router.push("/scan-ingredients");
+    },
+    startCarousel() {
+      this.carouselInterval = setInterval(() => {
+        this.currentIndex = (this.currentIndex + 1) % this.carouselItems.length;
+      }, 4000); // ganti slide setiap 4 detik
+    },
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 768;
     },
   },
 };
@@ -170,6 +250,7 @@ export default {
   background-color: #f4f4f4;
   overflow-y: auto;
   margin-left: 270px;
+  transition: margin-left 0.3s ease-in-out;
 }
 
 .main-layout {
@@ -181,27 +262,135 @@ export default {
   flex: 3;
 }
 
+.main-section-mobile {
+  margin-left: 0; /* Menghapus margin saat sidebar terbuka di mode mobile */
+}
+
+/* Responsive improvement */
+@media (max-width: 768px) {
+  .main-section {
+    margin-left: 0; /* Menghapus margin untuk mode mobile */
+  }
+}
+
 /* Header */
 .header {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
   align-items: center;
 }
 
+.header-left {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.header-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem; /* jarak antar tombol */
+}
+
 .search-input {
+  width: 100%;
   padding: 0.6rem 1rem;
   border-radius: 8px;
   border: 1px solid #ccc;
-  width: 60%;
+  font-size: 1rem;
+  box-sizing: border-box;
+  margin-right: 1rem; /* jarak dengan tombol */
 }
 
-.action-btn {
-  background: linear-gradient(to bottom, #235f3a, #73b06f);
-  color: white;
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.full-width {
+  flex: 1;
+}
+
+.big-btn {
+  padding: 1.2rem 0;
+  font-size: 1.2rem;
+  font-weight: bold;
   border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 12px;
+  border-radius: 16px;
+  background-color: #388e3c;
+  color: white;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.big-btn:hover {
+  background-color: #2e7d32;
+}
+
+/* Responsive improvement */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-right {
+    justify-content: flex-start;
+  }
+
+  .search-input {
+    margin-right: 0;
+  }
+}
+
+/* Additional responsiveness for homeView.vue */
+@media (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+  }
+
+  .main-content {
+    flex: none;
+    width: 100%;
+  }
+
+  .right-sidebar {
+    flex: none;
+    width: 100%;
+    order: 2;
+    margin-top: 1.5rem;
+  }
+
+  .hero-carousel {
+    height: auto;
+    padding: 1rem;
+  }
+
+  .carousel-item {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .hero-img {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    border-radius: 10px;
+  }
+
+  .hero-text {
+    max-width: 100%;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .big-btn {
+    width: 100%;
+  }
 }
 
 .user-box {
@@ -212,19 +401,63 @@ export default {
 }
 
 /* Hero Section */
-.hero {
-  display: flex;
-  background: white;
+.hero-carousel {
+  position: relative;
+  overflow: hidden;
+  background: #4caf50; /* hijau */
   border-radius: 12px;
-  padding: 1.5rem;
   margin-top: 2rem;
+  padding: 1.5rem;
+  height: 250px; /* Atur tinggi tetap */
+  display: flex;
   align-items: center;
-  gap: 1.5rem;
+  justify-content: center;
+}
+
+.carousel-slide {
+  display: flex;
+  width: 100%;
+  position: relative;
+  height: 100%;
+}
+
+.carousel-item {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  width: 100%;
+  height: 100%;
+  color: white;
+}
+
+.carousel-item.active {
+  display: flex;
+  animation: fadeIn 0.8s ease-in-out;
 }
 
 .hero-img {
   width: 200px;
+  height: 200px;
   border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.hero-text {
+  max-width: 60%;
+  color: white;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Recommendations */
@@ -301,5 +534,18 @@ export default {
 .user-box:hover {
   text-decoration: underline;
 }
-
+/* Additional style for nutrition-card and canvas on mobile */
+@media (max-width: 768px) {
+  .main-section {
+    margin-top: 2rem;
+  }
+  .nutrition-card {
+    min-height: 250px;
+  }
+  #nutritionChart {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 250px;
+  }
+}
 </style>
