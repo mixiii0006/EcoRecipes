@@ -306,6 +306,6 @@ export default {
 @media (max-width: 600px) {
   .input-section {
     padding: 1rem;
-  }
+ }
 }
 </style>
