@@ -1,43 +1,95 @@
 <template>
-  <aside class="sidebar">
-    <h1 class="logo">EcoRecipes</h1>
+  <div>
+    <!-- Tombol Burger -->
+    <button v-if="!isMenuOpen && isMobile" class="burger-icon" @click="toggleMenu">
+      <i class="fas fa-bars">=</i>
+    </button>
 
-    <nav class="menu">
-      <router-link to="/home" class="menu-item" exact-active-class="active">
-        <i class="fas fa-home"></i>
-        Dashboard
-      </router-link>
-      <router-link to="/search" class="menu-item" exact-active-class="active">
-        <i class="fas fa-search"></i>
-        Recipes
-      </router-link>
-    </nav>
+    <!-- Konten utama yang dapat menutup sidebar -->
+    <div v-if="isMenuOpen && isMobile" class="overlay" @click="toggleMenu"></div>
 
-    <button class="logout-btn" @click="handleLogout"><i class="fas fa-sign-out-alt"></i> Logout</button>
-  </aside>
+    <!-- Sidebar -->
+    <aside v-show="!isMobile || isMenuOpen" class="sidebar">
+      <h1 class="logo">EcoRecipes</h1>
+
+      <nav class="menu">
+        <router-link to="/home" class="menu-item" exact-active-class="active">
+          <i class="fas fa-home"></i>
+          Dashboard
+        </router-link>
+        <router-link to="/search" class="menu-item" exact-active-class="active">
+          <i class="fas fa-search"></i>
+          Recipes
+        </router-link>
+      </nav>
+
+      <button class="logout-btn" @click="handleLogout">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </aside>
+  </div>
 </template>
 
 <script>
 export default {
   name: "Sidebar",
- methods: {
-    checkAuth() {
-      this.isAuthenticated = !!localStorage.getItem('token');
-    },
+  data() {
+    return {
+      isMenuOpen: false,
+      isMobile: false,
+    };
+  },
+  mounted() {
+    this.checkMobile();
+    window.addEventListener("resize", this.checkMobile);
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.checkMobile);
+  },
+  methods: {
     handleLogout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      this.isAuthenticated = false;
-      this.$router.push('/');
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      this.$router.push("/");
     },
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen;
-    }
+    },
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 768;
+      if (!this.isMobile) this.isMenuOpen = false;
+    },
   },
 };
 </script>
 
 <style scoped>
+/* Tombol burger */
+.burger-icon {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1001;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #2e7d32; /* Hijau */
+  cursor: pointer;
+  display: block;
+}
+
+/* Overlay untuk menutup sidebar */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* Sidebar */
 .sidebar {
   position: fixed;
   top: 0;
@@ -53,6 +105,7 @@ export default {
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
   font-family: "Poppins", sans-serif;
   border-right: 2px solid #e0e0e0;
+  z-index: 1000; /* Sidebar di atas overlay */
 }
 
 .logo {
@@ -100,5 +153,23 @@ export default {
   align-items: center;
   gap: 0.5rem;
   margin-top: auto;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    z-index: 1000;
+    background-color: #f9f9f9;
+    width: 222px;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-top-right-radius: 30px;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .overlay {
+    display: block;
+  }
 }
 </style>
