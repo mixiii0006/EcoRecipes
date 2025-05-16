@@ -146,7 +146,7 @@ export default {
     },
     goToDashboard() {
       // Arahkan ke halaman dashboard (ubah sesuai route-mu)
-      this.$router.push("/dashboard");
+      this.$router.push("/home");
     },
 
     logout() {
