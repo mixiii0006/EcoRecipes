@@ -3,37 +3,34 @@
     <div class="modal-content">
       <button class="close-btn" @click="closeModal">×</button>
       <div class="recipe-header">
-        <h2>Nastar Keju</h2>
+        <h2>{{ food.name || food.Title_Cleaned }}</h2>
       </div>
 
       <div class="recipe-body">
+        <!-- Left column -->
         <div class="left-column">
-          <img class="recipe-image" src="https://via.placeholder.com/150" alt="Nastar Keju" />
+          <img class="recipe-image" :src="getImageUrl(food.image || food.Image_Name)" :alt="food.name || 'Recipe image'" />
+
           <div class="ingredients-card">
             <h3>How to Cook</h3>
             <ul>
-              <li>1 bar cheese</li>
-              <li>1 cup of flour</li>
-              <li>1 tsp of sugar</li>
-              <li>1/2 tsp of salt</li>
-              <li>20 gr of butter</li>
-              <li>50 ml of oil</li>
-              <li>20 gr of condensed milk</li>
+              <li v-if="!instructionsArray.length">No instructions available.</li>
+              <li v-for="(step, index) in instructionsArray" :key="'step-' + index">
+                {{ step }}
+              </li>
             </ul>
           </div>
         </div>
 
+        <!-- Right column -->
         <div class="right-column">
           <div class="instructions-card">
             <h3>Ingredients</h3>
             <ul>
-              <li>1 bar cheese</li>
-              <li>1 cup of flour</li>
-              <li>1 tsp of sugar</li>
-              <li>1/2 tsp of salt</li>
-              <li>20 gr of butter</li>
-              <li>50 ml of oil</li>
-              <li>20 gr of condensed milk</li>
+              <li v-if="!ingredientsArray.length">No ingredients available.</li>
+              <li v-for="(ingredient, index) in ingredientsArray" :key="'ingredient-' + index">
+                {{ ingredient }}
+              </li>
             </ul>
           </div>
         </div>
@@ -45,10 +42,43 @@
 <script>
 export default {
   name: "RecipeModal",
+  props: {
+    food: {
+      type: Object,
+      required: true,
+    },
+  },
   emits: ["close"],
   methods: {
     closeModal() {
       this.$emit("close");
+    },
+    getImageUrl(img) {
+      return img ? `/foodImages/${img}.jpg` : "https://via.placeholder.com/150";
+    },
+  },
+  computed: {
+    instructionsArray() {
+      const raw = this.food.Instructions_Cleaned || this.food.instructions || "";
+      return Array.isArray(raw)
+        ? raw
+        : typeof raw === "string"
+        ? raw
+            .split(/[.●•-]/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [];
+    },
+    ingredientsArray() {
+      const raw = this.food.Cleaned_Ingredients || "";
+      return Array.isArray(raw)
+        ? raw
+        : typeof raw === "string"
+        ? raw
+            .split(/[,●•-]/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [];
     },
   },
 };
@@ -87,17 +117,18 @@ export default {
 }
 
 .recipe-header {
-  font-size: 1.5rem;
+  font-size: 1rem;
   background: linear-gradient(to right, #235f3a, #73b06f);
   color: white;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
+  padding: 0.5rem 2rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
 }
 
 .recipe-body {
   display: flex;
-  gap: 2rem;
+  gap: 1.5rem;
+  color: black;
 }
 
 .left-column,
@@ -107,9 +138,10 @@ export default {
 
 .recipe-image {
   width: 100%;
-  border-radius: 12px;
+  max-height: 250px;
   object-fit: cover;
-  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
 }
 
 .ingredients-card,
@@ -122,6 +154,10 @@ export default {
 @media (max-width: 768px) {
   .recipe-body {
     flex-direction: column;
+  }
+
+  .recipe-image {
+    max-height: 200px;
   }
 }
 </style>
