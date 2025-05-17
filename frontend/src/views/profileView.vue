@@ -4,20 +4,12 @@
     <div class="profile-header">
       <!-- Background dengan overlay dan konten -->
       <div class="profile-background">
-        <img
-          src="/images/bg-profil.jpg"
-          alt="beautiful background"
-          class="profile-bg"
-        />
+        <img src="/images/bg-profil.jpg" alt="beautiful background" class="profile-bg" />
         <div class="overlay"></div>
 
         <!-- Konten kiri bawah -->
         <div class="profile-overlay-left">
-          <img
-            src="/images/profile.jpg"
-            alt="Profile Picture"
-            class="profile-img"
-          />
+          <img src="/images/profile.jpg" alt="Profile Picture" class="profile-img" />
           <h2 class="profile-name">Natasya salsabilla</h2>
         </div>
         <!-- Tombol Dashboard -->
@@ -32,9 +24,7 @@
     <div class="profile-content">
       <!-- Information Section with Form -->
       <div class="information">
-        <div class="highlighted-karmon">
-          Total Jumlah Karmon Berhasil Dikurangi: {{ user.totalKarmonReduced }}
-        </div>
+        <div class="highlighted-karmon">Total Jumlah Karmon Berhasil Dikurangi: {{ user.totalKarmonReduced }}</div>
         <h3>Informasi</h3>
         <form class="info-form">
           <div class="form-group">
@@ -51,23 +41,11 @@
           </div>
           <div class="form-group">
             <label for="favoriteFoodCount">Jumlah Makanan Favorit:</label>
-            <input
-              type="number"
-              id="favoriteFoodCount"
-              v-model="user.favoriteFoodCount"
-              readonly
-            />
+            <input type="number" id="favoriteFoodCount" v-model="user.favoriteFoodCount" readonly />
           </div>
           <div class="form-group">
-            <label for="cookedFoodCount"
-              >Jumlah Makanan yang Telah Dimasak:</label
-            >
-            <input
-              type="number"
-              id="cookedFoodCount"
-              v-model="user.cookedFoodCount"
-              readonly
-            />
+            <label for="cookedFoodCount">Jumlah Makanan yang Telah Dimasak:</label>
+            <input type="number" id="cookedFoodCount" v-model="user.cookedFoodCount" readonly />
           </div>
         </form>
       </div>
@@ -76,48 +54,18 @@
       <div class="food-favorite-section">
         <!-- Toggle buttons for switching between food list and favorite -->
         <div class="toggle-buttons">
-          <button
-            :class="{ active: isFoodList }"
-            @click="toggleContent('food')"
-          >
-            Daftar Makanan
-          </button>
-          <button
-            :class="{ active: !isFoodList }"
-            @click="toggleContent('favorite')"
-          >
-            Favorit
-          </button>
+          <button :class="{ active: isFoodList }" @click="toggleContent('food')">Daftar Makanan</button>
+          <button :class="{ active: !isFoodList }" @click="toggleContent('favorite')">Favorit</button>
         </div>
 
-        <!-- Content for Daftar Makanan or Favorite based on active tab -->
-        <div class="food-list" v-if="isFoodList">
-         
+        <section class="food-favorite-section">
           <div class="food-list-grid">
             <div class="food-card" v-for="index in 6" :key="index">
-              <img
-                src="/images/bg-profil.jpg"
-                alt="Food Image"
-                class="food-img"
-              />
+              <img src="/images/bg-profil.jpg" alt="Food Image" class="food-img" />
               <div class="food-name">Bakar</div>
             </div>
           </div>
-        </div>
-
-        <div class="food-list" v-if="!isFoodList">
-          
-          <div class="food-list-grid">
-            <div class="food-card" v-for="index in 6" :key="'favorite' + index">
-              <img
-                src="https://via.placeholder.com/100"
-                alt="Food Image"
-                class="food-img"
-              />
-              <div class="food-name">Bakar</div>
-            </div>
-          </div>
-        </div>
+        </section>
       </div>
     </div>
   </div>
@@ -267,14 +215,14 @@ export default {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
   transition: box-shadow 0.3s ease;
 }
 
 .information:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .info-form {
@@ -312,7 +260,7 @@ export default {
   padding: 20px 0;
   background-color: #fff;
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
@@ -384,8 +332,8 @@ input[readonly] {
   background-color: #ffffff;
   padding: 20px;
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #222;
   transition: box-shadow 0.3s ease;
   display: flex;
@@ -393,7 +341,7 @@ input[readonly] {
 }
 
 .food-favorite-section:hover {
-  box-shadow: 0 12px 36px rgba(0,0,0,0.18);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
 }
 
 .toggle-buttons {
@@ -420,14 +368,14 @@ input[readonly] {
   background-color: #4caf50;
   color: white;
   border-color: #4caf50;
-  box-shadow: 0 4px 12px rgba(76,175,80,0.4);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
 }
 
 .toggle-buttons button:hover {
   background-color: #66bb6a;
   color: white;
   border-color: #66bb6a;
-  box-shadow: 0 4px 12px rgba(102,187,106,0.4);
+  box-shadow: 0 4px 12px rgba(102, 187, 106, 0.4);
 }
 
 .food-list-grid {
@@ -441,7 +389,7 @@ input[readonly] {
   border-radius: 20px;
   padding: 16px;
   text-align: center;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
   cursor: pointer;
   display: flex;
@@ -450,7 +398,7 @@ input[readonly] {
 }
 
 .food-card:hover {
-  box-shadow: 0 12px 36px rgba(0,0,0,0.18);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
   transform: translateY(-6px);
 }
 
@@ -544,5 +492,4 @@ input[readonly] {
 .dashboard-controls button:hover {
   background-color: #e0e0e0;
 }
-
 </style>

@@ -15,7 +15,7 @@
       <nav class="menu">
         <router-link to="/home" class="menu-item" exact-active-class="active">
           <i class="fa-solid fa-home"></i>
-          Dashboard
+          Home
         </router-link>
         <router-link to="/search" class="menu-item" exact-active-class="active">
           <i class="fa-solid fa-book"></i>

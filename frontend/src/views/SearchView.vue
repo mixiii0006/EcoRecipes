@@ -8,70 +8,106 @@
       <div class="top-bar">
         <input type="text" v-model="query" @input="handleSearch" placeholder="search the menu" class="search-input" />
         <div class="top-buttons">
-          <!-- Button Input -->
-          <button class="action-btn" @click="handleInputClick">📤 Input</button>
-          <!-- Button Scan -->
-          <button class="action-btn" @click="handleScanClick">📷 Scan</button>
+          <button class="action-btn" @click="handleInputClick"><i class="fa-solid fa-inbox icon"></i> Input</button>
+          <button class="action-btn" @click="handleScanClick"><i class="fa-solid fa-camera icon"></i> Scan</button>
         </div>
       </div>
 
-      <!-- Dish Hero Section -->
-      <section class="hero-section">
-        <img :src="dishImage" alt="Dish" class="hero-image" />
-        <div class="hero-text">
-          <h2>Makan Apa Hari Ini??</h2>
-          <p class="desc">{{ dishDescription }}</p>
-          <div class="ingredients-footprint">
-            <div>
-              <h4>Main Ingredients</h4>
-              <ul>
-                <li v-for="ingredient in dishIngredients" :key="ingredient">
-                  {{ ingredient }}
-                </li>
-              </ul>
+      <!-- Carousel Section -->
+      <section class="hero-carousel">
+        <div class="carousel-slide">
+          <div class="carousel-item" v-for="(item, index) in carouselItems" :key="index" :class="{ active: currentIndex === index }">
+            <div class="hero-text">
+              <h2>{{ item.title }}</h2>
+              <p>{{ item.description }}</p>
+              <p><strong>Main Ingredients:</strong> {{ item.ingredients }}</p>
             </div>
-            <div>
-              <h4>Carbon Percentage</h4>
-              <div class="stars">
-                <span v-for="(star, index) in carbonStars" :key="index">⭐</span>
-              </div>
-            </div>
+            <img :src="item.image" alt="Dish Image" class="hero-img" />
           </div>
         </div>
       </section>
 
       <!-- Recipe Recommendations -->
-      <section class="recommendations">
-        <h3>Recommendations</h3>
-        <div class="recipe-grid" v-if="results.length > 0">
-          <RecipeCard v-for="item in results" :key="item.id" :image="item.image" :name="item.name" :duration="item.duration" :carbon="item.carbon" :rating="item.rating" />
+      <section class="food-category-list">
+        <h3>Favorite Food</h3>
+        <div class="food-category-grid">
+          <div class="food-category-card" v-for="(item, index) in favoriteFoods" :key="index" @click="openModal(index)">
+            <div class="food-category-image">
+              <img :src="item.image" :alt="item.name" />
+            </div>
+            <div class="food-category-info">
+              <h4 class="food-name">Ayam Bakar</h4>
+              <p class="food-meta">Durasi: 30 min · Karbon: 120g</p>
+
+              <div class="food-actions">
+                <button class="btn cook-btn">Masak</button>
+                <i class="fa-regular fa-heart heart-icon"></i>
+              </div>
+            </div>
+          </div>
         </div>
-        <p v-else class="no-results">No results found.</p>
       </section>
     </main>
+    <RecipeModal v-if="showModal" @close="showModal = false" />
   </div>
-  <Footer />
 </template>
 
 <script>
 import axios from "axios";
 import RecipeCard from "../components/RecipeCard.vue";
+import RecipeModal from "../components/RecipeModal.vue";
 
 export default {
   name: "SearchView",
   components: {
     RecipeCard,
+    RecipeModal,
   },
   data() {
     return {
       query: "",
       results: [],
       searched: false,
-      dishImage: "/path/to/dish-image.jpg",
-      dishDescription: "Sop ala western dengan bahan lokal...",
-      dishIngredients: ["Shrimp", "Garlic", "Onion"],
-      carbonStars: [1, 1],
+      currentIndex: 0,
+      carouselInterval: null,
+      showModal: false, // 👈 untuk kontrol modal
+      selectedRecipeId: null, // 👈 jika kamu ingin tahu item yang dipilih
+      carouselItems: [
+        {
+          title: "Makan Apa Hari Ini??",
+          description: "Siap sedia wawasan dengan bahan lokal. Satu masakanmu mendekatkan keberlanjutan di setiap hidangan.",
+          ingredients: "Ayam, Sayur, Cabai, Bawang",
+          image: "https://source.unsplash.com/featured/?food",
+        },
+        {
+          title: "Inspirasi Masakan Nusantara",
+          description: "Ciptakan sajian lezat dari dapurmu dengan bumbu tradisional Indonesia.",
+          ingredients: "Ikan, Serai, Kunyit, Daun Jeruk",
+          image: "https://source.unsplash.com/featured/?indonesian-food",
+        },
+        {
+          title: "Menu Sehat Hari Ini",
+          description: "Masakan sehat dan lezat bisa dimulai dari bahan lokal berkualitas.",
+          ingredients: "Tahu, Tempe, Brokoli, Wortel",
+          image: "https://source.unsplash.com/featured/?healthy-food",
+        },
+      ],
+
+      favoriteFoods: [
+        { name: "Ayam Bakar", duration: 40, carbon: 210, image: "/images/bg-profil.jpg" },
+        { name: "Sate Lilit", duration: 30, carbon: 190, image: "/images/bg-profil.jpg" },
+        { name: "Tumis Kangkung", duration: 15, carbon: 80, image: "/images/bg-profil.jpg" },
+        { name: "Rendang", duration: 90, carbon: 320, image: "/images/bg-profil.jpg" },
+        { name: "Pecel Lele", duration: 20, carbon: 120, image: "/images/bg-profil.jpg" },
+        { name: "Gado-Gado", duration: 25, carbon: 150, image: "/images/bg-profil.jpg" },
+      ],
     };
+  },
+  mounted() {
+    this.startCarousel();
+  },
+  beforeDestroy() {
+    clearInterval(this.carouselInterval);
   },
   methods: {
     async handleSearch() {
@@ -90,24 +126,32 @@ export default {
         this.searched = true;
       }
     },
-
-    // Handle the "Input" button click
+    startCarousel() {
+      this.carouselInterval = setInterval(() => {
+        this.currentIndex = (this.currentIndex + 1) % this.carouselItems.length;
+      }, 4000);
+    },
     handleInputClick() {
-      // Redirect to the input ingredients page or process input data
-      this.$router.push("/input-ingredients"); // Assuming you're using Vue Router
+      this.$router.push("/input-ingredients");
+    },
+    handleScanClick() {
+      this.$router.push("/scan-ingredients");
+    },
+    openModal(id = null) {
+      this.selectedRecipeId = id;
+      this.showModal = true;
     },
 
-    // Handle the "Scan" button click
-    handleScanClick() {
-      // You can implement scan functionality here if needed
-      this.$router.push("/scan-ingredients");
+    openModal(index) {
+      // Logic untuk buka modal resep
+      this.selectedFood = this.favoriteFoods[index];
+      this.showModal = true;
     },
   },
 };
 </script>
 
 <style scoped>
-/* Layout & Sidebar */
 .eco-recipes {
   display: flex;
   height: 100vh;
@@ -115,103 +159,171 @@ export default {
   background-color: #f8f8f8;
 }
 
-.logo {
-  font-family: "Georgia", serif;
-  font-size: 1.6rem;
-  margin-bottom: 2rem;
-}
-.menu ul {
-  list-style: none;
-  padding: 0;
-}
-.menu li {
-  margin: 1rem 0;
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.logout-btn {
-  background-color: #2e7d32;
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border-radius: 25px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* Main Content */
 .main-content {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
   margin-left: 270px;
 }
+
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.header-left {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.header-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem; /* jarak antar tombol */
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap; /* agar bisa pindah baris di mobile */
+}
+
 .search-input {
-  width: 60%;
+  flex: 1;
   padding: 0.8rem 1.2rem;
   border-radius: 12px;
   border: 1px solid #ccc;
+  font-size: 1rem;
+  min-width: 250px;
 }
+
 .top-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
+}
+
+/* 👇 Mobile-specific behavior */
+@media (max-width: 768px) {
+  .top-bar input.search-input {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .top-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .action-btn {
+    flex: 1;
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem 1rem;
+    font-weight: bold;
+    background: linear-gradient(to right, #2e7d32, #66bb6a);
+    color: white;
+    border: none;
+    border-radius: 12px;
+  }
+
+  .icon {
+    margin-right: 6px;
+  }
 }
 
 .action-btn {
-  background: linear-gradient(to bottom, #235f3a, #73b06f);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Jarak antara ikon dan teks */
+  background: linear-gradient(to right, #2e7d32, #66bb6a);
   color: white;
   border: none;
-  padding: 0.8rem 1.5rem;
+  padding: 0.75rem 1rem;
   border-radius: 12px;
-  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  width: 100%;
+  text-align: center;
 }
 
-/* Hero */
-.hero-section {
-  display: flex;
-  background: linear-gradient(to right, #256d39, #71c77f);
-  border-radius: 20px;
+.action-btn:hover {
+  background: linear-gradient(to right, #1b5e20, #4caf50); /* Gradasi hijau lebih gelap saat hover */
+}
+
+/* ===== Carousel Styles ===== */
+.hero-carousel {
+  position: relative;
+  overflow: hidden;
+  background: #4caf50;
+  border-radius: 12px;
+  padding: 1.5rem;
   margin: 2rem 0;
-  padding: 2rem;
-  color: white;
-  align-items: center;
-}
-.hero-image {
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 2rem;
-}
-.hero-text h2 {
-  font-size: 1.8rem;
-}
-.desc {
-  margin: 0.8rem 0;
-  font-size: 0.95rem;
-}
-.ingredients-footprint {
+  height: 300px;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.carousel-slide {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.carousel-item {
+  display: none;
+  align-items: center;
   justify-content: space-between;
-  margin-top: 1rem;
+  gap: 2rem;
+  width: 100%;
+  height: 100%;
+  color: white;
 }
-.ingredients-footprint h4 {
-  margin-bottom: 0.3rem;
+
+.carousel-item.active {
+  display: flex;
+  animation: fadeIn 0.8s ease-in-out;
 }
-.ingredients-footprint ul {
-  padding-left: 1rem;
+
+.hero-img {
+  width: 200px;
+  height: 200px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
 }
-.stars span {
-  font-size: 1.2rem;
-  color: gold;
+
+.hero-text {
+  max-width: 60%;
+  color: white;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Recipe Cards */
@@ -252,14 +364,165 @@ export default {
   color: #555;
 }
 
-.recipe-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.5rem;
-}
 .no-results {
   text-align: center;
   margin-top: 2rem;
   color: #999;
+}
+
+.food-category-list {
+  margin-top: 2rem;
+}
+
+.food-category-list h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #2e7d32;
+}
+
+.food-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.food-category-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s;
+  text-align: justify;
+}
+
+.food-category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.food-category-image {
+  width: 100%;
+  aspect-ratio: 2 / 1; /* rasio seperti di gambar */
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.food-category-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.food-category-label {
+  font-weight: bold;
+  color: #2e7d32;
+  font-size: 1.1rem;
+}
+
+.food-category-info {
+  text-align: justify;
+  margin-top: 0.5rem;
+}
+
+.food-name {
+  font-size: 1.1rem;
+  color: #2e7d32;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.food-meta {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 0.75rem;
+}
+
+.food-buttons {
+  display: flex;
+  justify-content: left;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.cook-btn {
+  background: linear-gradient(to right, #2e7d32, #66bb6a);
+  color: white;
+}
+
+.cook-btn:hover {
+  background: linear-gradient(to right, #1b5e20, #4caf50);
+}
+
+.fav-btn {
+  background: #eeeeee;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.fav-btn:hover {
+  background: #dcedc8;
+}
+
+.food-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.food-actions .cook-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: linear-gradient(to right, #2e7d32, #66bb6a);
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.food-actions .fa-heart {
+  font-size: 1.4rem;
+  margin-left: 1rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.food-actions .fa-heart.active {
+  color: red;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    padding-top: 0;
+    margin-top: 60px;
+  }
+
+  .recipe-body {
+    flex-direction: column;
+  }
+
+  .left-column,
+  .right-column {
+    width: 100%;
+  }
+
+  .recipe-image {
+    max-height: 250px;
+  }
 }
 </style>

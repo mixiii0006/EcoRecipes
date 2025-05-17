@@ -262,9 +262,29 @@ export default {
   font-weight: bold;
 }
 
-@media (max-width: 600px) {
-  .input-section {
+@media (max-width: 768px) {
+  .recipe-detail-page {
+    flex-direction: column;
+  }
+
+  .content {
+    margin-left: 0;
     padding: 1rem;
+    margin-top: 50px;
+  }
+
+  .recipe-body {
+    flex-direction: column;
+  }
+
+  .left-column,
+  .right-column {
+    width: 100%;
+  }
+
+  .recipe-image {
+    max-height: 250px;
   }
 }
+
 </style>

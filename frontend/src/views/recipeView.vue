@@ -14,7 +14,7 @@
           <img class="recipe-image" src="https://via.placeholder.com/150" alt="Nastar Keju" />
 
           <div class="ingredients-card">
-            <h3>Ingredients</h3>
+            <h3>How to Cook</h3>
             <ul>
               <li>1 bar cheese</li>
               <li>1 cup of flour</li>
@@ -29,7 +29,7 @@
 
         <div class="right-column">
           <div class="instructions-card">
-            <h3>How to Cook</h3>
+            <h3>Ingredients</h3>
             <ul>
               <li>1 bar cheese</li>
               <li>1 cup of flour</li>
@@ -91,7 +91,7 @@ export default {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  margin-left: 300px;
+  margin-left: 270px;
 }
 
 /* Header Title */
@@ -171,4 +171,30 @@ export default {
   line-height: 1.5;
   font-size: 1rem;
 }
+
+@media (max-width: 768px) {
+  .recipe-detail-page {
+    flex-direction: column;
+  }
+
+  .content {
+    margin-left: 0;
+    padding-top: 0;
+    margin-top: 60px;
+  }
+
+  .recipe-body {
+    flex-direction: column;
+  }
+
+  .left-column,
+  .right-column {
+    width: 100%;
+  }
+
+  .recipe-image {
+    max-height: 250px;
+  }
+}
+
 </style>

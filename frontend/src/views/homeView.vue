@@ -3,41 +3,17 @@
     <Sidebar />
 
     <!-- Konten Utama -->
-    <main
-      :class="[
-        'main-section',
-        { 'main-section-mobile': isMobile && isMenuOpen },
-      ]"
-    >
+    <main :class="['main-section', { 'main-section-mobile': isMobile && isMenuOpen }]">
       <div class="main-layout">
         <!-- Konten Tengah -->
         <div class="main-content">
-          <header class="header">
-            <div class="header-left">
-              <input
-                type="text"
-                placeholder="Search the menu"
-                class="search-input"
-              />
-            </div>
-          </header>
-
-          <!-- Hero -->
-          <!-- Hero Carousel -->
           <section class="hero-carousel">
             <div class="carousel-slide">
-              <div
-                class="carousel-item"
-                v-for="(item, index) in carouselItems"
-                :key="index"
-                :class="{ active: currentIndex === index }"
-              >
+              <div class="carousel-item" v-for="(item, index) in carouselItems" :key="index" :class="{ active: currentIndex === index }">
                 <div class="hero-text">
                   <h2>{{ item.title }}</h2>
                   <p>{{ item.description }}</p>
-                  <p>
-                    <strong>Main Ingredients:</strong> {{ item.ingredients }}
-                  </p>
+                  <p><strong>Main Ingredients:</strong> {{ item.ingredients }}</p>
                 </div>
                 <img :src="item.image" alt="Dish Image" class="hero-img" />
               </div>
@@ -45,57 +21,57 @@
           </section>
 
           <section class="feature-section">
-            <div class="feature-card" @click="goToInput">
-              <i class="fa-solid fa-inbox icon"></i>
-              <p class="feature-title">Input</p>
-              <p class="feature-desc">Please Input your Ingredients</p>
+            <div class="feature-card">
+              <router-link to="/input-ingredients" class="feature-link">
+                <i class="fa-solid fa-inbox icon"></i>
+                <p class="feature-title">Input</p>
+                <p class="feature-desc">Please Input your Ingredients</p>
+              </router-link>
             </div>
-            <div class="feature-card" @click="goToScan">
-              <i class="fa-solid fa-camera icon"></i>
-              <p class="feature-title">Scan</p>
-              <p class="feature-desc">Please Scan your Food</p>
-            </div>
-          </section>
 
-          <!-- Rekomendasi -->
-          <section class="recommendations">
-            <h3>Recommendations</h3>
-            <div class="recipe-grid">
-              <div class="recipe-card" v-for="n in 6" :key="n">
-                <img
-                  src="https://source.unsplash.com/160x160/?indonesian-food"
-                  alt="Food"
-                />
-                <h4>Sate Ayam</h4>
-                <p>★★★★☆</p>
-              </div>
+            <div class="feature-card">
+              <router-link to="/scan-ingredients" class="feature-link">
+                <i class="fa-solid fa-camera icon"></i>
+                <p class="feature-title">Scan</p>
+                <p class="feature-desc">Please Scan your Food</p>
+              </router-link>
             </div>
           </section>
         </div>
 
         <!-- Sidebar Kanan -->
         <aside class="right-sidebar">
-          <router-link to="/profile" class="user-box">
-            <span class="username">{{ username }}</span>
-          </router-link>
+          <div class="sidebar-wrapper">
+            <!-- Profil Card -->
+            <div class="profile-card">
+              <router-link to="/profile">
+                <img src="/images/profile.jpg" alt="Profile Picture" class="profile-img" />
+              </router-link>
+              <h3 class="profile-name">Natasya salsabilla</h3>
+            </div>
 
-          <!-- Grafik Pie -->
-          <div class="nutrition-card">
-            <canvas id="nutritionChart"></canvas>
-          </div>
+            <!-- Emisi Karbon Card -->
+            <div class="carbon-card">
+              <span class="sparkle">✨</span>
+              <p><strong>Total Jumlah Karmon</strong><br />Berhasil Dikurangi: 12</p>
+            </div>
 
-          <!-- Top User -->
-          <div class="top-users">
-            <h4>Top User</h4>
-            <ul>
-              <li v-for="n in 4" :key="n" class="top-user">
-                <img
-                  src="https://source.unsplash.com/32x32/?person"
-                  alt="User Avatar"
-                />
-                <span>Natasya Salsabila</span>
-              </li>
-            </ul>
+            <section class="food-category-list">
+              <h3>Favorite Food</h3>
+              <div class="food-category-scroll">
+                <div class="food-category-card" v-for="index in 2" :key="index">
+                  <div class="food-category-icon">
+                    <router-link to="/recipe-detail">
+                      <img src="/images/bg-profil.jpg" alt="Food Image" />
+                    </router-link>
+                  </div>
+                  <div class="food-category-label">Bakar</div>
+                </div>
+              </div>
+              <span>
+                <router-link to="/profile">See All</router-link>
+              </span>
+            </section>
           </div>
         </aside>
       </div>
@@ -104,37 +80,37 @@
 </template>
 
 <script>
-import Chart from "chart.js/auto";
+import Sidebar from "../components/Sidebar.vue";
 
 export default {
   name: "HomeView",
+  components: {
+    Sidebar,
+  },
   data() {
     return {
       username: "",
       currentIndex: 0,
       carouselInterval: null,
       isMobile: false,
-      isMenuOpen: false, // Menambahkan status isMenuOpen
+      isMenuOpen: false,
       chartInstance: null,
       carouselItems: [
         {
           title: "Makan Apa Hari Ini??",
-          description:
-            "Siap sedia wawasan dengan bahan lokal. Satu masakanmu mendekatkan keberlanjutan di setiap hidangan.",
+          description: "Siap sedia wawasan dengan bahan lokal. Satu masakanmu mendekatkan keberlanjutan di setiap hidangan.",
           ingredients: "Ayam, Sayur, Cabai, Bawang",
           image: "https://source.unsplash.com/featured/?food",
         },
         {
           title: "Inspirasi Masakan Nusantara",
-          description:
-            "Ciptakan sajian lezat dari dapurmu dengan bumbu tradisional Indonesia.",
+          description: "Ciptakan sajian lezat dari dapurmu dengan bumbu tradisional Indonesia.",
           ingredients: "Ikan, Serai, Kunyit, Daun Jeruk",
           image: "https://source.unsplash.com/featured/?indonesian-food",
         },
         {
           title: "Menu Sehat Hari Ini",
-          description:
-            "Masakan sehat dan lezat bisa dimulai dari bahan lokal berkualitas.",
+          description: "Masakan sehat dan lezat bisa dimulai dari bahan lokal berkualitas.",
           ingredients: "Tahu, Tempe, Brokoli, Wortel",
           image: "https://source.unsplash.com/featured/?healthy-food",
         },
@@ -148,12 +124,7 @@ export default {
     this.renderPieChart();
     this.startCarousel();
     this.checkMobile();
-    window.addEventListener("resize", () => {
-      this.checkMobile();
-      if (this.chartInstance) {
-        this.chartInstance.resize();
-      }
-    });
+    window.addEventListener("resize", this.checkMobile);
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.checkMobile);
@@ -165,36 +136,6 @@ export default {
       localStorage.removeItem("username");
       this.$router.push("/");
     },
-    renderPieChart() {
-      const ctx = document.getElementById("nutritionChart");
-      this.chartInstance = new Chart(ctx, {
-        type: "pie",
-        data: {
-          labels: ["Protein", "Carbs", "Fat", "Fiber"],
-          datasets: [
-            {
-              label: "Nutrient Composition",
-              data: [30, 40, 20, 10],
-              backgroundColor: ["#42A5F5", "#66BB6A", "#FFA726", "#AB47BC"],
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: "bottom",
-            },
-          },
-        },
-      });
-    },
-    goToInput() {
-      this.$router.push("/input-ingredients");
-    },
-    goToScan() {
-      this.$router.push("/scan-ingredients");
-    },
     startCarousel() {
       this.carouselInterval = setInterval(() => {
         this.currentIndex = (this.currentIndex + 1) % this.carouselItems.length;
@@ -203,11 +144,18 @@ export default {
     checkMobile() {
       this.isMobile = window.innerWidth <= 768;
     },
+    toggleMenu() {
+      this.isMenuOpen = !this.isMenuOpen;
+    },
+    renderPieChart() {
+      // Optional: isi logika chart jika dibutuhkan
+    },
   },
 };
 </script>
 
 <style scoped>
+/* ===== CONTAINER ===== */
 .home-container {
   display: flex;
   height: 100vh;
@@ -216,7 +164,7 @@ export default {
   background-color: #f4f4f4;
 }
 
-/* Sidebar Kiri */
+/* ===== SIDEBAR KIRI ===== */
 .logo {
   font-size: 1.8rem;
   font-weight: bold;
@@ -233,8 +181,8 @@ export default {
   padding: 1rem;
   margin: 0.25rem 0;
   color: white;
-  text-decoration: none;
   text-align: center;
+  text-decoration: none;
   border-radius: 8px;
   transition: background 0.3s;
 }
@@ -248,7 +196,7 @@ export default {
   background-color: #d32f2f;
 }
 
-/* Main Layout */
+/* ===== MAIN SECTION ===== */
 .main-section {
   flex: 1;
   padding: 2rem;
@@ -258,120 +206,30 @@ export default {
   transition: margin-left 0.3s ease-in-out;
 }
 
+.main-section-mobile {
+  margin-left: 0;
+}
+
 .main-layout {
   display: flex;
   gap: 1.5rem;
+  align-items: flex-start;
 }
 
 .main-content {
   flex: 3;
+  width: 100%;
+  height: auto;
 }
 
-.main-section-mobile {
-  margin-left: 0; /* Menghapus margin saat sidebar terbuka di mode mobile */
-}
-
-/* Responsive improvement */
+/* ===== RESPONSIVE (<=768px) ===== */
 @media (max-width: 768px) {
   .main-section {
-    margin-left: 0; /* Menghapus margin untuk mode mobile */
-  }
-}
-
-/* Header */
-.header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  align-items: center;
-}
-
-.header-left {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.header-right {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem; /* jarak antar tombol */
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  box-sizing: border-box;
-  margin-right: 1rem; /* jarak dengan tombol */
-}
-
-.feature-section {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin: 20px 0;
-}
-
-.feature-card {
-  flex: 1;
-  padding: 20px;
-  background-color: #e9f7ef;
-  border: 1px solid #2e7d32;
-  border-radius: 12px;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.feature-card:hover {
-  background-color: #d4efdf;
-  transform: translateY(-3px);
-}
-
-.icon {
-  font-size: 48px;
-  color: #2e7d32;
-  margin-bottom: 10px;
-}
-
-.feature-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #2e7d32;
-  margin: 8px 0 4px;
-}
-
-.feature-desc {
-  font-size: 14px;
-  color: #f9f9f9;
-  background-color: #2e7d32;
-  width: 65%;
-  padding: 5px;
-  border-radius: 8px;
-  justify-self: center;
-}
-
-/* Responsive improvement */
-@media (max-width: 768px) {
-  .header {
-    flex-direction: column;
-    align-items: stretch;
+    margin-left: 0;
+    margin-top: 60px;
+    padding-top: 0;
   }
 
-  .header-right {
-    justify-content: flex-start;
-  }
-
-  .search-input {
-    margin-right: 0;
-  }
-}
-
-/* Additional responsiveness for homeView.vue */
-@media (max-width: 768px) {
   .main-layout {
     flex-direction: column;
   }
@@ -382,15 +240,19 @@ export default {
   }
 
   .right-sidebar {
-    flex: none;
     width: 100%;
-    order: 2;
-    margin-top: 1.5rem;
+    padding: 1.25rem;
+    border-radius: 12px;
+    background-color: #eaf5eb;
+    display: flex;
+    flex: none;
+    margin-left: -18px;
+    flex-direction: column;
   }
 
   .hero-carousel {
-    height: auto;
     padding: 1rem;
+    height: auto;
   }
 
   .carousel-item {
@@ -416,24 +278,26 @@ export default {
   .big-btn {
     width: 100%;
   }
+
+  .nutrition-card {
+    min-height: 250px;
+  }
+
+  #nutritionChart {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 250px;
+  }
 }
 
-.user-box {
-  background-color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Hero Section */
+/* ===== HERO SECTION ===== */
 .hero-carousel {
   position: relative;
   overflow: hidden;
-  background: #4caf50; /* hijau */
+  background: #4caf50;
   border-radius: 12px;
-  margin-top: 2rem;
   padding: 1.5rem;
-  height: 250px; /* Atur tinggi tetap */
+  height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -442,8 +306,8 @@ export default {
 .carousel-slide {
   display: flex;
   width: 100%;
-  position: relative;
   height: 100%;
+  position: relative;
 }
 
 .carousel-item {
@@ -461,6 +325,17 @@ export default {
   animation: fadeIn 0.8s ease-in-out;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .hero-img {
   width: 200px;
   height: 200px;
@@ -474,103 +349,236 @@ export default {
   color: white;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateX(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* ===== FEATURE SECTION ===== */
+.feature-section {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 20px 0;
 }
 
-/* Recommendations */
-.recommendations {
-  margin-top: 2rem;
-}
-
-.recipe-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.recipe-card {
-  background: white;
+.feature-card {
+  flex: 1;
+  padding: 4rem;
+  background-color: #ffffff;
+  border: 1px solid #d0e6d1;
   border-radius: 12px;
-  padding: 1rem;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.recipe-card img {
-  width: 100%;
+.feature-card:hover {
+  background-color: #d4efdf;
+  transform: translateY(-3px);
+}
+
+.feature-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  flex: 1;
+}
+
+.icon {
+  font-size: 40px;
+  color: #2e7d32;
+  margin-bottom: 10px;
+}
+
+.feature-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2e7d32;
+  margin: 8px 0 4px;
+}
+
+.feature-desc {
+  font-size: 14px;
+  color: #f9f9f9;
+  background-color: #2e7d32;
+  margin: 0 auto;
+  padding: 5px;
   border-radius: 8px;
 }
 
-/* Sidebar Kanan */
+/* ===== RIGHT SIDEBAR ===== */
 .right-sidebar {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-wrapper {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.nutrition-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.profile-card {
   text-align: center;
 }
 
-.top-users {
-  background: white;
-  border-radius: 12px;
+.profile-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid white;
+  object-fit: cover;
+}
+
+.profile-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.carbon-card {
+  background: #d7ecd8;
+  color: #2e7d32;
   padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  text-align: center;
+  font-weight: bold;
+  border-color: #1b5e20;
 }
 
-.top-users h4 {
-  margin-bottom: 0.5rem;
+.carbon-card .sparkle {
+  display: inline-block;
+  font-size: 1.2rem;
 }
 
-.top-user {
+/* ===== USER INFO ===== */
+.user-info {
+  background: #d7ecd8;
+  border-radius: 12px;
+  padding: 0 20px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.user-info h4 {
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.info-item label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+  color: #2e7d32;
+}
+
+.info-value {
+  background: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #2e7d32;
+}
+
+/* ===== FOOD LIST SECTION ===== */
+.food-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.food-category-list h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2e7d32;
+  margin-left: 8px;
+}
+
+.food-category-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 8px 0;
+}
+
+.food-category-card {
+  min-width: 100px;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 12px 10px;
+  text-align: center;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.food-category-card:hover {
+  transform: translateY(-3px);
+}
+
+.food-category-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #e0e0e0;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0.5rem 0;
+  justify-content: center;
+  margin-bottom: 6px; /* kecilkan agar tidak terlalu turun */
 }
 
-.top-user img {
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
+.food-category-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.user-box {
-  cursor: pointer;
-  text-decoration: none;
-  color: inherit;
-  font-weight: bold;
+.food-category-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2e7d32;
+  margin-top: 4px;
+  line-height: 1.2;
 }
-.user-box:hover {
+
+.food-category-list span {
+  margin-left: 8px;
+}
+
+.food-category-list span a {
+  font-size: 13px;
+  color: #2e7d32;
   text-decoration: underline;
 }
-/* Additional style for nutrition-card and canvas on mobile */
+
 @media (max-width: 768px) {
-  .main-section {
-    margin-top: 2rem;
+  .main-layout {
+    flex-direction: column;
   }
-  .nutrition-card {
-    min-height: 250px;
+
+  .right-sidebar {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    background-color: #eaf5eb;
+    border-radius: 12px;
+    order: 2;
   }
-  #nutritionChart {
-    width: 100% !important;
-    height: auto !important;
-    max-height: 250px;
+
+  .feature-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .feature-card {
+    padding: 2rem;
   }
 }
 </style>
