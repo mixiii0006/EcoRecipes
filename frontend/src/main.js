@@ -6,6 +6,7 @@ import Navbar from './components/navbar.vue';
 import Sidebar from './components/sidebar.vue'; 
 import Footer from './components/footer.vue';
 
+
 const app = createApp(App);
 
 app.component('Navbar', Navbar);

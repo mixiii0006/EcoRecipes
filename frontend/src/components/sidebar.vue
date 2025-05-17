@@ -2,7 +2,7 @@
   <div>
     <!-- Tombol Burger -->
     <button v-if="!isMenuOpen && isMobile" class="burger-icon" @click="toggleMenu">
-      <i class="fas fa-bars">=</i>
+      <i class="fa-solid fa-bars"></i>
     </button>
 
     <!-- Konten utama yang dapat menutup sidebar -->
@@ -14,17 +14,17 @@
 
       <nav class="menu">
         <router-link to="/home" class="menu-item" exact-active-class="active">
-          <i class="fas fa-home"></i>
+          <i class="fa-solid fa-home"></i>
           Dashboard
         </router-link>
         <router-link to="/search" class="menu-item" exact-active-class="active">
-          <i class="fas fa-search"></i>
+          <i class="fa-solid fa-book"></i>
           Recipes
         </router-link>
       </nav>
 
       <button class="logout-btn" @click="handleLogout">
-        <i class="fas fa-sign-out-alt"></i> Logout
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
       </button>
     </aside>
   </div>

@@ -44,13 +44,17 @@
             </div>
           </section>
 
-          <section class="action-buttons">
-            <button class="big-btn full-width" @click="handleInputClick">
-              Input
-            </button>
-            <button class="big-btn full-width" @click="handleScanClick">
-              Scan
-            </button>
+          <section class="feature-section">
+            <div class="feature-card" @click="goToInput">
+              <i class="fa-solid fa-inbox icon"></i>
+              <p class="feature-title">Input</p>
+              <p class="feature-desc">Please Input your Ingredients</p>
+            </div>
+            <div class="feature-card" @click="goToScan">
+              <i class="fa-solid fa-camera icon"></i>
+              <p class="feature-title">Scan</p>
+              <p class="feature-desc">Please Scan your Food</p>
+            </div>
           </section>
 
           <!-- Rekomendasi -->
@@ -185,10 +189,10 @@ export default {
         },
       });
     },
-    handleInputClick() {
+    goToInput() {
       this.$router.push("/input-ingredients");
     },
-    handleScanClick() {
+    goToScan() {
       this.$router.push("/scan-ingredients");
     },
     startCarousel() {
@@ -207,6 +211,7 @@ export default {
 .home-container {
   display: flex;
   height: 100vh;
+  max-width: 100%;
   font-family: "Segoe UI", sans-serif;
   background-color: #f4f4f4;
 }
@@ -303,30 +308,50 @@ export default {
   margin-right: 1rem; /* jarak dengan tombol */
 }
 
-.action-buttons {
+.feature-section {
   display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  justify-content: center;
+  gap: 20px;
+  margin: 20px 0;
 }
 
-.full-width {
+.feature-card {
   flex: 1;
-}
-
-.big-btn {
-  padding: 1.2rem 0;
-  font-size: 1.2rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 16px;
-  background-color: #388e3c;
-  color: white;
+  padding: 20px;
+  background-color: #e9f7ef;
+  border: 1px solid #2e7d32;
+  border-radius: 12px;
+  text-align: center;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: 0.3s;
 }
 
-.big-btn:hover {
+.feature-card:hover {
+  background-color: #d4efdf;
+  transform: translateY(-3px);
+}
+
+.icon {
+  font-size: 48px;
+  color: #2e7d32;
+  margin-bottom: 10px;
+}
+
+.feature-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2e7d32;
+  margin: 8px 0 4px;
+}
+
+.feature-desc {
+  font-size: 14px;
+  color: #f9f9f9;
   background-color: #2e7d32;
+  width: 65%;
+  padding: 5px;
+  border-radius: 8px;
+  justify-self: center;
 }
 
 /* Responsive improvement */
