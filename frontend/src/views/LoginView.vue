@@ -15,13 +15,6 @@
         <p>Login to your account!</p>
         <form @submit.prevent="handleLogin">
           <FormInput
-            id="name"
-            label="Name"
-            v-model="name"
-            placeholder="Enter your name"
-            required
-          />
-          <FormInput
             id="email"
             label="Email"
             type="email"
@@ -37,14 +30,36 @@
             placeholder="Enter your password"
             required
           />
+
           <div class="form-options">
-            <label
-              ><input type="checkbox" v-model="rememberMe" /> Remember Me</label
+            <label class="remember-me">
+              <input type="checkbox" v-model="rememberMe" />
+              Remember Me
+            </label>
+
+            <button
+              type="button"
+              @click="showForgotModal = true"
+              class="forgot-password"
             >
-            <a href="#" class="forgot-password">Forgot Password?</a>
+              Forgot Password?
+            </button>
           </div>
+
           <Button type="submit">Login</Button>
         </form>
+
+        <ForgotPasswordModal
+          v-if="showForgotModal"
+          @close="showForgotModal = false"
+          @email-verified="handleEmailVerified"
+        />
+
+        <ResetPasswordModal
+          v-if="showResetModal"
+          :email="resetEmail"
+          @close="showResetModal = false"
+        />
         <p class="register-link">
           Don't have an account?
           <router-link to="/register">Register Here</router-link>
@@ -57,6 +72,8 @@
 <script>
 import FormInput from "../components/FormInput.vue";
 import Button from "../components/Button.vue";
+import ForgotPasswordModal from "../components/forgotPasswordModal.vue";
+import ResetPasswordModal from "../components/resetPasswordModal.vue";
 import axios from "axios";
 
 export default {
@@ -64,20 +81,28 @@ export default {
   components: {
     FormInput,
     Button,
+    ForgotPasswordModal,
+    ResetPasswordModal,
   },
   data() {
     return {
-      name: "",
       email: "",
       password: "",
       rememberMe: false,
+      showForgotModal: false,
+      showResetModal: false,
+      resetEmail: "",
     };
   },
   methods: {
+    handleEmailVerified(email) {
+      this.resetEmail = email;
+      this.showForgotModal = false;
+      this.showResetModal = true;
+    },
     async handleLogin() {
       try {
-        const response = await axios.post("http://localhost:3000/api/login", {
-          username: this.name,
+        const response = await axios.post("http://localhost:3000/v1/login", {
           email: this.email,
           password: this.password,
         });
@@ -158,13 +183,31 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
   font-size: 0.9rem;
 }
 
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.remember-me input {
+  accent-color: #2e7d32;
+  cursor: pointer;
+}
+
 .forgot-password {
+  background: none;
+  border: none;
   color: #2e7d32;
-  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
 }
 
 .forgot-password:hover {

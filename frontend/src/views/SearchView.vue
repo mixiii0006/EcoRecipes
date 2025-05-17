@@ -27,51 +27,52 @@
         </div>
       </section>
 
-      <!-- Recipe Recommendations -->
+      <!-- Recipe Recommendations with RecipeCard -->
       <section class="food-category-list">
-        <h3>Favorite Food</h3>
-        <div class="food-category-grid">
-          <div class="food-category-card" v-for="(item, index) in favoriteFoods" :key="index" @click="openModal(index)">
-            <div class="food-category-image">
-              <img :src="item.image" :alt="item.name" />
-            </div>
-            <div class="food-category-info">
-              <h4 class="food-name">Ayam Bakar</h4>
-              <p class="food-meta">Durasi: 30 min · Karbon: 120g</p>
-
-              <div class="food-actions">
-                <button class="btn cook-btn">Masak</button>
-                <i class="fa-regular fa-heart heart-icon"></i>
-              </div>
-            </div>
-          </div>
+        <h3>Recommendations</h3>
+        <div v-if="loadingRecommendations" class="loading-message">Loading recommendations...</div>
+        <div v-else class="food-category-grid">
+          <RecipeCard
+            v-for="(item, index) in recommendations"
+            :key="item.id || item.Title_Cleaned || item.name"
+            :Image_Name="item.image ? item.image + '.jpg' : ''"
+            :name="item.name || item.Title_Cleaned || ''"
+            :duration="parseInt(item.duration) || 0"
+            :carbon="item.carbon"
+            :rating="item.rating"
+            @open="openModal(index)"
+          />
         </div>
       </section>
+      <RecipeModal v-if="showModal" :food="selectedFood" @close="showModal = false" />
     </main>
-    <RecipeModal v-if="showModal" @close="showModal = false" />
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import Sidebar from "../components/Sidebar.vue";
 import RecipeCard from "../components/RecipeCard.vue";
 import RecipeModal from "../components/RecipeModal.vue";
 
 export default {
   name: "SearchView",
   components: {
+    Sidebar,
     RecipeCard,
     RecipeModal,
   },
   data() {
     return {
+      username: "",
       query: "",
-      results: [],
-      searched: false,
+      searchText: "",
       currentIndex: 0,
       carouselInterval: null,
-      showModal: false, // 👈 untuk kontrol modal
-      selectedRecipeId: null, // 👈 jika kamu ingin tahu item yang dipilih
+      isMobile: false,
+      recommendations: [],
+      loadingRecommendations: false,
+      showModal: false,
+      selectedFood: null,
       carouselItems: [
         {
           title: "Makan Apa Hari Ini??",
@@ -92,44 +93,47 @@ export default {
           image: "https://source.unsplash.com/featured/?healthy-food",
         },
       ],
-
-      favoriteFoods: [
-        { name: "Ayam Bakar", duration: 40, carbon: 210, image: "/images/bg-profil.jpg" },
-        { name: "Sate Lilit", duration: 30, carbon: 190, image: "/images/bg-profil.jpg" },
-        { name: "Tumis Kangkung", duration: 15, carbon: 80, image: "/images/bg-profil.jpg" },
-        { name: "Rendang", duration: 90, carbon: 320, image: "/images/bg-profil.jpg" },
-        { name: "Pecel Lele", duration: 20, carbon: 120, image: "/images/bg-profil.jpg" },
-        { name: "Gado-Gado", duration: 25, carbon: 150, image: "/images/bg-profil.jpg" },
-      ],
     };
+  },
+  created() {
+    this.username = localStorage.getItem("username") || "";
+    this.fetchRecommendations();
   },
   mounted() {
     this.startCarousel();
-  },
-  beforeDestroy() {
-    clearInterval(this.carouselInterval);
+    this.checkMobile();
   },
   methods: {
-    async handleSearch() {
-      if (!this.query) {
-        this.results = [];
-        this.searched = false;
-        return;
-      }
+    async fetchRecommendations() {
       try {
-        const response = await axios.get(`http://localhost:3000/api/search?q=${encodeURIComponent(this.query)}`);
-        this.results = response.data;
-        this.searched = true;
+        this.loadingRecommendations = true;
+        const response = await fetch("http://localhost:3000/api/recommend/text", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: this.searchText.trim() || "dummy" }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          alert(errorData.error || "Failed to get recommendations from backend.");
+          this.recommendations = [];
+          this.loadingRecommendations = false;
+          return;
+        }
+
+        const data = await response.json();
+        const filtered = data.recommendations.filter((item) => item && item.name);
+        this.recommendations = filtered;
+        this.loadingRecommendations = false;
       } catch (error) {
-        console.error("Search failed:", error);
-        this.results = [];
-        this.searched = true;
+        alert("Error connecting to backend: " + error.message);
+        this.recommendations = [];
+        this.loadingRecommendations = false;
       }
     },
-    startCarousel() {
-      this.carouselInterval = setInterval(() => {
-        this.currentIndex = (this.currentIndex + 1) % this.carouselItems.length;
-      }, 4000);
+    handleSearch() {
+      this.searchText = this.query;
+      this.fetchRecommendations();
     },
     handleInputClick() {
       this.$router.push("/input-ingredients");
@@ -137,14 +141,22 @@ export default {
     handleScanClick() {
       this.$router.push("/scan-ingredients");
     },
+
+    startCarousel() {
+      this.carouselInterval = setInterval(() => {
+        this.currentIndex = (this.currentIndex + 1) % this.carouselItems.length;
+      }, 4000);
+    },
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 768;
+    },
     openModal(id = null) {
       this.selectedRecipeId = id;
       this.showModal = true;
     },
 
     openModal(index) {
-      // Logic untuk buka modal resep
-      this.selectedFood = this.favoriteFoods[index];
+      this.selectedFood = this.recommendations[index];
       this.showModal = true;
     },
   },

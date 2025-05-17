@@ -1,12 +1,14 @@
 <template>
-  <div class="recipe-card">
-    <img :src="image" alt="Recipe Image" class="recipe-image" />
-    <div class="recipe-info">
-      <h4 class="recipe-title">{{ name }}</h4>
-      <p class="recipe-duration">Duration: {{ duration }} mins</p>
-      <p class="recipe-carbon">Footprint Carbon: {{ carbon }}%</p>
-      <div class="stars">
-        <span v-for="n in 5" :key="n" class="star" :class="{ filled: n <= rating }">★</span>
+  <div class="food-category-card" @click="handleClick">
+    <div class="food-category-image">
+      <img :src="imageUrl" :alt="name" />
+    </div>
+    <div class="food-category-info">
+      <h4 class="food-name">{{ name }}</h4>
+      <p class="food-meta">Durasi: {{ duration }} min · Karbon: {{ carbon || 'N/A' }} g</p>
+      <div class="food-actions">
+        <button class="btn cook-btn" @click.stop="handleCook">Masak</button>
+        <i class="fa-regular fa-heart heart-icon" @click.stop="toggleFavorite"></i>
       </div>
     </div>
   </div>
@@ -16,88 +18,142 @@
 export default {
   name: "RecipeCard",
   props: {
-    image: {
+    Image_Name: {
       type: String,
-      required: true,
+      default: "",
     },
     name: {
       type: String,
-      required: true,
+      default: "",
     },
     duration: {
       type: Number,
-      required: true,
+      default: 0,
     },
     carbon: {
-      type: Number,
-      required: true,
+      type: [Number, String],
+      default: null,
     },
     rating: {
       type: Number,
-      required: true,
+      default: 0,
     },
   },
-  mounted() {
-    // Memeriksa apakah data props sudah sampai
-    console.log("RecipeCard props:", this.$props);
+  computed: {
+    imageUrl() {
+      return this.Image_Name
+        ? `/foodImages/${this.Image_Name}`
+        : "https://source.unsplash.com/160x160/?food";
+    },
+  },
+  methods: {
+    handleClick() {
+      this.$emit("open");
+    },
+    handleCook() {
+      alert(`Memasak: ${this.name}`);
+    },
+    toggleFavorite() {
+      alert(`Favorit: ${this.name}`);
+    },
   },
 };
 </script>
 
 <style scoped>
-.recipe-card {
-  background: #ffffff;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out;
+/* Card wrapper */
+.food-category-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s;
+  text-align: left;
   display: flex;
   flex-direction: column;
 }
 
-.recipe-card:hover {
-  transform: scale(1.05);
+/* Hover effect */
+.food-category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
-.recipe-image {
+/* Image container */
+.food-category-image {
   width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 15px 15px 0 0;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 1rem;
 }
 
-.recipe-info {
-  padding: 1.2rem;
+.food-category-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Info section */
+.food-category-info {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 150px;
+  gap: 0.5rem;
 }
 
-.recipe-title {
-  font-size: 1.2rem;
+/* Food name */
+.food-name {
+  font-size: 1.1rem;
+  color: #2e7d32;
   font-weight: bold;
-  color: #333;
-  margin-bottom: 0.5rem;
+  margin: 0;
 }
 
-.recipe-duration,
-.recipe-carbon {
+/* Meta info */
+.food-meta {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+/* Actions row */
+.food-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  gap: 0.75rem;
+}
+
+/* Cook button */
+.cook-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: linear-gradient(to right, #2e7d32, #66bb6a);
+  color: white;
+  border: none;
+  font-weight: bold;
   font-size: 0.9rem;
-  color: #666;
-  margin: 0.3rem 0;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-.stars {
-  margin-top: 0.5rem;
+.cook-btn:hover {
+  background: linear-gradient(to right, #1b5e20, #4caf50);
 }
 
-.star {
-  font-size: 1.2rem;
+/* Heart icon */
+.heart-icon {
+  font-size: 1.4rem;
   color: #ccc;
+  cursor: pointer;
+  transition: color 0.3s ease;
 }
 
-.star.filled {
-  color: #ffc107;
+.heart-icon:hover {
+  color: red;
 }
 </style>
+
