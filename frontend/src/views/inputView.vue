@@ -12,8 +12,8 @@
 
       <!-- Ingredients Input Section -->
       <div class="input-section">
-        <textarea placeholder="ex : I have one and a half kilos of chicken, ... " rows="5" class="ingredients-input"></textarea>
-        <button class="submit-btn">Submit</button>
+        <textarea v-model="ingredients" placeholder="ex : I have one and a half kilos of chicken, ... " rows="5" class="ingredients-input"></textarea>
+        <button class="submit-btn" @click="submitIngredients">Submit</button>
       </div>
 
       <!-- Recommendations + Right Section -->
@@ -23,14 +23,15 @@
           <section class="recommendations">
             <h3>Recommendations</h3>
             <div class="recipe-grid">
-              <div class="card-link">
-                <RecipeCard image="https://via.placeholder.com/150" name="Siomay Bandung" duration="15" carbon="25" rating="4" />
-              </div>
-              <div class="card-link">
-                <RecipeCard image="https://via.placeholder.com/150" name="Sop Ikan" duration="30" carbon="20" rating="5" />
-              </div>
-              <div class="card-link">
-                <RecipeCard image="https://via.placeholder.com/150" name="Nasi Goreng" duration="20" carbon="15" rating="3" />
+              <div v-if="recommendations.length === 0">No recommendations yet.</div>
+              <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
+                <RecipeCard
+                  :image="rec.image || 'https://via.placeholder.com/150'"
+                  :name="rec.Title_Cleaned || 'No Title'"
+                  duration="15"
+                  carbon="25"
+                  rating="4"
+                />
               </div>
             </div>
           </section>
@@ -42,21 +43,9 @@
             <section class="recent-search">
               <h3>Recent Search</h3>
               <div class="recent-search-list">
-                <div class="recent-search-item">
-                  <span>Siomay Bandung</span>
-                  <button class="delete-btn">
-                    <i class="fa-solid fa-trash-can"></i>
-                  </button>
-                </div>
-                <div class="recent-search-item">
-                  <span>Sop Ikan</span>
-                  <button class="delete-btn">
-                    <i class="fa-solid fa-trash-can"></i>
-                  </button>
-                </div>
-                <div class="recent-search-item">
-                  <span>Nasi Goreng</span>
-                  <button class="delete-btn">
+                <div class="recent-search-item" v-for="(search, idx) in recentSearches" :key="idx">
+                  <span>{{ search }}</span>
+                  <button class="delete-btn" @click="deleteRecentSearch(idx)">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>
                 </div>
@@ -77,6 +66,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import RecipeCard from "../components/RecipeCard.vue";
 import Sidebar from "../components/Sidebar.vue";
 
@@ -86,9 +76,39 @@ export default {
     RecipeCard,
     Sidebar,
   },
+  data() {
+    return {
+      ingredients: '',
+      recommendations: [],
+      recentSearches: []
+    };
+  },
   methods: {
     scanIngredients() {
       this.$router.push("/scan-ingredients");
+    },
+    async submitIngredients() {
+      if (!this.ingredients.trim()) {
+        alert('Please enter some ingredients.');
+        return;
+      }
+      try {
+        const response = await axios.post('http://localhost:5001/api/recommend', { ingredients: this.ingredients });
+        this.recommendations = response.data.recommendations || [];
+        this.addRecentSearch(this.ingredients);
+      } catch (error) {
+        alert('Failed to fetch recommendations.');
+        console.error(error);
+      }
+    },
+    addRecentSearch(search) {
+      this.recentSearches.unshift(search);
+      if (this.recentSearches.length > 5) {
+        this.recentSearches.pop();
+      }
+    },
+    deleteRecentSearch(index) {
+      this.recentSearches.splice(index, 1);
     }
   },
 };
@@ -286,5 +306,4 @@ export default {
     max-height: 250px;
   }
 }
-
 </style>
