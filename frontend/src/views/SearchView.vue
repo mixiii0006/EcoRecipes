@@ -93,24 +93,27 @@ export default {
           image: "https://source.unsplash.com/featured/?healthy-food",
         },
       ],
+      searchTimeout: null,
     };
   },
   created() {
     this.username = localStorage.getItem("username") || "";
-    this.fetchRecommendations();
+    this.fetchRecommendations('');
   },
   mounted() {
     this.startCarousel();
     this.checkMobile();
   },
   methods: {
-    async fetchRecommendations() {
+    async fetchRecommendations(searchText) {
       try {
+        const textToSend = (typeof searchText === 'string') ? searchText.trim() : (this.searchText.trim() || '');
+        console.log("Fetching recommendations with search text:", textToSend);
         this.loadingRecommendations = true;
         const response = await fetch("http://localhost:3000/api/recommend/text", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: this.searchText.trim() || "dummy" }),
+          body: JSON.stringify({ text: textToSend }),
         });
 
         if (!response.ok) {
@@ -122,6 +125,7 @@ export default {
         }
 
         const data = await response.json();
+        console.log("Received recommendations:", data.recommendations.length);
         const filtered = data.recommendations.filter((item) => item && item.name);
         this.recommendations = filtered;
         this.loadingRecommendations = false;
@@ -132,8 +136,11 @@ export default {
       }
     },
     handleSearch() {
-      this.searchText = this.query;
-      this.fetchRecommendations();
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(() => {
+        this.searchText = this.query;
+        this.fetchRecommendations(this.searchText);
+      }, 300);
     },
     handleInputClick() {
       this.$router.push("/input-ingredients");

@@ -45,23 +45,37 @@ function loadRecipes() {
   });
 }
 
-// Stub function for ML model recommendation based on input text or image data
+// Function to recommend recipes based on input text or return random recipes if no input
 function recommendRecipes(input, recipes) {
-  // For now, return first 10 unique recipes as dummy recommendation
-  return recipes.slice(0, 10);
+  if (!input || input.trim() === '') {
+    // Return 12 random unique recipes
+    const shuffled = recipes.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 12);
+  } else {
+    // Filter recipes by checking if input is in name or ingredients (case-insensitive)
+    const lowerInput = input.toLowerCase();
+    const filtered = recipes.filter(recipe => {
+      const normalizedIngredients = recipe.ingredients ? recipe.ingredients.replace(/[\[\]'"]/g, '').toLowerCase() : '';
+      return (recipe.name && recipe.name.toLowerCase().includes(lowerInput)) ||
+             (normalizedIngredients.includes(lowerInput));
+    });
+    // Return up to 50 matching recipes
+    return filtered.slice(0, 50);
+  }
 }
 
 // Controller for text input recommendation
 exports.recommendByText = async (req, res) => {
   try {
-    const { text } = req.body;
+    let { text } = req.body;
+    console.log('Received search text:', text);
     if (!text) {
-      return res.status(400).json({ error: 'Text input is required' });
+      text = ''; // Treat empty or missing text as empty string to get random recipes
     }
     const recipes = await loadRecipes();
     console.log('Loaded recipes:', recipes.length);
     const recommendations = recommendRecipes(text, recipes);
-    console.log('Recommendations:', recommendations.length);
+    console.log('Filtered recommendations count:', recommendations.length);
     res.json({ recommendations });
   } catch (error) {
     console.error('Error in recommendByText:', error);

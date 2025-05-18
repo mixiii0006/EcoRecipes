@@ -102,7 +102,7 @@ export default {
     },
     async handleLogin() {
       try {
-        const response = await axios.post("http://localhost:3000/v1/login", {
+        const response = await axios.post("http://localhost:3000/api/login", {
           email: this.email,
           password: this.password,
         });
