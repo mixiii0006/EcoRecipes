@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 # Ignore large CSV files
 backend/data/nama_file.csv
+replacements.txt
+
