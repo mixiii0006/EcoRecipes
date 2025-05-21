@@ -12,7 +12,12 @@
 
       <!-- Ingredients Input Section -->
       <div class="input-section">
-        <textarea v-model="ingredients" placeholder="ex : I have one and a half kilos of chicken, ... " rows="5" class="ingredients-input"></textarea>
+        <textarea
+          v-model="ingredients"
+          placeholder="ex : I have one and a half kilos of chicken, ... "
+          rows="5"
+          class="ingredients-input"
+        ></textarea>
         <button class="submit-btn" @click="submitIngredients">Submit</button>
       </div>
 
@@ -23,14 +28,21 @@
           <section class="recommendations">
             <h3>Recommendations</h3>
             <div class="recipe-grid">
-              <div v-if="recommendations.length === 0">No recommendations yet.</div>
-              <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
+              <div v-if="recommendations.length === 0">
+                No recommendations yet.
+              </div>
+              <div
+                v-for="(rec, index) in recommendations"
+                :key="index"
+                class="card-link"
+              >
                 <RecipeCard
-                  :image="rec.image || 'https://via.placeholder.com/150'"
+                  :image="rec.Image_Name || 'https://via.placeholder.com/150'"
                   :name="rec.Title_Cleaned || 'No Title'"
-                  duration="15"
-                  carbon="25"
-                  rating="4"
+                  :duration="15"
+                  :carbon="25"
+                  :rating="4"
+                  @open="goToRecipe(rec)"
                 />
               </div>
             </div>
@@ -43,7 +55,11 @@
             <section class="recent-search">
               <h3>Recent Search</h3>
               <div class="recent-search-list">
-                <div class="recent-search-item" v-for="(search, idx) in recentSearches" :key="idx">
+                <div
+                  class="recent-search-item"
+                  v-for="(search, idx) in recentSearches"
+                  :key="idx"
+                >
                   <span>{{ search }}</span>
                   <button class="delete-btn" @click="deleteRecentSearch(idx)">
                     <i class="fa-solid fa-trash-can"></i>
@@ -62,25 +78,31 @@
         </section>
       </section>
     </main>
+    <RecipeModal v-if="showModal" :food="selectedRecipe" @close="closeModal" />
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 import RecipeCard from "../components/RecipeCard.vue";
 import Sidebar from "../components/Sidebar.vue";
+import RecipeModal from "../components/RecipeModal.vue";
 
 export default {
   name: "InputIngredients",
   components: {
     RecipeCard,
     Sidebar,
+    RecipeModal,
   },
   data() {
     return {
-      ingredients: '',
+      ingredients: "",
       recommendations: [],
-      recentSearches: []
+      recentSearches: [],
+      loading: false,
+      showModal: false,
+      selectedRecipe: null,
     };
   },
   methods: {
@@ -88,18 +110,41 @@ export default {
       this.$router.push("/scan-ingredients");
     },
     async submitIngredients() {
+      if (this.loading) return; // 🔒 Cegah submit ganda saat loading
+
       if (!this.ingredients.trim()) {
-        alert('Please enter some ingredients.');
+        alert("Please enter some ingredients.");
         return;
       }
+
+      this.loading = true;
+      console.log("Submitting:", this.ingredients);
+
       try {
-        const response = await axios.post('http://localhost:5001/api/recommend', { ingredients: this.ingredients });
-        this.recommendations = response.data.recommendations || [];
+        const response = await axios.post(
+          "http://localhost:3000/api/recommend",
+          {
+            ingredients: this.ingredients,
+          }
+        );
+
+        console.log("Response data:", response.data);
+
+        if (Array.isArray(response.data.recommendations)) {
+          this.recommendations = response.data.recommendations;
+        } else {
+          this.recommendations = [];
+          console.warn("Unexpected format:", response.data);
+        }
+
         this.addRecentSearch(this.ingredients);
       } catch (error) {
-        alert('Failed to fetch recommendations.');
-        console.error(error);
+        console.error("Axios error:", error);
+        alert("Failed to fetch recommendations. Please try again.");
+      } finally {
+        this.loading = false;
       }
+      console.log("Image name received:", this.recommendations.map(r => r.Image_Name));
     },
     addRecentSearch(search) {
       this.recentSearches.unshift(search);
@@ -109,7 +154,15 @@ export default {
     },
     deleteRecentSearch(index) {
       this.recentSearches.splice(index, 1);
-    }
+    },
+    goToRecipe(recipe) {
+      this.selectedRecipe = recipe;
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+      this.selectedRecipe = null;
+    },
   },
 };
 </script>

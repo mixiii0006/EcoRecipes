@@ -9,18 +9,21 @@ from pprint import pprint
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import load_model
 import pickle
+import os
 
 # — Load machine learning artifacts
-model = load_model('best_ner_bilstm.h5')
-tok2idx = pickle.load(open('tok2idx.pkl', 'rb'))
-le = pickle.load(open('label_encoder.pkl', 'rb'))
+base_dir = os.path.dirname(__file__)
+model_path = os.path.join(base_dir, 'best_ner_bilstm.h5')
+model = load_model(model_path)
+tok2idx = pickle.load(open(os.path.join(base_dir, 'tok2idx.pkl'), 'rb'))
+le = pickle.load(open(os.path.join(base_dir, 'label_encoder.pkl'), 'rb'))
 
 # — Constants
 MAXLEN = 50
 
 # — Load recipe dataset (ubah path sesuai lokasi file Anda)
 df_exploded = pd.read_csv(
-    'nama_file.csv',
+    os.path.join(base_dir, 'nama_file.csv'),
     converters={
         'Cleaned_Ingredients': lambda x: ast.literal_eval(x) if isinstance(x, str) else x
     }
@@ -57,7 +60,7 @@ def parse_ingredients(text):
     toks = text.lower().replace(',', '').split()
     seq = [tok2idx.get(w, tok2idx['UNK']) for w in toks]
     pad = pad_sequences([seq], maxlen=MAXLEN, padding='post', value=tok2idx['PAD'])
-    preds = model.predict(pad)[0]
+    preds = model.predict(pad, verbose=0)[0]
     labs = le.inverse_transform(preds.argmax(-1))[:len(toks)]
 
     items = []
@@ -94,7 +97,7 @@ def parse_ingredients(text):
 # — Fungsi rekomendasi resep berdasarkan bahan parsed
 def recommend_recipes(text, top_n=5):
     items = parse_ingredients(text)
-    pprint(items)
+    # pprint(items)
     if not items:
         return pd.DataFrame(columns=['Title_Cleaned', 'Instructions_Cleaned', 'Cleaned_Ingredients'])
 
@@ -135,7 +138,7 @@ def recommend_recipes(text, top_n=5):
     df_meta = (
         df_exploded
         .drop_duplicates(subset=['Title_Cleaned'])
-        .loc[:, ['Title_Cleaned', 'Instructions_Cleaned', 'Cleaned_Ingredients']]
+        .loc[:, ['Title_Cleaned', 'Instructions_Cleaned', 'Cleaned_Ingredients', 'Image_Name']]
     )
 
     return df_meta[df_meta['Title_Cleaned'].isin(common)].head(top_n)
@@ -168,5 +171,25 @@ def main():
             print(f"  - {ing}")
         print("\n" + "="*40)
 
+def cli():
+    import sys
+    text = sys.stdin.read().strip()
+    res = recommend_recipes(text, top_n=5)
+    if res.empty:
+        sys.stdout.buffer.write(json.dumps([]).encode('utf-8'))
+    else:
+        def safe_serialize(row):
+            return {
+                'Title_Cleaned': row['Title_Cleaned'],
+                'Instructions_Cleaned': row['Instructions_Cleaned'],
+                'Cleaned_Ingredients': row['Cleaned_Ingredients'],
+                'Image_Name': row.get('Image_Name', '')
+            }
+        output = [safe_serialize(row) for _, row in res.iterrows()]
+        sys.stdout.buffer.write(json.dumps(output, ensure_ascii=False).encode('utf-8'))
+
 if __name__ == "__main__":
-    main()
+    cli()
+
+# if __name__ == "__main__":
+#     main()
