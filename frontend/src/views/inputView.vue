@@ -5,19 +5,15 @@
 
     <!-- Main Content Area -->
     <main class="main-content">
-      <div class="header-section">
-        <h2 class="input-title">Please Input your Ingredients</h2>
-        <button class="scan-btn" @click="scanIngredients">Scan</button>
+      <!-- Section Header Baris: Judul kiri, Tombol kanan -->
+      <div class="section-header">
+        <h2 class="section-title">Please Input your Ingredients</h2>
+        <button class="scan-btn-bar" @click="scanIngredients">Scan</button>
       </div>
 
       <!-- Ingredients Input Section -->
       <div class="input-section">
-        <textarea
-          v-model="ingredients"
-          placeholder="ex : I have one and a half kilos of chicken, ... "
-          rows="5"
-          class="ingredients-input"
-        ></textarea>
+        <textarea v-model="ingredients" placeholder="ex : I have one and a half kilos of chicken, ... " rows="5" class="ingredients-input"></textarea>
         <button class="submit-btn" @click="submitIngredients">Submit</button>
       </div>
 
@@ -28,22 +24,9 @@
           <section class="recommendations">
             <h3>Recommendations</h3>
             <div class="recipe-grid">
-              <div v-if="recommendations.length === 0">
-                No recommendations yet.
-              </div>
-              <div
-                v-for="(rec, index) in recommendations"
-                :key="index"
-                class="card-link"
-              >
-                <RecipeCard
-                  :image="rec.Image_Name || 'https://via.placeholder.com/150'"
-                  :name="rec.Title_Cleaned || 'No Title'"
-                  :duration="15"
-                  :carbon="25"
-                  :rating="4"
-                  @open="goToRecipe(rec)"
-                />
+              <div v-if="recommendations.length === 0">No recommendations yet.</div>
+              <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
+                <RecipeCard :image="rec.Image_Name || 'https://via.placeholder.com/150'" :name="rec.Title_Cleaned || 'No Title'" :duration="15" :carbon="25" :rating="4" @open="goToRecipe(rec)" />
               </div>
             </div>
           </section>
@@ -55,11 +38,7 @@
             <section class="recent-search">
               <h3>Recent Search</h3>
               <div class="recent-search-list">
-                <div
-                  class="recent-search-item"
-                  v-for="(search, idx) in recentSearches"
-                  :key="idx"
-                >
+                <div class="recent-search-item" v-for="(search, idx) in recentSearches" :key="idx">
                   <span>{{ search }}</span>
                   <button class="delete-btn" @click="deleteRecentSearch(idx)">
                     <i class="fa-solid fa-trash-can"></i>
@@ -110,7 +89,7 @@ export default {
       this.$router.push("/scan-ingredients");
     },
     async submitIngredients() {
-      if (this.loading) return; // 🔒 Cegah submit ganda saat loading
+      if (this.loading) return;
 
       if (!this.ingredients.trim()) {
         alert("Please enter some ingredients.");
@@ -118,33 +97,23 @@ export default {
       }
 
       this.loading = true;
-      console.log("Submitting:", this.ingredients);
-
       try {
-        const response = await axios.post(
-          "http://localhost:3000/api/recommend",
-          {
-            ingredients: this.ingredients,
-          }
-        );
-
-        console.log("Response data:", response.data);
+        const response = await axios.post("http://localhost:3000/api/recommend", {
+          ingredients: this.ingredients,
+        });
 
         if (Array.isArray(response.data.recommendations)) {
           this.recommendations = response.data.recommendations;
         } else {
           this.recommendations = [];
-          console.warn("Unexpected format:", response.data);
         }
 
         this.addRecentSearch(this.ingredients);
       } catch (error) {
-        console.error("Axios error:", error);
         alert("Failed to fetch recommendations. Please try again.");
       } finally {
         this.loading = false;
       }
-      console.log("Image name received:", this.recommendations.map(r => r.Image_Name));
     },
     addRecentSearch(search) {
       this.recentSearches.unshift(search);
@@ -175,6 +144,95 @@ export default {
   background-color: #f8f8f8;
 }
 
+/* ---- JUDUL UTAMA, seperti Home ---- */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  background: transparent;
+}
+.section-title {
+  font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2e7d32;
+  margin: 0;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  flex: 1;
+  text-align: justify;
+}
+
+.scan-btn-bar {
+  align-self: center;
+  background: linear-gradient(to right, #235f3a, #73b06f);
+  color: white;
+  border: none;
+  padding: 0.8rem 2.5rem;
+  border-radius: 18px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  margin-top: 1.5rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+}
+
+.scan-btn-bar:hover {
+  background: #388e3c;
+}
+
+/* Responsive: tombol di bawah judul di mobile */
+@media (max-width: 700px) {
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.7rem;
+  }
+  .section-title {
+    font-size: 1.22rem;
+    text-align: center;
+  }
+  .scan-btn-bar {
+    width: 100%;
+    justify-content: center;
+    font-size: 1.12rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .section-title {
+    font-size: 1.22rem;
+    text-align: center;
+  }
+}
+
+/* ---- Tombol Scan ---- */
+.scan-btn-home {
+  background: linear-gradient(to right, #235f3a, #73b06f);
+  color: #fff;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 600;
+  padding: 0.8rem 1.6rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+}
+
+.scan-btn-home:hover {
+  background: #388e3c;
+}
+@media (max-width: 600px) {
+  .scan-btn-home {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+}
+
 .main-content {
   flex: 1;
   padding: 2rem;
@@ -182,27 +240,6 @@ export default {
   display: flex;
   flex-direction: column;
   margin-left: 270px;
-}
-
-.header-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.input-title {
-  font-size: 1.6rem;
-}
-
-.scan-btn {
-  background: linear-gradient(to right, #235f3a, #73b06f);
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 1rem;
 }
 
 .input-section {
@@ -234,10 +271,13 @@ export default {
   background: linear-gradient(to right, #235f3a, #73b06f);
   color: white;
   border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 12px;
+  padding: 0.8rem 2.5rem;
+  border-radius: 18px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.2rem;
+  margin-top: 1.5rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
 }
 
 .combined-section {
@@ -335,28 +375,56 @@ export default {
   font-weight: bold;
 }
 
-@media (max-width: 768px) {
-  .recipe-detail-page {
-    flex-direction: column;
-  }
-
-  .content {
-    margin-left: 0;
+@media (max-width: 1100px) {
+  .main-content {
+    margin-left: 0 !important;
     padding: 1rem;
-    margin-top: 50px;
   }
-
-  .recipe-body {
+  .input-ingredients {
     flex-direction: column;
   }
+}
 
-  .left-column,
-  .right-column {
-    width: 100%;
+@media (max-width: 900px) {
+  .combined-section {
+    flex-direction: column;
+    gap: 1rem;
   }
+  .recommendations-wrapper,
+  .right-section {
+    width: 100%;
+    flex: unset;
+  }
+}
 
-  .recipe-image {
-    max-height: 250px;
+@media (max-width: 600px) {
+  .main-content {
+    padding: 0.5rem;
+  }
+  .input-section {
+    padding: 1rem;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+  }
+  .ingredients-input {
+    font-size: 0.95rem;
+    padding: 0.7rem;
+  }
+  .recipe-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .recent-search-item {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.95rem;
+  }
+  .card,
+  .card1 {
+    padding: 0.7rem;
+  }
+  .submit-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
   }
 }
 </style>
