@@ -1,2 +1,10 @@
 venv/
+env/
 nama_file.csv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.DS_Store
+.ipynb_checkpoints/
