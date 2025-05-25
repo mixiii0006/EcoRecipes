@@ -14,7 +14,7 @@ function loadRecipes() {
       return;
     }
     const results = [];
-    fs.createReadStream(path.join(__dirname, '../data/nama_file.csv'))
+    fs.createReadStream(path.join(__dirname, '../ML_model/Capstone-NLP-main/nama_file.csv'))
       .pipe(csv())
       .on('data', (data) => results.push(data))
       .on('end', () => {
