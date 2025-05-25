@@ -53,28 +53,23 @@
             <div class="recipe-grid">
               <div v-if="recommendations.length === 0">No recommendations yet.</div>
               <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
-                <RecipeCard :image="`/static/${rec.Image_Name}`" :name="rec.Title_Cleaned" :duration="15" :carbon="25" :rating="4" @open="goToRecipe(rec)" />
+                <RecipeCard :image="rec.Image_Name || 'https://via.placeholder.com/150'" :name="rec.Title_Cleaned || 'No Title'" :duration="15" :carbon="25" :rating="4" @open="goToRecipe(rec)" />
               </div>
             </div>
           </section>
         </div>
 
+        <!-- Right Section -->
         <section class="right-section">
           <div class="card">
             <section class="recent-search">
               <h3>Recent Search</h3>
               <div class="recent-search-list">
-                <div class="recent-search-item">
-                  <span>Siomay Bandung</span>
-                  <button class="delete-btn"><i class="fa-solid fa-trash-can"></i></button>
-                </div>
-                <div class="recent-search-item">
-                  <span>Sop Ikan</span>
-                  <button class="delete-btn"><i class="fa-solid fa-trash-can"></i></button>
-                </div>
-                <div class="recent-search-item">
-                  <span>Nasi Goreng</span>
-                  <button class="delete-btn"><i class="fa-solid fa-trash-can"></i></button>
+                <div class="recent-search-item" v-for="(search, idx) in recentSearches" :key="idx">
+                  <span>{{ search }}</span>
+                  <button class="delete-btn" @click="deleteRecentSearch(idx)">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
                 </div>
               </div>
             </section>
