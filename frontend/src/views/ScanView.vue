@@ -42,7 +42,7 @@
             </label>
           </div>
         </div>
-        <button class="submit-btn">Submit</button>
+        <button class="submit-btn" @click="submitImages">Submit</button>
       </div>
 
       <!-- Combined Section -->
@@ -51,14 +51,9 @@
           <section class="recommendations">
             <h3>Recommendations</h3>
             <div class="recipe-grid">
-              <div class="card-link">
-                <RecipeCard image="https://via.placeholder.com/150" name="Siomay Bandung" duration="15" carbon="25" rating="4" />
-              </div>
-              <div class="card-link">
-                <RecipeCard image="https://via.placeholder.com/150" name="Sop Ikan" duration="30" carbon="20" rating="5" />
-              </div>
-              <div class="card-link">
-                <RecipeCard image="https://via.placeholder.com/150" name="Nasi Goreng" duration="20" carbon="15" rating="3" />
+              <div v-if="recommendations.length === 0">No recommendations yet.</div>
+              <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
+                <RecipeCard :image="rec.Image_Name || 'https://via.placeholder.com/150'" :name="rec.Title_Cleaned || 'No Title'" :duration="15" :carbon="25" :rating="4" @open="goToRecipe(rec)" />
               </div>
             </div>
           </section>
@@ -95,17 +90,20 @@
       </section>
     </main>
   </div>
+  <RecipeModal v-if="showModal" :food="selectedRecipe" @close="closeModal" />
 </template>
 
 <script>
 import RecipeCard from "../components/RecipeCard.vue";
 import Sidebar from "../components/Sidebar.vue";
+import RecipeModal from "../components/RecipeModal.vue";
 
 export default {
   name: "ScanIngredients",
   components: {
     RecipeCard,
     Sidebar,
+    RecipeModal,
   },
   data() {
     return {
@@ -131,6 +129,15 @@ export default {
         this.images[idx].showCamera = false;
         this.stopCamera();
       }
+    },
+
+    goToRecipe(recipe) {
+      this.selectedRecipe = recipe;
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+      this.selectedRecipe = null;
     },
     async openCamera(idx) {
       // Tutup kamera di card lain jika ada
@@ -193,6 +200,37 @@ export default {
       }
       return new File([u8arr], filename, { type: mime });
     },
+
+    async submitImages() {
+      const imagesToSubmit = this.images.filter((img) => img.file);
+
+      if (imagesToSubmit.length === 0) {
+        alert("Please upload or capture at least one image!");
+        return;
+      }
+
+      // Misal kamu hanya kirim gambar pertama
+      const formData = new FormData();
+      formData.append("file", imagesToSubmit[0].file);
+
+      try {
+        const response = await fetch("http://localhost:5000/api/scan", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) throw new Error("Failed to scan image");
+        const data = await response.json();
+
+        // Sesuaikan field dengan hasil dari backend kamu!
+        // Jika hasil backend berupa: { recommendations: [...] }
+        this.recommendations = data.recommendations || [];
+        // Jika hasil backend berupa: { results: [...] } => ganti fieldnya!
+        // this.recommendations = data.results || [];
+      } catch (error) {
+        alert("Failed to fetch recommendations.");
+      }
+    },
   },
   beforeDestroy() {
     this.stopCamera();
@@ -202,6 +240,7 @@ export default {
     this.stopCamera();
   },
 };
+
 </script>
 
 <style scoped>
