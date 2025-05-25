@@ -115,8 +115,12 @@ export default {
       ],
       cameraStream: null,
       currentCameraIdx: null,
+      recommendations: [], // PENTING: Supaya tidak undefined!
+      showModal: false, // Untuk modal resep
+      selectedRecipe: null, // Untuk data resep yang dipilih di modal
     };
   },
+
   methods: {
     inputIngredients() {
       this.$router.push("/input-ingredients");
@@ -240,7 +244,6 @@ export default {
     this.stopCamera();
   },
 };
-
 </script>
 
 <style scoped>
