@@ -1,4 +1,4 @@
-<template>
+<template> 
   <header>
     <nav class="navbar">
       <div class="navbar-brand">
@@ -13,10 +13,10 @@
 
       <ul class="navbar-actions" :class="{ open: isMenuOpen }">
         <li>
-          <router-link to="/login" class="btn login-btn">Login</router-link>
+          <router-link to="/login" class="btn login-btn"><i class="fa-solid fa-right-to-bracket"></i> Login</router-link>
         </li>
         <li>
-          <router-link to="/register" class="btn register-btn">Register</router-link>
+          <router-link to="/register" class="btn register-btn"><i class="fa-solid fa-user-plus"></i> Register</router-link>
         </li>
       </ul>
     </nav>
@@ -42,7 +42,7 @@ export default {
 <style scoped>
 /* Navbar wrapper */
 .navbar {
-  background: linear-gradient(to right, #235f3a, #73b06f); /* hijau */
+  background: linear-gradient(to right, #235f3a, #73b06f);
   color: white;
   display: flex;
   justify-content: space-between;
@@ -51,12 +51,11 @@ export default {
   top: 0;
   width: 100%;
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  padding: 10px 20px; /* Tambahkan padding untuk navbar */
+  padding: 10px 20px;
 }
 
-/* Brand/Logo */
+/* Logo */
 .logo-text {
   margin: 0;
   font-size: 1.5rem;
@@ -68,7 +67,7 @@ export default {
   margin-left: 20px;
 }
 
-/* Nav Actions */
+/* Desktop Nav Actions */
 .navbar-actions {
   display: flex;
   list-style: none;
@@ -76,8 +75,9 @@ export default {
   margin: 0;
   padding: 0;
   margin-right: 60px;
-  height: 60px; /* Tetapkan tinggi tetap */
-  align-items: center; /* Rata tengah vertikal */
+  height: 60px;
+  align-items: center;
+  transition: none;
 }
 
 /* Buttons */
@@ -87,28 +87,25 @@ export default {
   text-decoration: none;
   text-align: center;
   display: inline-block;
-  transition: all 0.3s ease; /* Tambahkan transisi untuk efek yang lebih halus */
+  transition: all 0.3s ease;
 }
 
 .login-btn, .register-btn {
   background-color: white;
   color: #2e7d32;
-  padding: 8px 16px; /* Tetapkan padding awal */
-  font-size: 16px; /* Tetapkan ukuran font awal */
-  position: relative; /* Tambahkan position relative */
-  justify-content: center; /* Rata tengah horizontal */
-  width: 100px; /* Lebar tetap untuk tombol */
-  box-sizing: border-box; /* Pastikan padding tidak mengubah ukuran total */
+  padding: 8px 16px;
+  font-size: 16px;
+  width: 120px;
+  box-sizing: border-box;
 }
 
 .login-btn:hover, .register-btn:hover {
   font-size: 18px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Tambahkan bayangan saat hover */
-  /* Hapus perubahan padding agar ukuran tidak berubah */
-  transform: scale(1.05); /* Efek sedikit membesar tanpa mengubah dimensi navbar */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
 }
 
-/* Burger menu default hidden */
+/* Burger Button */
 .burger {
   display: none;
   flex-direction: column;
@@ -116,6 +113,7 @@ export default {
   background: none;
   border: none;
   cursor: pointer;
+  z-index: 1100;
 }
 
 .burger span {
@@ -123,7 +121,8 @@ export default {
   height: 3px;
   background-color: white;
   border-radius: 2px;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform-origin: center;
 }
 
 .burger span.open:nth-child(1) {
@@ -136,34 +135,59 @@ export default {
   transform: translateY(-8px) rotate(-45deg);
 }
 
-/* Responsive */
+/* Responsive - Mobile / Tablet */
 @media (max-width: 768px) {
   .burger {
     display: flex;
-    margin-right: 50px;
+    margin-right: 40px;
   }
 
   .navbar {
-    padding: 1.5rem;
-  }
+  height: 50px; 
+}
 
   .navbar-actions {
-    display: none;
-    flex-direction: column;
-    background-color: #2e7d32;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    width: 100%;
-    padding: 1rem;
-  }
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(37, 89, 40, 0.75); /* hijau dengan transparansi 95% */
+  position: fixed;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  right: -100%; /* awalnya di luar layar */
+  width: 70%;
+  height: 100vh;
+  padding-top: 80px;
+  transition: right 0.3s ease;
+  box-shadow: -2px 0 8px rgba(0,0,0,0.2);
+  z-index: 1050;
+}
 
   .navbar-actions.open {
-    display: flex;
+    right: 0;
   }
 
   .navbar-actions li {
-    margin: 0.5rem 0;
+    margin: 1rem 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .login-btn, .register-btn {
+    width: 80%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    border-radius: 8px;
+    background-color: white;
+    color: #2e7d32;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .login-btn:hover, .register-btn:hover {
+    background-color: #a5d6a7;
+    color: #235f3a;
+    transform: scale(1.05);
   }
 }
 </style>

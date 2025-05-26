@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="close">
     <div class="modal">
       <button class="close-btn" @click="close">×</button>
-      <h3>Forgot Password</h3>
+      <h3>Forget Password</h3>
       <form @submit.prevent="sendResetLink">
         <label for="email">Email</label>
         <input
