@@ -6,4 +6,4 @@
 # Ignore folder dataset, model, dan virtualenv
 venv/
 __pycache__/
-.env/
+.env

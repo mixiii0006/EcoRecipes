@@ -1,5 +1,4 @@
 venv/
-env/
 nama_file.csv
 __pycache__/
 .env
