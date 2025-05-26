@@ -1,10 +1,9 @@
 <template>
   <div class="auth-container">
     <div class="left-panel">
-      <h1>Satu Resep, Satu langkah untuk Bumi.</h1>
+      <h1>One Recipe, One step for the Earth.</h1>
       <p>
-        Masukkan bahan makanan yang kamu miliki, dan temukan resep rendah emisi
-        yang membantu melindungi bumi.
+        Input the ingredients you have and discover low-emission recipes that help protect the earth.
       </p>
     </div>
     <div class="right-panel">
@@ -119,6 +118,7 @@ export default {
 
 .left-panel {
   flex: 1;
+  position: relative;
   background: url("/images/landing-bg.jpg") no-repeat center center/cover;
   color: white;
   padding: 4rem;
@@ -128,12 +128,27 @@ export default {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  overflow: hidden;
+}
+
+.left-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65); /* overlay gelap */
+  z-index: 0;
+}
+
+.left-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .left-panel h1 {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  animation: fadeSlideUp 1s ease forwards;
 }
 
 .left-panel p {
@@ -148,17 +163,20 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 4rem;
+  box-sizing: border-box;
 }
 
 .form-card {
   background: white;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
   width: 100%;
   max-width: 400px;
   text-align: center;
   position: relative;
+  box-sizing: border-box;
+  animation: fadeSlideUp 1s ease forwards;
 }
 
 .form-card h2 {
@@ -175,6 +193,11 @@ export default {
   width: 100%;
   background: linear-gradient(to right, #235f3a, #73b06f);
   margin-top: 5px;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(to right, #1b4727, #549c4a);
 }
 
 .close-btn {
@@ -214,25 +237,46 @@ export default {
   font-weight: 500;
 }
 
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
 @media (max-width: 1024px) {
   .left-panel {
-    padding: 2rem;
+    display: none;
   }
-
-  .left-panel h1 {
-    font-size: 2rem;
-  }
-
-  .left-panel p {
-    font-size: 1.1rem;
+  .auth-container {
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
   }
 
   .right-panel {
-    padding: 2rem;
+    flex: none;
+    width: 100%;
+    height: 100vh;
+    padding: 1rem 1rem; /* padding lebih kecil */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .form-card {
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto; /* pastikan center horizontal */
     padding: 2rem;
+    box-sizing: border-box;
   }
 }
 
@@ -242,30 +286,25 @@ export default {
   }
 
   .left-panel {
-    order: 1;
-    text-align: center;
-    padding: 2rem 1.5rem;
-  }
-
-  .left-panel h1 {
-    font-size: 1.8rem;
-  }
-
-  .left-panel p {
-    font-size: 1rem;
-    max-width: 100%;
+    display: none;
   }
 
   .right-panel {
     order: 2;
-    padding: 2rem 1rem;
-    justify-content: flex-start;
-    min-height: auto;
+    padding: 2rem 1.5rem;       /* padding kiri kanan agak besar tapi pas */
+    justify-content: center;    /* horizontal center */
+    align-items: center;        /* vertical center */
+    display: flex;
+    min-height: 100vh;          /* agar tinggi penuh layar */
+    box-sizing: border-box;
   }
 
   .form-card {
-    max-width: 100%;
-    width: 100%;
+    max-width: 400px;           /* batas maksimal */
+    width: 100%;                /* agar responsif */
+    padding: 1.75rem;           /* padding nyaman */
+    margin: 0 auto;             /* center horizontal */
+    box-sizing: border-box;
   }
 }
 
@@ -286,12 +325,6 @@ export default {
     font-size: 1.2rem;
     top: 0.75rem;
     right: 0.75rem;
-  }
-
-  .form-options {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
   }
 }
 </style>

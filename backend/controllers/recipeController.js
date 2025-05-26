@@ -52,15 +52,11 @@ function recommendRecipes(input, recipes) {
     const shuffled = recipes.sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 12);
   } else {
-    // Filter recipes by checking if input is in name or ingredients (case-insensitive)
     const lowerInput = input.toLowerCase();
     const filtered = recipes.filter(recipe => {
-      const normalizedIngredients = recipe.ingredients ? recipe.ingredients.replace(/[\[\]'"]/g, '').toLowerCase() : '';
-      return (recipe.name && recipe.name.toLowerCase().includes(lowerInput)) ||
-             (normalizedIngredients.includes(lowerInput));
+      return recipe.name && recipe.name.toLowerCase().includes(lowerInput);
     });
-    // Return up to 50 matching recipes
-    return filtered.slice(0, 50);
+    return filtered.slice(0, 50); // Maksimal 50 hasil
   }
 }
 

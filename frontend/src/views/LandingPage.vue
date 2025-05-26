@@ -5,10 +5,9 @@
 
     <section class="hero">
       <div class="hero-text">
-        <h1>Satu Resep, Satu langkah untuk Bumi.</h1>
+        <h1>One Recipe, One step for the Earth.</h1>
         <p>
-          Masukkan bahan makanan yang kamu miliki, dan temukan resep rendah
-          emisi yang membantu melindungi bumi.
+           Input the ingredients you have and discover low-emission recipes that help protect the earth.
         </p>
         <button class="btn btn-primary" @click="goToLogin">Input Here</button>
       </div>
@@ -36,28 +35,19 @@
       <h2>Current World Carbon Footprint</h2>
       <div class="carbon-content">
         <div class="carbon-text">
-          <h3>Apa itu Jejak Karbon? Bagaimana situasi Bumi saat ini?</h3>
+          <h3>What is the Carbon Footprint? What is the current situation of the Earth?</h3>
           <p>
-            Jejak karbon adalah total emisi gas rumah kaca (terutama karbon
-            dioksida dan metana) yang dihasilkan oleh aktivitas manusia. Menurut
-            Pusat Penelitian Gabungan Uni Eropa di tahun 2023, total emisi
-            CO<sub>2</sub> global mencapai 37,4 hingga 37,55 Mt (juta ton
-            metrik).
+            The carbon footprint is the total greenhouse gas emissions (mainly carbon dioxide and methane) produced by human activities. According to the European Union Joint Research Center in 2023, total global CO<sub>2</sub> emissions will reach 37.4 to 37.55 Mt (million metric tons).
           </p>
-          <h3>Mengapa Ini Penting?</h3>
+          <h3>Why is this important?</h3>
           <p>
-            Gas rumah kaca membantu Bumi tetap hangat, tetapi kelebihan gas ini
-            menyebabkan pemanasan global. Dengan memilih makanan rendah karbon,
-            maka Anda ikut melindungi planet kita.
+            Greenhouse gases help keep the Earth warm, but an excess of these gases causes global warming. By choosing low-carbon foods, you are helping to protect our planet.
           </p>
           <h3>
-            Tahukah Anda bahwa pilihan makanan kita turut berperan besar pada
-            lingkungan?
+            Did you know that our food choices play a big role in the environment?
           </h3>
           <p>
-            Setiap makanan meninggalkan jejak karbon, yaitu jumlah gas rumah
-            kaca yang dihasilkan selama produksi, pengolahan, dan
-            transportasinya.
+            Every food leaves a carbon footprint, which is the amount of greenhouse gases produced during its production, processing and transportation.
           </p>
         </div>
         <div class="carbon-chart">
@@ -66,37 +56,32 @@
       </div>
       <div class="carbon-note">
         <p>
-          Oleh karena itu, kami hadir sebagai website yang dapat mengalkulasi
-          jejak karbon dari bahan makanan yang dimiliki pengguna dan memberikan
-          rekomendasi resep masakan rendah emisi karbon, dilengkapi saran
-          substitusi bahan yang lebih ramah lingkungan.
+          Therefore, we present a website that can calculate the carbon footprint of food ingredients that users have and provide recommendations for low carbon emission cooking recipes, with suggestions for substituting more environmentally friendly ingredients.
         </p>
       </div>
     </section>
 
     <section class="how-it-works">
       <h2>How Does it Work</h2>
-      <p>Mulai semuanya dengan tiga langkah mudah.</p>
+      <p>Start it all with three easy steps</p>
       <div class="how-it-works-card">
         <div class="step-card">
           <img src="/images/rekomendasi-resep.png" alt="Resep Rendah Emisi" />
-          <h3>Dapatkan Rekomendasi Resep Rendah Emisi</h3>
+          <h3>Get Low Emission Recipe Recommendations</h3>
           <p>
-            Kami menyarankan resep-resep lezat dengan jejak karbon yang lebih
-            rendah, berdasarkan bahan yang kamu input.
+            We suggest delicious recipes with a lower carbon footprint, based on the ingredients you input.
           </p>
         </div>
         <div class="step-card active">
           <img src="/images/input-bahan.png" alt="Input Bahan Makanan" />
-          <h3>Input bahan makanan yang kamu miliki</h3>
-          <p>Cukup tulis bahan-bahan masakanmu yang ada di rumah.</p>
+          <h3>Input the ingredients you have</h3>
+          <p>Simply write down the ingredients you have at home.</p>
         </div>
         <div class="step-card">
           <img src="/images/belajar-memasak.png" alt="Belajar Sambil Memasak" />
-          <h3>Belajar Sambil Memasak</h3>
+          <h3>Learn While Cooking</h3>
           <p>
-            Lihat estimasi emisi dari setiap resep dan pelajari bagaimana
-            pilihan kecil bisa memberi dampak besar.
+            Check out the estimated emissions of each recipe and learn how small choices can make a big impact.
           </p>
         </div>
       </div>
@@ -105,8 +90,8 @@
     <section class="why-choose-us">
       <h2>Why Choose Us?</h2>
       <p>
-        Kami percaya bahwa perubahan besar dimulai dari pilihan kecil.<br />
-        Inilah alasan kamu bisa percaya pada kami.
+        We believe that big changes start with small choices<br />
+        Here's why you can trust us
       </p>
       <div class="choose-us-card-container">
         <div class="top-row">
@@ -116,11 +101,11 @@
               alt="Cepat dan Mudah"
               class="choose-us-icon"
             />
-            <h3 class="choose-us-heading">Cepat dan Mudah</h3>
+            <h3 class="choose-us-heading">Fast and Simple</h3>
             <p class="choose-us-desc">
-              Cukup masukkan bahan<br />
-              ↓ <br>Dapatkan resep<br />
-              ↓ <br>Lihat estimasi emisi
+              Just put the ingredients<br />
+              ↓ <br>Get recipes<br />
+              ↓ <br>See carbon emission estimates
             </p>
           </div>
           <div class="choose-us-card">
@@ -129,10 +114,9 @@
               alt="Rekomendatif"
               class="choose-us-icon"
             />
-            <h3 class="choose-us-heading">Rekomendatif</h3>
+            <h3 class="choose-us-heading">Recommended</h3>
             <p class="choose-us-desc">
-              Dapatkan alternatif bahan makanan dan resep yang lebih rendah
-              emisi.
+              Get alternative ingredients and recipes that are lower in emissions.
             </p>
           </div>
           <div class="choose-us-card">
@@ -141,9 +125,9 @@
               alt="Ramah Lingkungan"
               class="choose-us-icon"
             />
-            <h3 class="choose-us-heading">Ramah Lingkungan</h3>
+            <h3 class="choose-us-heading">Eco-Friendly</h3>
             <p class="choose-us-desc">
-              Bantu kurangi emisi karbon dari dapurmu.
+              Help reduce carbon emissions from your kitchen.
             </p>
           </div>
         </div>
@@ -154,10 +138,9 @@
               alt="Berdasarkan Data"
               class="choose-us-icon"
             />
-            <h3 class="choose-us-heading">Berdasarkan Data</h3>
+            <h3 class="choose-us-heading">Based on Data</h3>
             <p class="choose-us-desc">
-              Sistem kami menggunakan data terpercaya tentang emisi karbon dari
-              makanan.
+              Our system uses reliable data on carbon emissions from food.
             </p>
           </div>
           <div class="choose-us-card">
@@ -166,9 +149,9 @@
               alt="Didukung Machine Learning"
               class="choose-us-icon"
             />
-            <h3 class="choose-us-heading">Didukung Machine Learning</h3>
+            <h3 class="choose-us-heading">Supported by Machine Learning</h3>
             <p class="choose-us-desc">
-              Rekomendasi resep berdasarkan data dan pola terbaik.
+              Recipe recommendations based on the best data and patterns.
             </p>
           </div>
         </div>
@@ -258,7 +241,19 @@ export default {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f9f9f9;
+  background-color: #f9f5f0;
+}
+
+/* Card form dengan animasi fade + slide up */
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero {
@@ -270,14 +265,30 @@ export default {
   padding: 0 4rem;
   background: url("/images/landing-bg.jpg") no-repeat center center;
   background-size: cover;
-  color: #f9f9f9;
+  color: #f9f5f0;
   margin-top: 70px; /* Sesuaikan dengan tinggi navbar yang fixed */
   box-sizing: border-box;
 }
 
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom right,
+    rgba(0, 0, 0, 0.6),
+    rgba(0, 0, 0, 0.4)
+  );
+  z-index: 0;
+}
+
+/* Pastikan konten hero berada di atas overlay */
 .hero-text {
+  position: relative;
+  z-index: 1;
   max-width: 600px;
   margin-left: 80px;
+  animation: fadeSlideUp 1s ease forwards;
 }
 
 .hero-text h1 {
@@ -593,12 +604,25 @@ export default {
     align-items: center;
   }
 
-  .step-card, .choose-us-card {
+  .step-card {
     width: 80%;
+  }
+
+  .choose-us-card {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 350px;  /* sesuaikan agar card tidak terlalu lebar */
+    padding: 1rem 1.5rem;
+    box-sizing: border-box;
   }
 
   .choose-us-card-container {
     margin: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;  /* jarak antar card */
+    margin: 1rem auto;
   }
 
   .top-row,

@@ -1,10 +1,10 @@
 <template>
   <div class="auth-container">
     <div class="left-panel">
-      <h1>Satu Resep, Satu langkah untuk Bumi.</h1>
+      <h1>One Recipe, One step for the Earth.</h1>
       <p>
-        Masukkan bahan makanan yang kamu miliki, dan temukan resep rendah emisi
-        yang membantu melindungi bumi.
+        Input the ingredients you have and discover low-emission recipes that
+        help protect the earth.
       </p>
     </div>
     <div class="right-panel">
@@ -42,24 +42,13 @@
               @click="showForgotModal = true"
               class="forgot-password"
             >
-              Forgot Password?
+              Forget Password?
             </button>
           </div>
 
           <Button type="submit">Login</Button>
         </form>
 
-        <ForgotPasswordModal
-          v-if="showForgotModal"
-          @close="showForgotModal = false"
-          @email-verified="handleEmailVerified"
-        />
-
-        <ResetPasswordModal
-          v-if="showResetModal"
-          :email="resetEmail"
-          @close="showResetModal = false"
-        />
         <p class="register-link">
           Don't have an account?
           <router-link to="/register">Register Here</router-link>
@@ -67,6 +56,17 @@
       </div>
     </div>
   </div>
+  <ForgotPasswordModal
+    v-if="showForgotModal"
+    @close="showForgotModal = false"
+    @email-verified="handleEmailVerified"
+  />
+
+  <ResetPasswordModal
+    v-if="showResetModal"
+    :email="resetEmail"
+    @close="showResetModal = false"
+  />
 </template>
 
 <script>
@@ -118,6 +118,7 @@ export default {
 </script>
 
 <style scoped>
+/* Container utama */
 .auth-container {
   display: flex;
   min-height: 100vh;
@@ -125,8 +126,10 @@ export default {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Panel kiri dengan background gambar + overlay */
 .left-panel {
   flex: 1;
+  position: relative;
   background: url("/images/landing-bg.jpg") no-repeat center center/cover;
   color: white;
   padding: 4rem;
@@ -136,12 +139,33 @@ export default {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  overflow: hidden;
+}
+
+/* Overlay gradasi gelap untuk kontras teks */
+.left-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom right,
+    rgba(0, 0, 0, 0.7),
+    rgba(0, 0, 0, 0.6)
+  );
+  z-index: 0;
+}
+
+/* Pastikan konten panel kiri di atas overlay */
+.left-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .left-panel h1 {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  animation: fadeSlideUp 1s ease forwards;
 }
 
 .left-panel p {
@@ -149,6 +173,7 @@ export default {
   max-width: 400px;
 }
 
+/* Panel kanan form */
 .right-panel {
   flex: 1;
   background: #f9f5f0;
@@ -156,6 +181,18 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 4rem;
+}
+
+/* Card form dengan animasi fade + slide up */
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .form-card {
@@ -167,6 +204,8 @@ export default {
   max-width: 400px;
   text-align: center;
   position: relative;
+  box-sizing: border-box;
+  animation: fadeSlideUp 1s ease forwards;
 }
 
 .form-card h2 {
@@ -179,6 +218,7 @@ export default {
   color: #666;
 }
 
+/* Opsi form (remember me + forgot password) */
 .form-options {
   display: flex;
   justify-content: space-between;
@@ -200,6 +240,7 @@ export default {
   cursor: pointer;
 }
 
+/* Tombol forgot password dan hover efek */
 .forgot-password {
   background: none;
   border: none;
@@ -207,18 +248,28 @@ export default {
   font-weight: 500;
   cursor: pointer;
   padding: 0;
-  transition: color 0.2s ease;
+  transition: transform 0.2s ease, color 0.3s ease;
 }
 
 .forgot-password:hover {
+  transform: scale(1.05);
+  color: #1b4727;
   text-decoration: underline;
 }
 
+/* Tombol utama login */
 .btn {
   width: 100%;
   background: linear-gradient(to right, #235f3a, #73b06f);
+  transition: transform 0.2s ease, background 0.3s ease;
 }
 
+.btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(to right, #1b4727, #549c4a);
+}
+
+/* Tombol close di pojok */
 .close-btn {
   position: absolute;
   top: 1rem;
@@ -235,6 +286,7 @@ export default {
   color: #2e7d32;
 }
 
+/* Link register */
 .register-link {
   margin-top: 1rem;
   font-size: 0.9rem;
@@ -244,67 +296,86 @@ export default {
   color: #2e7d32;
   font-weight: 600;
   text-decoration: none;
+  transition: transform 0.2s ease, color 0.3s ease;
 }
 
 .register-link a:hover {
+  transform: scale(1.05);
+  color: #1b4727;
   text-decoration: underline;
 }
 
+/* Responsiveness */
+
+/* Tablet besar */
 @media (max-width: 1024px) {
   .left-panel {
-    padding: 2rem;
+    display: none;
   }
-
-  .left-panel h1 {
-    font-size: 2rem;
-  }
-
-  .left-panel p {
-    font-size: 1.1rem;
-  }
-
-  .right-panel {
-    padding: 2rem;
-  }
-
-  .form-card {
-    padding: 2rem;
-  }
-}
-
-@media (max-width: 768px) {
+  /* Container flex jadi kolom, full tinggi viewport */
   .auth-container {
     flex-direction: column;
+    height: 100vh;
+    margin: 0;
   }
 
-  .left-panel {
-    order: 1;
-    text-align: center;
-    padding: 2rem 1.5rem;
-  }
-
-  .left-panel h1 {
-    font-size: 1.8rem;
-  }
-
-  .left-panel p {
-    font-size: 1rem;
-    max-width: 100%;
-  }
-
+  /* Panel kanan jadi full layar, flex container center */
   .right-panel {
-    order: 2;
-    padding: 2rem 1rem;
-    justify-content: flex-start;
-    min-height: auto;
+    flex: none;
+    width: 100%;
+    height: 100vh; /* penuh layar */
+    padding: 1.5rem 1.5rem; /* padding kiri kanan cukup */
+    display: flex;
+    justify-content: center; /* horizontal center */
+    align-items: center; /* vertical center */
+    box-sizing: border-box;
+    overflow: hidden; /* hilangkan scroll jika ada */
   }
 
+  /* Form card muat penuh lebar dengan max 400px */
   .form-card {
-    max-width: 100%;
+    max-width: 400px;
     width: 100%;
+    margin: 0; /* hilangkan margin supaya benar-benar center */
+    box-sizing: border-box;
   }
 }
 
+/* Tablet kecil / mobile landscape */
+@media (max-width: 768px) {
+  .form-options {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .remember-me {
+    display: flex !important;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  /* Pastikan tombol forgot-password inline flex supaya sejajar */
+  .forgot-password {
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: inline-flex; /* <- ini tambahan penting */
+    align-items: center; /* vertikal rata tengah */
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+}
+
+/* Mobile portrait kecil */
 @media (max-width: 480px) {
   .left-panel h1 {
     font-size: 1.5rem;
@@ -324,9 +395,11 @@ export default {
     right: 0.75rem;
   }
 
+  /* Ubah dari flex-direction: column ke row supaya tetap sejajar */
   .form-options {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
     gap: 0.5rem;
   }
 }

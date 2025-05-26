@@ -18,7 +18,7 @@
 export default {
   name: "RecipeCard",
   props: {
-    Image_Name: {
+    image: {
       type: String,
       default: "",
     },
@@ -41,9 +41,9 @@ export default {
   },
   computed: {
     imageUrl() {
-      return this.Image_Name
-        ? `/foodImages/${this.Image_Name}`
-        : "https://source.unsplash.com/160x160/?food";
+    return this.image
+      ? `/foodImages/${this.image}.jpg`
+      : '/foodImages/default.jpg';
     },
   },
   methods: {

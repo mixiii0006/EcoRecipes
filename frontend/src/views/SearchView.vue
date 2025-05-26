@@ -35,7 +35,7 @@
           <RecipeCard
             v-for="(item, index) in recommendations"
             :key="item.id || item.Title_Cleaned || item.name"
-            :Image_Name="item.image ? item.image + '.jpg' : ''"
+            :image="item.image"
             :name="item.name || item.Title_Cleaned || ''"
             :duration="parseInt(item.duration) || 0"
             :carbon="item.carbon"

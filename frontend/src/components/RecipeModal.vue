@@ -9,13 +9,22 @@
       <div class="recipe-body">
         <!-- Left column -->
         <div class="left-column">
-          <img class="recipe-image" :src="getImageUrl(food.image || food.Image_Name)" :alt="food.name || 'Recipe image'" />
+          <img
+            class="recipe-image"
+            :src="getImageUrl(food.image || food.Image_Name)"
+            :alt="food.name || 'Recipe image'"
+          />
 
           <div class="ingredients-card">
             <h3>How to Cook</h3>
             <ul>
-              <li v-if="!instructionsArray.length">No instructions available.</li>
-              <li v-for="(step, index) in instructionsArray" :key="'step-' + index">
+              <li v-if="!instructionsArray.length">
+                No instructions available.
+              </li>
+              <li
+                v-for="(step, index) in instructionsArray"
+                :key="'step-' + index"
+              >
                 {{ step }}
               </li>
             </ul>
@@ -28,7 +37,10 @@
             <h3>Ingredients</h3>
             <ul>
               <li v-if="!ingredientsArray.length">No ingredients available.</li>
-              <li v-for="(ingredient, index) in ingredientsArray" :key="'ingredient-' + index">
+              <li
+                v-for="(ingredient, index) in ingredientsArray"
+                :key="'ingredient-' + index"
+              >
                 {{ ingredient }}
               </li>
             </ul>
@@ -59,7 +71,8 @@ export default {
   },
   computed: {
     instructionsArray() {
-      const raw = this.food.Instructions_Cleaned || this.food.instructions || "";
+      const raw =
+        this.food.Instructions_Cleaned || this.food.instructions || "";
       return Array.isArray(raw)
         ? raw
         : typeof raw === "string"
@@ -70,34 +83,33 @@ export default {
         : [];
     },
     ingredientsArray() {
-  const raw = this.food.Cleaned_Ingredients || this.food.ingredients;
+      const raw = this.food.Cleaned_Ingredients || this.food.ingredients;
 
-  console.log("ingredientsArray raw data:", raw);
+      console.log("ingredientsArray raw data:", raw);
 
-  if (Array.isArray(raw)) {
-    return raw;
-  }
+      if (Array.isArray(raw)) {
+        return raw;
+      }
 
-  if (typeof raw === "string" && raw.startsWith("[")) {
-    try {
-      // Hapus karakter yang mengganggu
-      let fixed = raw.replace(/\\u[a-fA-F0-9]{4}/g, ''); // hapus unicode escape
-      fixed = fixed.replace(/â€“|â€|Ã|½/g, ''); // hapus karakter aneh
-      fixed = fixed.replace(/'/g, '"'); // ganti ' jadi "
+      if (typeof raw === "string" && raw.startsWith("[")) {
+        try {
+          // Hapus karakter yang mengganggu
+          let fixed = raw.replace(/\\u[a-fA-F0-9]{4}/g, ""); // hapus unicode escape
+          fixed = fixed.replace(/â€“|â€|Ã|½/g, ""); // hapus karakter aneh
+          fixed = fixed.replace(/'/g, '"'); // ganti ' jadi "
 
-      const parsed = JSON.parse(fixed);
-      return Array.isArray(parsed)
-        ? parsed.map((s) => s.trim()).filter(Boolean)
-        : [];
-    } catch (e) {
-      console.error("Parse error:", e.message);
+          const parsed = JSON.parse(fixed);
+          return Array.isArray(parsed)
+            ? parsed.map((s) => s.trim()).filter(Boolean)
+            : [];
+        } catch (e) {
+          console.error("Parse error:", e.message);
+          return [];
+        }
+      }
+
       return [];
-    }
-  }
-
-  return [];
-}
-
+    },
   },
 };
 </script>
