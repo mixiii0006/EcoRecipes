@@ -9,3 +9,5 @@ features.pkl
 .env
 .DS_Store
 .ipynb_checkpoints/
+nama_file.csv
+all_carbon.csv
