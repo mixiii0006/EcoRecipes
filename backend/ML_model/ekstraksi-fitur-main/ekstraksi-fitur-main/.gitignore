@@ -2,11 +2,6 @@ venv/
 env/
 nama_file.csv
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.py
 .env
-.DS_Store
 .ipynb_checkpoints/
 static/images
