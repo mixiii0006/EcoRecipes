@@ -7,7 +7,7 @@ exports.recommendRecipes = (req, res) => {
     return res.status(400).json({ error: true, message: 'Ingredients input is required' });
   }
 
-  const pythonPath = 'D:/Coding Camp/CAPSTONE/EcoRecipesNew/EcoRecipes/backend/ML_model/Capstone-NLP-main/venv/Scripts/python.exe'; // sesuaikan
+  const pythonPath = path.join(__dirname, '..', 'ML_model', 'Capstone-NLP-main', 'venv', 'Scripts', 'python.exe');
   const scriptPath = path.join(__dirname, '..', 'ML_model', 'Capstone-NLP-main', 'main.py');
 
   console.log('Received ingredients:', ingredients);
