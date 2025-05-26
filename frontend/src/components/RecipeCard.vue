@@ -61,17 +61,28 @@ export default {
 </script>
 
 <style scoped>
-/* Card wrapper */
+.card-list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.2rem;
+  align-items: stretch;
+  padding-bottom: 2rem;
+}
+
+/* CARD STYLES */
 .food-category-card {
   background: #fff;
   border-radius: 16px;
-  padding: 1rem;
+  padding: 0.75rem;          /* Lebih kecil */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.3s;
   text-align: left;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  min-height: 270px;         /* Ubah sesuai keinginan, 250px - 300px oke */
+  box-sizing: border-box;
 }
 
 /* Hover effect */
@@ -80,13 +91,14 @@ export default {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
-/* Image container */
+/* IMAGE */
 .food-category-image {
   width: 100%;
   aspect-ratio: 2 / 1;
   overflow: hidden;
   border-radius: 12px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.7rem;     /* Lebih kecil */
+  flex-shrink: 0;
 }
 
 .food-category-image img {
@@ -96,40 +108,44 @@ export default {
   display: block;
 }
 
-/* Info section */
+/* INFO & ACTIONS */
 .food-category-info {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.3rem;               /* Lebih kecil */
+  min-height: 50px;
 }
 
-/* Food name */
 .food-name {
   font-size: 1.1rem;
   color: #2e7d32;
   font-weight: bold;
   margin: 0;
+  /* Batasi max 2 baris */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Meta info */
 .food-meta {
   font-size: 0.85rem;
   color: #555;
 }
 
-/* Actions row */
+/* Tombol dan Favorit */
 .food-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
-/* Cook button */
 .cook-btn {
   flex: 1;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 1rem;      /* Lebih ramping */
   border-radius: 8px;
   background: linear-gradient(to right, #2e7d32, #66bb6a);
   color: white;
@@ -144,7 +160,6 @@ export default {
   background: linear-gradient(to right, #1b5e20, #4caf50);
 }
 
-/* Heart icon */
 .heart-icon {
   font-size: 1.4rem;
   color: #ccc;
@@ -155,5 +170,7 @@ export default {
 .heart-icon:hover {
   color: red;
 }
+
+
 </style>
 

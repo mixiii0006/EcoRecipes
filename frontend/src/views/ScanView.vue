@@ -221,11 +221,15 @@ export default {
         if (!response.ok) throw new Error("Failed to scan image");
         const data = await response.json();
 
-        // Sesuaikan field dengan hasil dari backend kamu!
-        // Jika hasil backend berupa: { recommendations: [...] }
-        this.recommendations = data.recommendations || [];
-        // Jika hasil backend berupa: { results: [...] } => ganti fieldnya!
-        // this.recommendations = data.results || [];
+        // Mapping agar image-nya sama dengan halaman input
+        this.recommendations = (data.recommendations || []).map((rec) => ({
+          ...rec,
+          // Ambil hanya nama file (tanpa path dan tanpa .jpg)
+          Image_Name: rec.Image_Name.split("/").pop().replace(".jpg", ""),
+        }));
+
+        // Untuk debug, boleh tambahkan ini:
+        console.log("Scan Recommendations:", this.recommendations);
       } catch (error) {
         alert("Failed to fetch recommendations.");
       }
