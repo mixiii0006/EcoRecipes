@@ -1,0 +1,10 @@
+# Ignore semua gambar/folder images
+/static/images/
+/static/images/FoodImages/
+/*.jpg
+/*.png
+# Ignore folder dataset, model, dan virtualenv
+*.pkl
+*.h5
+venv/
+__pycache__/
