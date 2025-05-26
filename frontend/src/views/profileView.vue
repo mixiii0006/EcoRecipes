@@ -4,18 +4,27 @@
     <div class="profile-header">
       <!-- Background dengan overlay dan konten -->
       <div class="profile-background">
-        <img src="/images/bg-profil.jpg" alt="beautiful background" class="profile-bg" />
+        <img
+          src="/images/bg-profil.jpg"
+          alt="beautiful background"
+          class="profile-bg"
+        />
         <div class="overlay"></div>
 
-        <!-- Konten kiri bawah -->
-        <div class="profile-overlay-left">
-          <img src="/images/profile.jpg" alt="Profile Picture" class="profile-img" />
-          <h2 class="profile-name">Natasya salsabilla</h2>
-        </div>
         <!-- Tombol Dashboard -->
         <div class="dashboard-controls">
           <button @click="goToDashboard">Dashboard</button>
           <button @click="logout" class="logout">Logout</button>
+        </div>
+
+        <!-- Konten kiri bawah -->
+        <div class="profile-overlay-left">
+          <img
+            src="/images/profile.jpg"
+            alt="Profile Picture"
+            class="profile-img"
+          />
+          <h2 class="profile-name">Natasya salsabilla</h2>
         </div>
       </div>
     </div>
@@ -24,11 +33,13 @@
     <div class="profile-content">
       <!-- Information Section with Form -->
       <div class="information">
-        <div class="highlighted-karmon">Total Jumlah Karmon Berhasil Dikurangi: {{ user.totalKarmonReduced }}</div>
-        <h3>Informasi</h3>
+        <div class="highlighted-karmon">
+          Total Amount of Carmon Successfully Reduced: {{ user.totalKarmonReduced }}
+        </div>
+        <h3>Information</h3>
         <form class="info-form">
           <div class="form-group">
-            <label for="name">Nama:</label>
+            <label for="name">Name:</label>
             <input type="text" id="name" v-model="user.name" readonly />
           </div>
           <div class="form-group">
@@ -36,16 +47,28 @@
             <input type="email" id="email" v-model="user.email" readonly />
           </div>
           <div class="form-group">
-            <label for="gender">Jenis Kelamin:</label>
+            <label for="gender">Gender:</label>
             <input type="text" id="gender" v-model="user.gender" readonly />
           </div>
           <div class="form-group">
-            <label for="favoriteFoodCount">Jumlah Makanan Favorit:</label>
-            <input type="number" id="favoriteFoodCount" v-model="user.favoriteFoodCount" readonly />
+            <label for="favoriteFoodCount">Number of Favorite Foods:</label>
+            <input
+              type="number"
+              id="favoriteFoodCount"
+              v-model="user.favoriteFoodCount"
+              readonly
+            />
           </div>
           <div class="form-group">
-            <label for="cookedFoodCount">Jumlah Makanan yang Telah Dimasak:</label>
-            <input type="number" id="cookedFoodCount" v-model="user.cookedFoodCount" readonly />
+            <label for="cookedFoodCount"
+              >Amount of Food Cooked:</label
+            >
+            <input
+              type="number"
+              id="cookedFoodCount"
+              v-model="user.cookedFoodCount"
+              readonly
+            />
           </div>
         </form>
       </div>
@@ -54,15 +77,29 @@
       <div class="food-favorite-section">
         <!-- Toggle buttons for switching between food list and favorite -->
         <div class="toggle-buttons">
-          <button :class="{ active: isFoodList }" @click="toggleContent('food')">Daftar Makanan</button>
-          <button :class="{ active: !isFoodList }" @click="toggleContent('favorite')">Favorit</button>
+          <button
+            :class="{ active: isFoodList }"
+            @click="toggleContent('food')"
+          >
+            Food List
+          </button>
+          <button
+            :class="{ active: !isFoodList }"
+            @click="toggleContent('favorite')"
+          >
+            Favorite
+          </button>
         </div>
 
         <section class="food-favorite-section">
           <div class="food-list-grid">
             <div class="food-card" v-for="index in 6" :key="index">
-              <img src="/images/bg-profil.jpg" alt="Food Image" class="food-img" />
-              <div class="food-name">Bakar</div>
+              <img
+                src="/images/bg-profil.jpg"
+                alt="Food Image"
+                class="food-img"
+              />
+              <div class="food-name">grilled</div>
             </div>
           </div>
         </section>
@@ -94,7 +131,7 @@ export default {
     },
     goToDashboard() {
       // Arahkan ke halaman dashboard (ubah sesuai route-mu)
-      this.$router.push("/dashboard");
+      this.$router.push("/home");
     },
 
     logout() {
@@ -123,21 +160,19 @@ export default {
 
 .highlighted-karmon {
   position: relative;
-  background: linear-gradient(90deg, #4caf50, #81c784);
+  background:  #4caf50;
   color: white;
   font-weight: 700;
   font-size: 1.5rem;
   padding: 15px 30px 15px 50px;
   margin-bottom: 20px;
-  border-radius: 30px;
-  box-shadow: 0 0 20px 6px rgba(76, 175, 80, 0.6);
+  border-radius: 10px;
   letter-spacing: 1.2px;
   text-align: center;
   user-select: none;
 }
 
 .highlighted-karmon::before {
-  content: "✨";
   position: absolute;
   left: 20px;
   top: 50%;
@@ -491,5 +526,55 @@ input[readonly] {
 
 .dashboard-controls button:hover {
   background-color: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .profile-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .dashboard-controls {
+    position: absolute;
+    top: 20px;
+    left: 50%; /* posisikan titik awal di tengah */
+    transform: translateX(-50%); /* geser ke kiri setengah lebar elemen */
+    z-index: 2;
+    display: flex;
+    gap: 10px;
+  }
+
+  .information,
+  .food-favorite-section {
+    width: 100%;
+    margin-left: -20px;
+  }
+
+  .profile-overlay-left {
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .profile-name {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .food-list-grid {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 15px;
+  }
+
+  .form-group input {
+    width: 100%;
+  }
+
+  .toggle-buttons {
+    justify-content: center;
+  }
 }
 </style>

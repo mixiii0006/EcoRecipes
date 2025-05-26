@@ -52,8 +52,7 @@
 
             <!-- Emisi Karbon Card -->
             <div class="carbon-card">
-              <span class="sparkle">✨</span>
-              <p><strong>Total Jumlah Karmon</strong><br />Berhasil Dikurangi: 12</p>
+              <p><strong>Total Amount of Carbon</strong><br />Successfully Reduced: 12</p>
             </div>
 
             <section class="food-category-list">
@@ -65,7 +64,7 @@
                       <img src="/images/bg-profil.jpg" alt="Food Image" />
                     </router-link>
                   </div>
-                  <div class="food-category-label">Bakar</div>
+                  <div class="food-category-label">Grilled</div>
                 </div>
               </div>
               <span>
