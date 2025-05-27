@@ -75,6 +75,8 @@ import Button from "../components/Button.vue";
 import ForgotPasswordModal from "../components/forgotPasswordModal.vue";
 import ResetPasswordModal from "../components/resetPasswordModal.vue";
 import axios from "axios";
+import Swal from 'sweetalert2';
+
 
 export default {
   name: "LoginView",
@@ -100,19 +102,33 @@ export default {
       this.showForgotModal = false;
       this.showResetModal = true;
     },
-    async handleLogin() {
-      try {
-        const response = await axios.post("http://localhost:3000/api/login", {
-          email: this.email,
-          password: this.password,
-        });
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("username", response.data.username);
-        this.$router.push("/home");
-      } catch (error) {
-        alert("Login failed. Please check your credentials.");
-      }
-    },
+async handleLogin() {
+  try {
+    const response = await axios.post("http://localhost:3000/api/login", {
+      email: this.email,
+      password: this.password,
+    });
+
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("username", response.data.username);
+    this.$router.push("/home");
+
+  } catch (error) {
+    // Coba ambil pesan dari server, kalau ada
+    const message =
+      error.response && error.response.data && error.response.data.message
+        ? error.response.data.message
+        : error.message || "Something went wrong!";
+
+    Swal.fire({
+      icon: "error",
+      title: "Login Failed",
+      text: message,
+    });
+  }
+}
+
+
   },
 };
 </script>
