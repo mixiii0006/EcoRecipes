@@ -15,35 +15,22 @@
 </template>
 
 <script>
+import Swal from 'sweetalert2';
+
 export default {
   name: "RecipeCard",
   props: {
-    image: {
-      type: String,
-      default: "",
-    },
-    name: {
-      type: String,
-      default: "",
-    },
-    duration: {
-      type: Number,
-      default: 0,
-    },
-    carbon: {
-      type: [Number, String],
-      default: null,
-    },
-    rating: {
-      type: Number,
-      default: 0,
-    },
+    image: { type: String, default: "" },
+    name: { type: String, default: "" },
+    duration: { type: Number, default: 0 },
+    carbon: { type: [Number, String], default: null },
+    rating: { type: Number, default: 0 },
   },
   computed: {
     imageUrl() {
-    return this.image
-      ? `/foodImages/${this.image}.jpg`
-      : '/foodImages/default.jpg';
+      return this.image
+        ? `/foodImages/${this.image}.jpg`
+        : '/foodImages/default.jpg';
     },
   },
   methods: {
@@ -51,10 +38,25 @@ export default {
       this.$emit("open");
     },
     handleCook() {
-      alert(`Memasak: ${this.name}`);
+      Swal.fire({
+        icon: 'success',
+        title: 'Memasak...',
+        text: `Memasak: ${this.name}`,
+        confirmButtonText: 'OK'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$emit("open"); // Buka modal jika user tekan OK
+        }
+      });
     },
     toggleFavorite() {
-      alert(`Favorit: ${this.name}`);
+      Swal.fire({
+        icon: 'success',
+        title: 'Ditambahkan ke Favorit',
+        text: `Favorit: ${this.name}`,
+        showConfirmButton: false,
+        timer: 1500
+      });
     },
   },
 };
