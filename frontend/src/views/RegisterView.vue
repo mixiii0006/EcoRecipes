@@ -60,6 +60,7 @@
 import FormInput from "../components/FormInput.vue";
 import Button from "../components/Button.vue";
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 export default {
   name: "RegisterView",
@@ -76,35 +77,46 @@ export default {
       errorMessage: "",
     };
   },
-  methods: {
-    async handleRegister() {
-      if (this.password !== this.confirmPassword) {
-        this.errorMessage = "Passwords do not match.";
-        return;
-      }
+methods: {
+  async handleRegister() {
+    if (this.password !== this.confirmPassword) {
+      Swal.fire({
+        icon: "warning",
+        title: "Password Mismatch",
+        text: "Passwords do not match.",
+      });
+      return;
+    }
 
-      try {
-        await axios.post("http://localhost:3000/api/register", {
-          name: this.name,
-          email: this.email,
-          password: this.password,
-          confirmPassword: this.confirmPassword,
-        });
-        alert("Registration successful! Please login.");
+    try {
+      await axios.post("http://localhost:3000/api/register", {
+        name: this.name,
+        email: this.email,
+        password: this.password,
+        confirmPassword: this.confirmPassword,
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Registration Successful",
+        text: "You can now login.",
+      }).then(() => {
         this.$router.push("/login");
-      } catch (error) {
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
-          this.errorMessage = error.response.data.message;
-        } else {
-          this.errorMessage = "Registration failed. Please try again.";
-        }
-      }
-    },
+      });
+
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Registration failed. Please try again.";
+
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: message,
+      });
+    }
   },
+},
+
 };
 </script>
 

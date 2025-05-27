@@ -102,7 +102,7 @@ export default {
       this.showForgotModal = false;
       this.showResetModal = true;
     },
-async handleLogin() {
+  async handleLogin() {
   try {
     const response = await axios.post("http://localhost:3000/api/login", {
       email: this.email,
@@ -127,7 +127,6 @@ async handleLogin() {
     });
   }
 }
-
 
   },
 };
