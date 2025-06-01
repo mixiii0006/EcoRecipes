@@ -1,6 +1,0 @@
-venv/
-nama_file.csv
-__pycache__/
-.env
-.ipynb_checkpoints/
-static/images
