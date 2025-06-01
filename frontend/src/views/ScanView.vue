@@ -92,6 +92,8 @@
 import RecipeCard from "../components/RecipeCard.vue";
 import Sidebar from "../components/Sidebar.vue";
 import RecipeModal from "../components/RecipeModal.vue";
+import ScanModel from "../model/ScanModel";
+import ScanPresenter from "../presenter/ScanPresenter";
 
 export default {
   name: "ScanIngredients",
@@ -102,145 +104,81 @@ export default {
   },
   data() {
     return {
-      images: [
-        { file: null, preview: null, showCamera: false },
-        { file: null, preview: null, showCamera: false },
-        { file: null, preview: null, showCamera: false },
-        { file: null, preview: null, showCamera: false },
-      ],
-      cameraStream: null,
-      currentCameraIdx: null,
-      recommendations: [], // PENTING: Supaya tidak undefined!
-      showModal: false, // Untuk modal resep
-      selectedRecipe: null, // Untuk data resep yang dipilih di modal
+      model: new ScanModel(),
+      presenter: null,
+      images: [],
+      recommendations: [],
+      showModal: false,
+      selectedRecipe: null,
+      recentSearches: [],
     };
   },
-
+  created() {
+    this.presenter = new ScanPresenter(this.model, this);
+    this.images = this.model.images;
+    this.recommendations = this.model.recommendations;
+    this.showModal = this.model.showModal;
+    this.selectedRecipe = this.model.selectedRecipe;
+    this.recentSearches = this.model.recentSearches;
+  },
   methods: {
-    inputIngredients() {
-      this.$router.push("/input-ingredients");
+    update() {
+      this.images = this.model.images;
+      this.recommendations = this.model.recommendations;
+      this.showModal = this.model.showModal;
+      this.selectedRecipe = this.model.selectedRecipe;
+      this.recentSearches = this.model.recentSearches;
+      this.$forceUpdate();
     },
-    onFileChange(e, idx) {
-      const file = e.target.files[0];
-      if (file) {
-        this.images[idx].file = file;
-        this.images[idx].preview = URL.createObjectURL(file);
-        this.images[idx].showCamera = false;
-        this.stopCamera();
-      }
+    onFileChange(event, idx) {
+      this.presenter.onFileChange(event, idx);
     },
-
+    openCamera(idx) {
+      this.presenter.openCamera(idx);
+    },
+    capturePhoto(idx) {
+      this.presenter.capturePhoto(idx);
+    },
+    closeCamera(idx) {
+      this.presenter.closeCamera(idx);
+    },
+    submitImages() {
+      this.presenter.submitImages();
+    },
     goToRecipe(recipe) {
-      this.selectedRecipe = recipe;
-      this.showModal = true;
+      this.presenter.goToRecipe(recipe);
     },
     closeModal() {
-      this.showModal = false;
-      this.selectedRecipe = null;
+      this.presenter.closeModal();
     },
-    async openCamera(idx) {
-      // Tutup kamera di card lain jika ada
-      if (this.currentCameraIdx !== null && this.currentCameraIdx !== idx) {
-        this.closeCamera(this.currentCameraIdx);
-      }
-      this.currentCameraIdx = idx;
-      this.images[idx].showCamera = true;
-
-      try {
-        this.cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        this.$nextTick(() => {
-          const video = this.$refs["videoEl" + idx];
-          if (video) {
-            video.srcObject = this.cameraStream;
-            video.play();
-          }
-        });
-      } catch (err) {
-        alert("Tidak dapat mengakses kamera. Izinkan kamera di browser Anda.");
-        this.images[idx].showCamera = false;
-      }
+    deleteRecentSearch(idx) {
+      this.presenter.deleteRecentSearch(idx);
     },
-
-    capturePhoto(idx) {
+    setVideoStream(idx, stream) {
+      this.$nextTick(() => {
+        const video = this.$refs["videoEl" + idx];
+        if (video) {
+          video.srcObject = stream;
+          video.play();
+        }
+      });
+    },
+    captureVideoFrame(idx) {
       const video = this.$refs["videoEl" + idx];
-      if (!video) return;
-      // Buat canvas utk ambil gambar dari video
+      if (!video) return null;
       const canvas = document.createElement("canvas");
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      // Convert ke dataURL
-      const dataUrl = canvas.toDataURL("image/png");
-      this.images[idx].preview = dataUrl;
-      this.images[idx].file = this.dataURLtoFile(dataUrl, `capture-${Date.now()}.png`);
-      this.images[idx].showCamera = false;
-      this.stopCamera();
-    },
-    closeCamera(idx) {
-      this.images[idx].showCamera = false;
-      this.stopCamera();
-    },
-    stopCamera() {
-      if (this.cameraStream) {
-        this.cameraStream.getTracks().forEach((track) => track.stop());
-        this.cameraStream = null;
-        this.currentCameraIdx = null;
-      }
-    },
-    dataURLtoFile(dataurl, filename) {
-      const arr = dataurl.split(",");
-      const mime = arr[0].match(/:(.*?);/)[1];
-      const bstr = atob(arr[1]);
-      let n = bstr.length;
-      const u8arr = new Uint8Array(n);
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-      }
-      return new File([u8arr], filename, { type: mime });
-    },
-
-    async submitImages() {
-      const imagesToSubmit = this.images.filter((img) => img.file);
-
-      if (imagesToSubmit.length === 0) {
-        alert("Please upload or capture at least one image!");
-        return;
-      }
-
-      // Misal kamu hanya kirim gambar pertama
-      const formData = new FormData();
-      formData.append("file", imagesToSubmit[0].file);
-
-      try {
-        const response = await fetch("http://localhost:5000/api/scan", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) throw new Error("Failed to scan image");
-        const data = await response.json();
-
-        // Mapping agar image-nya sama dengan halaman input
-        this.recommendations = (data.recommendations || []).map((rec) => ({
-          ...rec,
-          // Ambil hanya nama file (tanpa path dan tanpa .jpg)
-          Image_Name: rec.Image_Name.split("/").pop().replace(".jpg", ""),
-        }));
-
-        // Untuk debug, boleh tambahkan ini:
-        console.log("Scan Recommendations:", this.recommendations);
-      } catch (error) {
-        alert("Failed to fetch recommendations.");
-      }
+      return canvas.toDataURL("image/png");
     },
   },
   beforeDestroy() {
-    this.stopCamera();
+    this.presenter.stopCamera();
   },
-  // Tambahan jika pakai Vue 3
   beforeUnmount() {
-    this.stopCamera();
+    this.presenter.stopCamera();
   },
 };
 </script>

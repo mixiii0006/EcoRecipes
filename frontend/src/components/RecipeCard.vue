@@ -49,15 +49,16 @@ export default {
         }
       });
     },
-    toggleFavorite() {
-      Swal.fire({
-        icon: 'success',
-        title: 'Ditambahkan ke Favorit',
-        text: `Favorit: ${this.name}`,
-        showConfirmButton: false,
-        timer: 1500
-      });
-    },
+toggleFavorite() {
+  this.$emit('favorite', { recipess_id: this.name, name: this.name, image: this.image });
+  Swal.fire({
+    icon: 'success',
+    title: 'Ditambahkan ke Favorit',
+    text: `Favorit: ${this.name}`,
+    showConfirmButton: false,
+    timer: 1500
+  });
+},
   },
 };
 </script>

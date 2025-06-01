@@ -52,7 +52,7 @@ export default {
       this.message = "";
       this.isError = false;
       try {
-        const res = await axios.post("http://localhost:3000/api/reset-password", {
+        const res = await axios.post("http://localhost:3000/api/auth/reset-password", {
           email: this.email,
           token: this.token,
           newPassword: this.password,

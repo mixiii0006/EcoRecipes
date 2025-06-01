@@ -31,20 +31,21 @@
       <section class="food-category-list">
         <h3>Recommendations</h3>
         <div v-if="loadingRecommendations" class="loading-message">Loading recommendations...</div>
-        <div v-else class="food-category-grid">
+      <div v-else class="food-category-grid">
           <RecipeCard
-            v-for="(item, index) in recommendations"
-            :key="item.id || item.Title_Cleaned || item.name"
-            :image="item.image"
-            :name="item.name || item.Title_Cleaned || ''"
+            v-for="(item, index) in model.recommendations"
+            :key="item.id || item.title_cleaned || item.name"
+            :image="item.Image_Name || ''"
+            :name="item.title_cleaned || item.name || ''"
             :duration="parseInt(item.duration) || 0"
-            :carbon="item.carbon"
-            :rating="item.rating"
+            :carbon="item.carbon_score ? item.carbon_score.toFixed(4) : 'N/A'"
+            :rating="item.rating || 0"
             @open="openModal(index)"
+            @favorite="handleFavorite(item)"
           />
         </div>
       </section>
-      <RecipeModal v-if="showModal" :food="selectedFood" @close="showModal = false" />
+      <RecipeModal v-if="showModal" :food="selectedFood" @close="closeModal" />
     </main>
   </div>
 </template>
@@ -53,6 +54,8 @@
 import Sidebar from "../components/Sidebar.vue";
 import RecipeCard from "../components/RecipeCard.vue";
 import RecipeModal from "../components/RecipeModal.vue";
+import SearchModel from "../model/SearchModel";
+import SearchPresenter from "../presenter/SearchPresenter";
 
 export default {
   name: "SearchView",
@@ -63,110 +66,67 @@ export default {
   },
   data() {
     return {
-      username: "",
-      query: "",
-      searchText: "",
-      currentIndex: 0,
-      carouselInterval: null,
-      isMobile: false,
-      recommendations: [],
+      model: new SearchModel(),
+      presenter: null,
+      query: '',
+      carouselItems: [],
       loadingRecommendations: false,
       showModal: false,
       selectedFood: null,
-      carouselItems: [
-        {
-          title: "Makan Apa Hari Ini??",
-          description: "Siap sedia wawasan dengan bahan lokal. Satu masakanmu mendekatkan keberlanjutan di setiap hidangan.",
-          ingredients: "Ayam, Sayur, Cabai, Bawang",
-          image: "https://source.unsplash.com/featured/?food",
-        },
-        {
-          title: "Inspirasi Masakan Nusantara",
-          description: "Ciptakan sajian lezat dari dapurmu dengan bumbu tradisional Indonesia.",
-          ingredients: "Ikan, Serai, Kunyit, Daun Jeruk",
-          image: "https://source.unsplash.com/featured/?indonesian-food",
-        },
-        {
-          title: "Menu Sehat Hari Ini",
-          description: "Masakan sehat dan lezat bisa dimulai dari bahan lokal berkualitas.",
-          ingredients: "Tahu, Tempe, Brokoli, Wortel",
-          image: "https://source.unsplash.com/featured/?healthy-food",
-        },
-      ],
-      searchTimeout: null,
+      currentIndex: 0,
     };
   },
   created() {
-    this.username = localStorage.getItem("username") || "";
-    this.fetchRecommendations('');
+    this.presenter = new SearchPresenter(this.model, this);
+    this.model.username = localStorage.getItem("username") || "";
+    this.presenter.fetchRecommendations('');
+    this.query = this.model.searchText;  // Use searchText instead of query
+    this.carouselItems = this.model.carouselItems;
+    this.loadingRecommendations = this.model.loadingRecommendations;
+    this.showModal = this.model.showModal;
+    this.selectedFood = this.model.selectedFood;
+    this.currentIndex = this.model.currentIndex;
   },
   mounted() {
-    this.startCarousel();
-    this.checkMobile();
+    this.presenter.startCarousel();
+    this.presenter.checkMobile();
   },
   methods: {
-    async fetchRecommendations(searchText) {
-      try {
-        const textToSend = (typeof searchText === 'string') ? searchText.trim() : (this.searchText.trim() || '');
-        console.log("Fetching recommendations with search text:", textToSend);
-        this.loadingRecommendations = true;
-        const response = await fetch("http://localhost:3000/api/recommend/text", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: textToSend }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          alert(errorData.error || "Failed to get recommendations from backend.");
-          this.recommendations = [];
-          this.loadingRecommendations = false;
-          return;
-        }
-
-        const data = await response.json();
-        console.log("Received recommendations:", data.recommendations.length);
-        const filtered = data.recommendations.filter((item) => item && item.name);
-        this.recommendations = filtered;
-        this.loadingRecommendations = false;
-      } catch (error) {
-        alert("Error connecting to backend: " + error.message);
-        this.recommendations = [];
-        this.loadingRecommendations = false;
-      }
+    update() {
+      // Removed resetting this.query to prevent input clearing and lag
+      this.carouselItems = this.model.carouselItems;
+      this.loadingRecommendations = this.model.loadingRecommendations;
+      this.showModal = this.model.showModal;
+      this.selectedFood = this.model.selectedFood;
+      this.currentIndex = this.model.currentIndex;
+      this.$forceUpdate();
     },
-    handleSearch() {
-      clearTimeout(this.searchTimeout);
-      this.searchTimeout = setTimeout(() => {
-        this.searchText = this.query;
-        this.fetchRecommendations(this.searchText);
-      }, 300);
+    handleSearch(event) {
+      this.presenter.handleSearch(event);
     },
     handleInputClick() {
-      this.$router.push("/input-ingredients");
+      this.presenter.handleInputClick();
     },
     handleScanClick() {
-      this.$router.push("/scan-ingredients");
+      this.presenter.handleScanClick();
     },
-
     startCarousel() {
-      this.carouselInterval = setInterval(() => {
-        this.currentIndex = (this.currentIndex + 1) % this.carouselItems.length;
-      }, 4000);
+      this.presenter.startCarousel();
     },
     checkMobile() {
-      this.isMobile = window.innerWidth <= 768;
+      this.presenter.checkMobile();
     },
-    openModal(id = null) {
-      this.selectedRecipeId = id;
-      this.showModal = true;
-    },
-
     openModal(index) {
-      this.selectedFood = this.recommendations[index];
-      this.showModal = true;
+      this.presenter.openModal(index);
     },
-  },
+    closeModal() {
+      this.model.setShowModal(false);
+      this.update();
+    },
+    handleFavorite(item) {
+      this.presenter.addFavorite(item.id || item._id || item.recipess_id || item.title_cleaned);
+    }
+  }
 };
 </script>
 

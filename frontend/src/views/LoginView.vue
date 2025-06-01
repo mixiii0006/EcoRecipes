@@ -18,7 +18,7 @@
             id="email"
             label="Email"
             type="email"
-            v-model="email"
+            v-model="model.email"
             placeholder="Enter your email"
             required
           />
@@ -26,7 +26,7 @@
             id="password"
             label="Password"
             type="password"
-            v-model="password"
+            v-model="model.password"
             placeholder="Enter your password"
             required
           />
@@ -74,9 +74,8 @@ import FormInput from "../components/FormInput.vue";
 import Button from "../components/Button.vue";
 import ForgotPasswordModal from "../components/forgotPasswordModal.vue";
 import ResetPasswordModal from "../components/resetPasswordModal.vue";
-import axios from "axios";
-import Swal from 'sweetalert2';
-
+import LoginModel from "../model/LoginModel";
+import LoginPresenter from "../presenter/LoginPresenter";
 
 export default {
   name: "LoginView",
@@ -88,46 +87,50 @@ export default {
   },
   data() {
     return {
-      email: "",
-      password: "",
+      model: new LoginModel(),
+      presenter: null,
       rememberMe: false,
-      showForgotModal: false,
-      showResetModal: false,
-      resetEmail: "",
     };
   },
-  methods: {
-    handleEmailVerified(email) {
-      this.resetEmail = email;
-      this.showForgotModal = false;
-      this.showResetModal = true;
+  computed: {
+    showForgotModal: {
+      get() {
+        return this.model.showForgotModal;
+      },
+      set(value) {
+        this.model.setShowForgotModal(value);
+      },
     },
-  async handleLogin() {
-  try {
-    const response = await axios.post("http://localhost:3000/api/login", {
-      email: this.email,
-      password: this.password,
-    });
-
-    localStorage.setItem("token", response.data.token);
-    localStorage.setItem("username", response.data.username);
-    this.$router.push("/home");
-
-  } catch (error) {
-    // Coba ambil pesan dari server, kalau ada
-    const message =
-      error.response && error.response.data && error.response.data.message
-        ? error.response.data.message
-        : error.message || "Something went wrong!";
-
-    Swal.fire({
-      icon: "error",
-      title: "Login Failed",
-      text: message,
-    });
-  }
-}
-
+    showResetModal: {
+      get() {
+        return this.model.showResetModal;
+      },
+      set(value) {
+        this.model.setShowResetModal(value);
+      },
+    },
+    resetEmail: {
+      get() {
+        return this.model.resetEmail;
+      },
+      set(value) {
+        this.model.setResetEmail(value);
+      },
+    },
+  },
+  created() {
+    this.presenter = new LoginPresenter(this.model, this);
+  },
+  methods: {
+    update() {
+      this.$forceUpdate();
+    },
+    handleEmailVerified(email) {
+      this.presenter.handleEmailVerified(email);
+    },
+    handleLogin() {
+      this.presenter.handleLogin();
+    },
   },
 };
 </script>

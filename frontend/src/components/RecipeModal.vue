@@ -4,6 +4,9 @@
       <button class="close-btn" @click="closeModal">×</button>
       <div class="recipe-header">
         <h2>{{ food.name || food.Title_Cleaned }}</h2>
+        <div class="carbon-highlight">
+          Total Carbon: {{ food.carbon_score ? food.carbon_score.toFixed(4) : 'N/A' }} g
+        </div>
       </div>
 
       <div class="recipe-body">

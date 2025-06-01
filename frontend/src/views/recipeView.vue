@@ -11,20 +11,15 @@
 
       <div class="recipe-body">
         <div class="left-column">
-          <img class="recipe-image" src="https://via.placeholder.com/150" alt="Nastar Keju" />
-
-          <div class="ingredients-card">
-            <h3>How to Cook</h3>
-            <ul>
-              <li>1 bar cheese</li>
-              <li>1 cup of flour</li>
-              <li>1 tsp of sugar</li>
-              <li>1/2 tsp of salt</li>
-              <li>20 gr of butter</li>
-              <li>50 ml of oil</li>
-              <li>20 gr of condensed milk</li>
-            </ul>
-          </div>
+          <RecipeCard
+            v-for="recipe in recipes"
+            :key="recipe.id"
+            :name="recipe.name"
+            :image="recipe.image"
+            :duration="recipe.duration"
+            :carbon="recipe.carbon"
+            @favorite="handleFavorite"
+          />
         </div>
 
         <div class="right-column">
@@ -48,22 +43,50 @@
 
 <script>
 import Sidebar from "../components/Sidebar.vue";
+import RecipeCard from "../components/RecipeCard.vue";
+import RecipeModel from "../model/RecipeModel";
+import RecipePresenter from "../presenter/RecipePresenter";
+import ProfileModel from "../model/ProfileModel";
 
 export default {
   name: "RecipeDetail",
   components: {
     Sidebar,
+    RecipeCard,
   },
   data() {
     return {
-      recipeId: null
+      model: new RecipeModel(),
+      presenter: null,
+      profileModel: new ProfileModel(),
+      recipes: [
+        // Example recipe data; replace with actual data fetching logic
+        { id: 1, name: "Nastar Keju", image: "nastar-keju", duration: 30, carbon: 100 },
+        // Add more recipes as needed
+      ],
     };
   },
+  created() {
+    this.presenter = new RecipePresenter(this.model, this);
+  },
   mounted() {
-    this.recipeId = this.$route.params.id;
-    // 🔧 You can use this.recipeId to fetch data dynamically
-    console.log("Recipe ID:", this.recipeId);
-  }
+    const id = this.$route.params.id;
+    this.presenter.setRecipeId(id);
+    console.log("Recipe ID:", id);
+  },
+  methods: {
+    update() {
+      this.$forceUpdate();
+    },
+    async handleFavorite(favoriteData) {
+      try {
+        await this.profileModel.addFavorite(favoriteData.recipess_id);
+        this.$toast.success(`Favorit: ${favoriteData.name} berhasil ditambahkan`);
+      } catch (error) {
+        this.$toast.error(`Gagal menambahkan favorit: ${favoriteData.name}`);
+      }
+    },
+  },
 };
 </script>
 
