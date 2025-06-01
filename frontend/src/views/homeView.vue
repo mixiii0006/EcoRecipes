@@ -47,12 +47,12 @@
               <router-link to="/profile">
                 <img src="/images/profile.jpg" alt="Profile Picture" class="profile-img" />
               </router-link>
-              <h3 class="profile-name">Natasya salsabilla</h3>
+              <h3 class="profile-name">{{ model.user ? model.user.name : "Loading..." }}</h3>
             </div>
 
             <!-- Emisi Karbon Card -->
             <div class="carbon-card">
-              <p><strong>Total Amount of Carbon</strong><br />Successfully Reduced: 12</p>
+              <p><strong>Total Amount of Carbon</strong><br />Successfully Reduced: {{ model.user ? model.user.totalKarmonReduced : 0 }}</p>
             </div>
 
             <section class="food-category-list">
@@ -80,6 +80,8 @@
 
 <script>
 import Sidebar from "../components/Sidebar.vue";
+import HomeModel from "../model/HomeModel";
+import HomePresenter from "../presenter/HomePresenter";
 
 export default {
   name: "HomeView",
@@ -88,63 +90,52 @@ export default {
   },
   data() {
     return {
-      username: "",
+      model: new HomeModel(),
+      presenter: null,
+      carouselItems: [],
       currentIndex: 0,
-      carouselInterval: null,
-      isMobile: false,
+      isMobile: null,
       isMenuOpen: false,
-      chartInstance: null,
-      carouselItems: [
-        {
-          title: "Makan Apa Hari Ini??",
-          description: "Siap sedia wawasan dengan bahan lokal. Satu masakanmu mendekatkan keberlanjutan di setiap hidangan.",
-          ingredients: "Ayam, Sayur, Cabai, Bawang",
-          image: "https://source.unsplash.com/featured/?food",
-        },
-        {
-          title: "Inspirasi Masakan Nusantara",
-          description: "Ciptakan sajian lezat dari dapurmu dengan bumbu tradisional Indonesia.",
-          ingredients: "Ikan, Serai, Kunyit, Daun Jeruk",
-          image: "https://source.unsplash.com/featured/?indonesian-food",
-        },
-        {
-          title: "Menu Sehat Hari Ini",
-          description: "Masakan sehat dan lezat bisa dimulai dari bahan lokal berkualitas.",
-          ingredients: "Tahu, Tempe, Brokoli, Wortel",
-          image: "https://source.unsplash.com/featured/?healthy-food",
-        },
-      ],
     };
   },
-  created() {
-    this.username = localStorage.getItem("username") || "";
+  async created() {
+    this.presenter = new HomePresenter(this.model, this);
+    this.model.setUsername(localStorage.getItem("username") || "");
+    await this.presenter.loadUserData();
+    this.carouselItems = this.model.carouselItems;
+    this.currentIndex = this.model.currentIndex;
+    this.isMobile = this.model.isMobile === undefined ? false : this.model.isMobile;
+    this.isMenuOpen = this.model.isMenuOpen;
+    this.$forceUpdate();
   },
   mounted() {
-    this.renderPieChart();
-    this.startCarousel();
-    this.checkMobile();
-    window.addEventListener("resize", this.checkMobile);
+    this.presenter.startCarousel();
+    this.presenter.checkMobile();
+    window.addEventListener("resize", this.presenter.checkMobile);
   },
   beforeDestroy() {
-    window.removeEventListener("resize", this.checkMobile);
-    clearInterval(this.carouselInterval);
+    window.removeEventListener("resize", this.presenter.checkMobile);
+    this.presenter.clearCarouselInterval();
   },
   methods: {
+    update() {
+      this.carouselItems = this.model.carouselItems;
+      this.currentIndex = this.model.currentIndex;
+      this.isMobile = this.model.isMobile;
+      this.isMenuOpen = this.model.isMenuOpen;
+      this.$forceUpdate();
+    },
     handleLogout() {
-      localStorage.removeItem("token");
-      localStorage.removeItem("username");
-      this.$router.push("/");
+      this.presenter.handleLogout();
     },
     startCarousel() {
-      this.carouselInterval = setInterval(() => {
-        this.currentIndex = (this.currentIndex + 1) % this.carouselItems.length;
-      }, 4000); // ganti slide setiap 4 detik
+      this.presenter.startCarousel();
     },
     checkMobile() {
-      this.isMobile = window.innerWidth <= 768;
+      this.presenter.checkMobile();
     },
     toggleMenu() {
-      this.isMenuOpen = !this.isMenuOpen;
+      this.presenter.toggleMenu();
     },
     renderPieChart() {
       // Optional: isi logika chart jika dibutuhkan

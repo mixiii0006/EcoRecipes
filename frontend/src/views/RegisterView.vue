@@ -17,7 +17,7 @@
           <FormInput
             id="name"
             label="Name"
-            v-model="name"
+            v-model="model.name"
             placeholder="Enter your name"
             required
           />
@@ -25,7 +25,7 @@
             id="email"
             label="Email"
             type="email"
-            v-model="email"
+            v-model="model.email"
             placeholder="Enter your email"
             required
           />
@@ -33,7 +33,7 @@
             id="password"
             label="Password"
             type="password"
-            v-model="password"
+            v-model="model.password"
             placeholder="Enter your password"
             required
           />
@@ -41,7 +41,7 @@
             id="confirm-password"
             label="Confirm Password"
             type="password"
-            v-model="confirmPassword"
+            v-model="model.confirmPassword"
             placeholder="Re-enter your password"
             required
           />
@@ -59,8 +59,8 @@
 <script>
 import FormInput from "../components/FormInput.vue";
 import Button from "../components/Button.vue";
-import axios from "axios";
-import Swal from 'sweetalert2';
+import RegisterModel from "../model/RegisterModel";
+import RegisterPresenter from "../presenter/RegisterPresenter";
 
 export default {
   name: "RegisterView",
@@ -70,53 +70,21 @@ export default {
   },
   data() {
     return {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      errorMessage: "",
+      model: new RegisterModel(),
+      presenter: null,
     };
   },
-methods: {
-  async handleRegister() {
-    if (this.password !== this.confirmPassword) {
-      Swal.fire({
-        icon: "warning",
-        title: "Password Mismatch",
-        text: "Passwords do not match.",
-      });
-      return;
-    }
-
-    try {
-      await axios.post("http://localhost:3000/api/register", {
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        confirmPassword: this.confirmPassword,
-      });
-
-      Swal.fire({
-        icon: "success",
-        title: "Registration Successful",
-        text: "You can now login.",
-      }).then(() => {
-        this.$router.push("/login");
-      });
-
-    } catch (error) {
-      const message =
-        error.response?.data?.message || "Registration failed. Please try again.";
-
-      Swal.fire({
-        icon: "error",
-        title: "Registration Failed",
-        text: message,
-      });
-    }
+  created() {
+    this.presenter = new RegisterPresenter(this.model, this);
   },
-},
-
+  methods: {
+    update() {
+      this.$forceUpdate();
+    },
+    handleRegister() {
+      this.presenter.handleRegister();
+    },
+  },
 };
 </script>
 

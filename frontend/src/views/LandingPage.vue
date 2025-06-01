@@ -164,6 +164,9 @@
 
 <script>
 import Navbar from "../components/navbar.vue";
+import LandingPageModel from "../model/LandingPageModel";
+import LandingPagePresenter from "../presenter/LandingPagePresenter";
+
 export default {
   name: "LandingPage",
   components: {
@@ -171,64 +174,33 @@ export default {
   },
   data() {
     return {
-      foodItems: [
-        { name: "Daging Sapi", image: "/images/beef.png", co2: "99,48 kg" },
-        { name: "Unggas", image: "/images/chicken.png", co2: "9,87 kg" },
-        {
-          name: "Dark Chocolate",
-          image: "/images/chocolate.png",
-          co2: "46,65 kg",
-        },
-        { name: "Keju", image: "/images/cheese.png", co2: "23,88 kg" },
-        { name: "Ikan", image: "/images/fish.png", co2: "13,63 kg" },
-      ],
-      moreFoodItems: [
-        { name: "Sayur Bayam", image: "/images/spinach.png", co2: "2,0 kg" },
-        { name: "Kacang Merah", image: "/images/red-beans.png", co2: "1,5 kg" },
-        { name: "Beras", image: "/images/rice.png", co2: "3,2 kg" },
-        { name: "Apel", image: "/images/apple.png", co2: "0,4 kg" },
-        { name: "Pisang", image: "/images/banana.png", co2: "0,5 kg" },
-      ],
-      scrollInterval: null,
+      model: new LandingPageModel(),
+      presenter: null,
     };
   },
   computed: {
     allFoodItems() {
-      return [...this.foodItems, ...this.moreFoodItems];
+      return this.model.allFoodItems;
     },
     duplicatedItems() {
-      // Gandakan untuk efek looping
-      return [...this.allFoodItems, ...this.allFoodItems];
+      return this.model.duplicatedItems;
     },
   },
+  created() {
+    this.presenter = new LandingPagePresenter(this.model, this);
+  },
   mounted() {
-    this.startCarouselAutoscroll();
+    this.presenter.startCarouselAutoscroll();
   },
   beforeUnmount() {
-    clearInterval(this.scrollInterval);
+    this.presenter.clearScrollInterval();
   },
   methods: {
     goToLogin() {
-      this.$router.push('/login')
+      this.presenter.goToLogin();
     },
     startCarouselAutoscroll() {
-      const carousel = this.$refs.carouselRef;
-      const track = this.$refs.trackRef;
-
-      const scrollSpeed = 1;
-      const intervalTime = 16;
-      const halfScroll = track.scrollWidth / 2;
-
-      this.scrollInterval = setInterval(() => {
-        if (!carousel || !track) return;
-
-        if (carousel.scrollLeft >= halfScroll) {
-          // Langsung reset tanpa animasi
-          carousel.scrollLeft = 0;
-        } else {
-          carousel.scrollLeft += scrollSpeed;
-        }
-      }, intervalTime);
+      this.presenter.startCarouselAutoscroll();
     },
   },
 };

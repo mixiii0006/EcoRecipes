@@ -1,11 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const recipeController = require('../controllers/recipeController');
+const recipe = require('../controllers/recipeController');
 
-// Route for text input recommendation
-router.post('/recommend/text', recipeController.recommendByText);
-
-// Route for image input recommendation
-router.post('/recommend/image', recipeController.recommendByImage);
+router.get('/', recipe.getAllRecipes);
+router.get('/:id', recipe.getRecipeById);
 
 module.exports = router;

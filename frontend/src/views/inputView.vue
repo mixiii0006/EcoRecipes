@@ -13,7 +13,7 @@
 
       <!-- Ingredients Input Section -->
       <div class="input-section">
-        <textarea v-model="ingredients" placeholder="ex : I have one and a half kilos of chicken, ... " rows="5" class="ingredients-input"></textarea>
+        <textarea v-model="ingredients" @input="onIngredientsInput" placeholder="ex : I have one and a half kilos of chicken, ... " rows="5" class="ingredients-input"></textarea>
         <button class="submit-btn" @click="submitIngredients">Submit</button>
       </div>
 
@@ -21,15 +21,15 @@
       <section class="combined-section">
         <!-- Recommendations Section -->
         <div class="recommendations-wrapper">
-          <section class="recommendations">
-            <h3>Recommendations</h3>
-            <div class="recipe-grid">
-              <div v-if="recommendations.length === 0">No recommendations yet.</div>
-              <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
-                <RecipeCard :image="rec.Image_Name || 'https://via.placeholder.com/150'" :name="rec.Title_Cleaned || 'No Title'" :duration="15" :carbon="25" :rating="4" @open="goToRecipe(rec)" />
-              </div>
-            </div>
-          </section>
+      <section class="recommendations">
+        <h3>Recommendations</h3>
+        <div class="recipe-grid">
+          <div v-if="recommendations.length === 0">No recommendations yet.</div>
+          <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
+            <RecipeCard :image="rec.Image_Name || 'https://via.placeholder.com/150'" :name="rec.Title_Cleaned || 'No Title'" :carbon="rec.carbon || rec.total_carbon || 25" @open="goToRecipe(rec)" />
+          </div>
+        </div>
+      </section>
         </div>
 
         <!-- Right Section -->
@@ -48,24 +48,74 @@
             </section>
           </div>
 
-          <div class="card1">
-            <section class="statistics">
-              <h3>Statistic</h3>
-              <div>Jejak Karbon: 25%</div>
-            </section>
+      <div class="card1">
+        <section class="statistics">
+          <h3>Statistic</h3>
+          <div>Jejak Karbon: {{ (totalCarbon * 100).toFixed(2) }}%</div>
+        </section>
+      </div>
+
+      <div class="card">
+        <section class="leftovers">
+          <h3>Leftovers</h3>
+          <ul v-if="leftovers.length > 0">
+            <li v-for="(item, index) in leftovers" :key="index">{{ item }}</li>
+          </ul>
+          <div v-else>No leftovers</div>
+        </section>
+      </div>
+
+      <div class="card">
+        <section class="missing">
+          <h3>Missing Ingredients</h3>
+          <ul v-if="missing.length > 0">
+            <li v-for="(item, index) in missing" :key="index">{{ item }}</li>
+          </ul>
+          <div v-else>No missing ingredients</div>
+        </section>
+      </div>
+
+      <div class="card">
+        <section class="parsed-ingredients">
+          <h3>Parsed Ingredients</h3>
+          <ul v-if="parsedIngredients.length > 0">
+            <li v-for="(item, index) in parsedIngredients" :key="index">{{ item.text || JSON.stringify(item) }}</li>
+          </ul>
+          <div v-else>No parsed ingredients</div>
+        </section>
+      </div>
+
+      <div class="card" v-if="selectedRecipe">
+        <section class="selected-recipe">
+          <h3>Selected Recipe</h3>
+          <div><strong>Title:</strong> {{ selectedRecipe.title || 'N/A' }}</div>
+          <div>
+            <strong>Ingredients:</strong>
+            <ul>
+              <li v-for="(ing, idx) in selectedRecipe.ingredients" :key="idx">{{ ing }}</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Instructions:</strong>
+            <ol>
+              <li v-for="(step, idx) in selectedRecipe.instructions" :key="idx">{{ step }}</li>
+            </ol>
           </div>
         </section>
-      </section>
-    </main>
-    <RecipeModal v-if="showModal" :food="selectedRecipe" @close="closeModal" />
-  </div>
+      </div>
+    </section>
+  </section>
+</main>
+<RecipeModal v-if="showModal" :food="selectedRecipe" @close="closeModal" />
+</div>
 </template>
 
 <script>
-import axios from "axios";
 import RecipeCard from "../components/RecipeCard.vue";
 import Sidebar from "../components/Sidebar.vue";
 import RecipeModal from "../components/RecipeModal.vue";
+import InputModel from "../model/InputModel";
+import InputPresenter from "../presenter/InputPresenter";
 
 export default {
   name: "InputIngredients",
@@ -76,61 +126,49 @@ export default {
   },
   data() {
     return {
+      model: new InputModel(),
+      presenter: null,
       ingredients: "",
       recommendations: [],
+      totalCarbon: 0,
       recentSearches: [],
       loading: false,
       showModal: false,
       selectedRecipe: null,
+      leftovers: [],
+      missing: [],
+      parsedIngredients: [],
     };
   },
+  created() {
+    this.presenter = new InputPresenter(this.model, this);
+    this.ingredients = this.model.ingredients;
+    this.recommendations = this.model.recommendations;
+    this.totalCarbon = this.model.totalCarbon;
+    this.recentSearches = this.model.recentSearches;
+    this.loading = this.model.loading;
+    this.showModal = this.model.showModal;
+    this.selectedRecipe = this.model.selectedRecipe;
+    this.leftovers = this.model.leftovers;
+    this.missing = this.model.missing;
+    this.parsedIngredients = this.model.parsedIngredients;
+  },
   methods: {
-    scanIngredients() {
-      this.$router.push("/scan-ingredients");
+    onIngredientsInput(event) {
+      this.model.setIngredients(this.ingredients);
     },
-    async submitIngredients() {
-      if (this.loading) return;
-
-      if (!this.ingredients.trim()) {
-        alert("Please enter some ingredients.");
-        return;
-      }
-
-      this.loading = true;
-      try {
-        const response = await axios.post("http://localhost:3000/api/recommend", {
-          ingredients: this.ingredients,
-        });
-
-        if (Array.isArray(response.data.recommendations)) {
-          this.recommendations = response.data.recommendations;
-        } else {
-          this.recommendations = [];
-        }
-
-        this.addRecentSearch(this.ingredients);
-      } catch (error) {
-        alert("Failed to fetch recommendations. Please try again.");
-      } finally {
-        this.loading = false;
-      }
-    },
-    addRecentSearch(search) {
-      this.recentSearches.unshift(search);
-      if (this.recentSearches.length > 5) {
-        this.recentSearches.pop();
-      }
-    },
-    deleteRecentSearch(index) {
-      this.recentSearches.splice(index, 1);
-    },
-    goToRecipe(recipe) {
-      this.selectedRecipe = recipe;
-      this.showModal = true;
-    },
-    closeModal() {
-      this.showModal = false;
-      this.selectedRecipe = null;
+    update() {
+      this.ingredients = this.model.ingredients;
+      this.recommendations = this.model.recommendations;
+      this.totalCarbon = this.model.totalCarbon;
+      this.recentSearches = this.model.recentSearches;
+      this.loading = this.model.loading;
+      this.showModal = this.model.showModal;
+      this.selectedRecipe = this.model.selectedRecipe;
+      this.leftovers = this.model.leftovers;
+      this.missing = this.model.missing;
+      this.parsedIngredients = this.model.parsedIngredients;
+      this.$forceUpdate();
     },
   },
 };

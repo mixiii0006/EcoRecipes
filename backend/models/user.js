@@ -1,14 +1,9 @@
-const db = require('../config/database');
-
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    email TEXT UNIQUE,
-    password TEXT,
-    reset_token TEXT,
-    reset_token_expire INTEGER
-  )`);
+const mongoose = require('mongoose');
+const UserSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, unique: true },
+  password: String,
+  reset_token: String,
+  reset_token_expired: Date
 });
-
-module.exports = db;
+module.exports = mongoose.model('User', UserSchema);

@@ -34,7 +34,7 @@
       <!-- Information Section with Form -->
       <div class="information">
         <div class="highlighted-karmon">
-          Total Amount of Carmon Successfully Reduced: {{ user.totalKarmonReduced }}
+          Total Amount of Carbon Successfully Reduced: {{ user.totalKarmonReduced }}
         </div>
         <h3>Information</h3>
         <form class="info-form">
@@ -93,51 +93,73 @@
 
         <section class="food-favorite-section">
           <div class="food-list-grid">
-            <div class="food-card" v-for="index in 6" :key="index">
-              <img
-                src="/images/bg-profil.jpg"
-                alt="Food Image"
-                class="food-img"
-              />
-              <div class="food-name">grilled</div>
-            </div>
+            <RecipeCard
+              v-for="item in isFoodList ? model.cooks : model.favorites"
+              :key="item._id"
+              :name="item.title_cleaned || item.name"
+              :image="item.image"
+              :duration="item.duration || 0"
+              :carbon="item.carbon_score || 'N/A'"
+              @open="openModal(item)"
+            />
           </div>
         </section>
       </div>
     </div>
+    <RecipeModal v-if="showModal" :food="selectedFood" @close="closeModal" />
   </div>
 </template>
 
 <script>
+import ProfileModel from "../model/ProfileModel";
+import ProfilePresenter from "../presenter/ProfilePresenter";
+import RecipeCard from "../components/RecipeCard.vue";
+import RecipeModal from "../components/RecipeModal.vue";
+
 export default {
   name: "Profile",
+  components: {
+    RecipeCard,
+    RecipeModal,
+  },
   data() {
     return {
-      isFoodList: true, // Determines which content (food list or favorite) is active
-      user: {
-        name: "Natasya Salsabilla",
-        email: "natasya@example.com",
-        gender: "Perempuan",
-        favoriteFoodCount: 8,
-        cookedFoodCount: 5,
-        totalKarmonReduced: 12, // example value for total karmon reduced
-      }, // User data
+      model: new ProfileModel(),
+      presenter: null,
+      user: null,
+      isFoodList: true,
+      showModal: false,
+      selectedFood: null,
     };
   },
+  async created() {
+    this.presenter = new ProfilePresenter(this.model, this);
+    await this.presenter.loadProfileData();
+    this.user = this.model.user;
+    this.isFoodList = this.model.isFoodList;
+  },
   methods: {
-    // Toggle between food list and favorite content
+    update() {
+      this.user = this.model.user;
+      this.isFoodList = this.model.isFoodList;
+      this.$forceUpdate();
+    },
     toggleContent(section) {
-      this.isFoodList = section === "food";
+      this.presenter.toggleContent(section);
     },
     goToDashboard() {
-      // Arahkan ke halaman dashboard (ubah sesuai route-mu)
-      this.$router.push("/home");
+      this.presenter.goToDashboard();
     },
-
     logout() {
-      localStorage.removeItem("token");
-      localStorage.removeItem("username");
-      this.$router.push("/");
+      this.presenter.logout();
+    },
+    openModal(item) {
+      this.selectedFood = item;
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+      this.selectedFood = null;
     },
   },
 };
@@ -260,52 +282,33 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.info-form {
-  gap: 12px;
-}
-
-.form-group label {
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 6px;
-}
-
-.form-group input {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-
-.form-group input[readonly] {
-  background-color: #f9f9f9;
-  cursor: default;
-  color: #666;
-}
-
+/* FORM WRAPPER */
 .info-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
   align-items: center;
   max-width: 600px;
+  width: 100%;
   margin: 0 auto;
-  padding: 20px 0;
+  padding: 20px;
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
 }
 
+/* FORM GROUP */
 .form-group {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 15px;
+  box-sizing: border-box;
 }
 
+/* LABEL */
 .form-group label {
   font-weight: 600;
   color: #444;
@@ -314,6 +317,7 @@ export default {
   width: 100%;
 }
 
+/* INPUT */
 .form-group input {
   width: 100%;
   max-width: 400px;
@@ -322,44 +326,62 @@ export default {
   border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #fafafa;
-  transition: border-color 0.3s ease;
+  color: #333;
   text-align: center;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
 }
 
+/* FOKUS */
 .form-group input:focus {
   border-color: #1976d2;
   outline: none;
-  background-color: white;
+  background-color: #ffffff;
 }
 
+/* READONLY */
 .form-group input[readonly] {
   background-color: #f0f0f0;
   cursor: default;
   color: #888;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
+/* GLOBAL INPUT DAN LABEL – optional kalau kamu pakai input/label di luar .form-group */
 label {
   font-weight: bold;
 }
 
 input {
-  padding: 10px;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
   margin-top: 5px;
   background-color: #f7f7f7;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 input[readonly] {
   background-color: #e0e0e0;
   cursor: not-allowed;
 }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .info-form {
+    padding: 15px;
+  }
+
+  .form-group input {
+    font-size: 0.95rem;
+    padding: 8px 10px;
+  }
+
+  .form-group label {
+    font-size: 0.95rem;
+  }
+}
+
 
 /* Food and Favorite Section */
 .food-favorite-section {
@@ -547,7 +569,9 @@ input[readonly] {
   .information,
   .food-favorite-section {
     width: 100%;
-    margin-left: -20px;
+    margin-left: 0; /* Changed from -20px to 0 for better alignment */
+    padding: 0 15px; /* Increased padding for better spacing */
+    box-sizing: border-box; /* Ensure padding doesn't cause overflow */
   }
 
   .profile-overlay-left {
@@ -569,12 +593,28 @@ input[readonly] {
     gap: 15px;
   }
 
-  .form-group input {
-    width: 100%;
-  }
+  
 
   .toggle-buttons {
     justify-content: center;
+  }
+
+  /* Additional improvements for mobile */
+  .profile-container {
+    padding: 10px 5px;
+  }
+
+  .dashboard-controls button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+
+  .food-card {
+    padding: 8px;
+  }
+
+  .food-img {
+    height: 120px;
   }
 }
 </style>
