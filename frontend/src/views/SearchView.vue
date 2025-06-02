@@ -39,7 +39,7 @@
             :image="item.Image_Name || ''"
             :name="item.title_cleaned || item.name || ''"
             :duration="parseInt(item.duration) || 0"
-            :carbon="item.carbon_score ? item.carbon_score.toFixed(4) : 'N/A'"
+            :carbon="item.total_recipe_carbon ? item.total_recipe_carbon.toFixed(4) : 'N/A'"
             :rating="item.rating || 0"
             @open="openModal(index)"
             @favorite="handleFavorite(item)"

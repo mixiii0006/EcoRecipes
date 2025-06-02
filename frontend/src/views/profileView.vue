@@ -99,7 +99,7 @@
               :name="item.title_cleaned || item.name"
               :image="item.image"
               :duration="item.duration || 0"
-              :carbon="item.carbon_score || 'N/A'"
+              :carbon="item.total_recipe_carbon || 'N/A'"
               @open="openModal(item)"
             />
           </div>
