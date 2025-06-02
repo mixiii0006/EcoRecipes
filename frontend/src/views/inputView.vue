@@ -21,15 +21,20 @@
       <section class="combined-section">
         <!-- Recommendations Section -->
         <div class="recommendations-wrapper">
-      <section class="recommendations">
-        <h3>Recommendations</h3>
-        <div class="recipe-grid">
-          <div v-if="recommendations.length === 0">No recommendations yet.</div>
-          <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
-            <RecipeCard :image="rec.Image_Name || 'https://via.placeholder.com/150'" :name="rec.Title_Cleaned || 'No Title'" :carbon="rec.carbon || rec.total_carbon || 25" @open="goToRecipe(rec)" />
-          </div>
-        </div>
-      </section>
+          <section class="recommendations">
+            <h3>Recommendations</h3>
+            <div class="recipe-grid">
+              <div v-if="recommendations.length === 0">No recommendations yet.</div>
+              <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
+                <RecipeCard
+                  :image="rec.image || rec.Image_Name || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?fit=crop&w=200&q=80'"
+                  :name="rec.title || rec.title_cleaned || rec.name || 'No Title'"
+                  :carbon="rec.carbon || rec.carbon_score || rec.total_recipe_carbon || 25"
+                  @open="goToRecipe(rec)"
+                />
+              </div>
+            </div>
+          </section>
         </div>
 
         <!-- Right Section -->
@@ -48,66 +53,66 @@
             </section>
           </div>
 
-      <div class="card1">
-        <section class="statistics">
-          <h3>Statistic</h3>
-          <div>Jejak Karbon: {{ (totalCarbon * 100).toFixed(2) }}%</div>
-        </section>
-      </div>
-
-      <div class="card">
-        <section class="leftovers">
-          <h3>Leftovers</h3>
-          <ul v-if="leftovers.length > 0">
-            <li v-for="(item, index) in leftovers" :key="index">{{ item }}</li>
-          </ul>
-          <div v-else>No leftovers</div>
-        </section>
-      </div>
-
-      <div class="card">
-        <section class="missing">
-          <h3>Missing Ingredients</h3>
-          <ul v-if="missing.length > 0">
-            <li v-for="(item, index) in missing" :key="index">{{ item }}</li>
-          </ul>
-          <div v-else>No missing ingredients</div>
-        </section>
-      </div>
-
-      <div class="card">
-        <section class="parsed-ingredients">
-          <h3>Parsed Ingredients</h3>
-          <ul v-if="parsedIngredients.length > 0">
-            <li v-for="(item, index) in parsedIngredients" :key="index">{{ item.text || JSON.stringify(item) }}</li>
-          </ul>
-          <div v-else>No parsed ingredients</div>
-        </section>
-      </div>
-
-      <div class="card" v-if="selectedRecipe">
-        <section class="selected-recipe">
-          <h3>Selected Recipe</h3>
-          <div><strong>Title:</strong> {{ selectedRecipe.title || 'N/A' }}</div>
-          <div>
-            <strong>Ingredients:</strong>
-            <ul>
-              <li v-for="(ing, idx) in selectedRecipe.ingredients" :key="idx">{{ ing }}</li>
-            </ul>
+          <div class="card1">
+            <section class="statistics">
+              <h3>Statistic</h3>
+              <div>Jejak Karbon: {{ (totalCarbon * 100).toFixed(2) }}%</div>
+            </section>
           </div>
-          <div>
-            <strong>Instructions:</strong>
-            <ol>
-              <li v-for="(step, idx) in selectedRecipe.instructions" :key="idx">{{ step }}</li>
-            </ol>
+
+          <div class="card">
+            <section class="leftovers">
+              <h3>Leftovers</h3>
+              <ul v-if="leftovers.length > 0">
+                <li v-for="(item, index) in leftovers" :key="index">{{ item }}</li>
+              </ul>
+              <div v-else>No leftovers</div>
+            </section>
+          </div>
+
+          <div class="card">
+            <section class="missing">
+              <h3>Missing Ingredients</h3>
+              <ul v-if="missing.length > 0">
+                <li v-for="(item, index) in missing" :key="index">{{ item }}</li>
+              </ul>
+              <div v-else>No missing ingredients</div>
+            </section>
+          </div>
+
+          <div class="card">
+            <section class="parsed-ingredients">
+              <h3>Parsed Ingredients</h3>
+              <ul v-if="parsedIngredients.length > 0">
+                <li v-for="(item, index) in parsedIngredients" :key="index">{{ item.text || JSON.stringify(item) }}</li>
+              </ul>
+              <div v-else>No parsed ingredients</div>
+            </section>
+          </div>
+
+          <div class="card" v-if="selectedRecipe">
+            <section class="selected-recipe">
+              <h3>Selected Recipe</h3>
+              <div><strong>Title:</strong> {{ selectedRecipe.title || "N/A" }}</div>
+              <div>
+                <strong>Ingredients:</strong>
+                <ul>
+                  <li v-for="(ing, idx) in selectedRecipe.ingredients" :key="idx">{{ ing }}</li>
+                </ul>
+              </div>
+              <div>
+                <strong>Instructions:</strong>
+                <ol>
+                  <li v-for="(step, idx) in selectedRecipe.instructions" :key="idx">{{ step }}</li>
+                </ol>
+              </div>
+            </section>
           </div>
         </section>
-      </div>
-    </section>
-  </section>
-</main>
-<RecipeModal v-if="showModal" :food="selectedRecipe" @close="closeModal" />
-</div>
+      </section>
+    </main>
+    <RecipeModal v-if="showModal" :food="selectedRecipe" @close="closeModal" />
+  </div>
 </template>
 
 <script>

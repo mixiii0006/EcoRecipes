@@ -24,7 +24,7 @@ export default class InputPresenter {
   async checkHealth() {
     try {
       const response = await axios.get("http://localhost:3000/api/ml/health");
-      alert(`ML API Health: ${response.data.status || 'OK'}`);
+      alert(`ML API Health: ${response.data.status || "OK"}`);
     } catch (error) {
       alert("Failed to check ML API health.");
     }
@@ -73,13 +73,11 @@ export default class InputPresenter {
     this.view.update();
 
     try {
-      // Use runFullPipeline ML API endpoint for recommendations and total carbon
       const response = await this.runFullPipeline({ text: this.model.ingredients });
       console.log("runFullPipeline response:", response);
 
-      if (Array.isArray(response.recipes)) {
-        // Use recipes array from API response
-        this.model.setRecommendations(response.recipes);
+      if (response) {
+        this.model.setRecommendations(response.recommended_recipes || []);
         this.model.setTotalCarbon(response.total_carbon || 0);
         this.model.setLeftovers(response.leftovers || []);
         this.model.setMissing(response.missing || []);
@@ -113,10 +111,17 @@ export default class InputPresenter {
     this.view.update();
   }
 
-  goToRecipe(recipe) {
-    this.model.setSelectedRecipe(recipe);
-    this.model.setShowModal(true);
-    this.view.update();
+  async goToRecipe(recipe) {
+    const recipeId = recipe.id || recipe._id;
+    if (recipeId) {
+      const resp = await axios.get(`http://localhost:3000/api/recipes/${recipeId}`);
+      const detail = resp.data;
+      this.model.setSelectedRecipe(detail);
+      this.model.setShowModal(true);
+      this.view.update();
+    } else {
+      alert("Detail resep tidak ditemukan di database.");
+    }
   }
 
   closeModal() {

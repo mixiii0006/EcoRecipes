@@ -3,49 +3,26 @@
     <div class="modal-content">
       <button class="close-btn" @click="closeModal">×</button>
       <div class="recipe-header">
-        <h2>{{ food.name || food.Title_Cleaned }}</h2>
-        <div class="carbon-highlight">
-          Total Carbon: {{ food.carbon_score ? food.carbon_score.toFixed(4) : 'N/A' }} g
-        </div>
+        <h2>{{ food.title_cleaned || food.title || food.name || food.Title_Cleaned || "No Title" }}</h2>
+        <div class="carbon-highlight">Total Carbon: {{ food.carbon_score ? food.carbon_score.toFixed(4) : "N/A" }} g</div>
       </div>
-
       <div class="recipe-body">
-        <!-- Left column -->
         <div class="left-column">
-          <img
-            class="recipe-image"
-            :src="getImageUrl(food.image || food.Image_Name)"
-            :alt="food.name || 'Recipe image'"
-          />
-
+          <img class="recipe-image" :src="getImageUrl(food.image || food.Image_Name)" :alt="food.title_cleaned || food.title || food.name || 'Recipe image'" />
           <div class="ingredients-card">
             <h3>How to Cook</h3>
             <ul>
-              <li v-if="!instructionsArray.length">
-                No instructions available.
-              </li>
-              <li
-                v-for="(step, index) in instructionsArray"
-                :key="'step-' + index"
-              >
-                {{ step }}
-              </li>
+              <li v-if="!instructionsArray.length">No instructions available.</li>
+              <li v-for="(step, index) in instructionsArray" :key="'step-' + index">{{ step }}</li>
             </ul>
           </div>
         </div>
-
-        <!-- Right column -->
         <div class="right-column">
           <div class="instructions-card">
             <h3>Ingredients</h3>
             <ul>
               <li v-if="!ingredientsArray.length">No ingredients available.</li>
-              <li
-                v-for="(ingredient, index) in ingredientsArray"
-                :key="'ingredient-' + index"
-              >
-                {{ ingredient }}
-              </li>
+              <li v-for="(ingredient, index) in ingredientsArray" :key="'ingredient-' + index">{{ ingredient }}</li>
             </ul>
           </div>
         </div>
@@ -69,13 +46,15 @@ export default {
       this.$emit("close");
     },
     getImageUrl(img) {
-      return img ? `/foodImages/${img}.jpg` : "https://via.placeholder.com/150";
+      if (!img) return "/assets/default-recipe.jpg";
+      if (img.startsWith("http")) return img;
+      if (img.endsWith(".jpg") || img.endsWith(".png")) return `/images/${img}`;
+      return `/images/${img}.jpg`;
     },
   },
   computed: {
     instructionsArray() {
-      const raw =
-        this.food.Instructions_Cleaned || this.food.instructions || "";
+      const raw = this.food.instructions_cleaned || this.food.Instructions_Cleaned || this.food.instructions || "";
       return Array.isArray(raw)
         ? raw
         : typeof raw === "string"
@@ -86,33 +65,30 @@ export default {
         : [];
     },
     ingredientsArray() {
-      const raw = this.food.Cleaned_Ingredients || this.food.ingredients;
-
-      console.log("ingredientsArray raw data:", raw);
-
-      if (Array.isArray(raw)) {
-        return raw;
-      }
-
+      const raw = this.food.cleaned_ingredients || this.food.Cleaned_Ingredients || this.food.ingredients || [];
+      return Array.isArray(raw) ? raw : [];
+    },
+    ingredientsArray() {
+      const raw = this.food.cleaned_ingredients || this.food.Cleaned_Ingredients || this.food.ingredients || "";
+      if (Array.isArray(raw)) return raw;
       if (typeof raw === "string" && raw.startsWith("[")) {
         try {
-          // Hapus karakter yang mengganggu
-          let fixed = raw.replace(/\\u[a-fA-F0-9]{4}/g, ""); // hapus unicode escape
-          fixed = fixed.replace(/â€“|â€|Ã|½/g, ""); // hapus karakter aneh
-          fixed = fixed.replace(/'/g, '"'); // ganti ' jadi "
-
+          let fixed = raw.replace(/\\u[a-fA-F0-9]{4}/g, "");
+          fixed = fixed.replace(/â€“|â€|Ã|½/g, "");
+          fixed = fixed.replace(/'/g, '"');
           const parsed = JSON.parse(fixed);
-          return Array.isArray(parsed)
-            ? parsed.map((s) => s.trim()).filter(Boolean)
-            : [];
+          return Array.isArray(parsed) ? parsed.map((s) => s.trim()).filter(Boolean) : [];
         } catch (e) {
           console.error("Parse error:", e.message);
           return [];
         }
       }
-
       return [];
     },
+  },
+  mounted() {
+    // Debug log agar tau data yang masuk ke modal
+    console.log("RecipeModal FOOD:", this.food);
   },
 };
 </script>
