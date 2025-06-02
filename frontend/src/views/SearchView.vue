@@ -35,6 +35,7 @@
           <RecipeCard
             v-for="(item, index) in model.recommendations"
             :key="item.id || item.title_cleaned || item.name"
+            :recipess_id="item.id || item._id || ''"
             :image="item.Image_Name || ''"
             :name="item.title_cleaned || item.name || ''"
             :duration="parseInt(item.duration) || 0"
@@ -42,6 +43,7 @@
             :rating="item.rating || 0"
             @open="openModal(index)"
             @favorite="handleFavorite(item)"
+            @cook="handleCook"
           />
         </div>
       </section>
@@ -125,6 +127,14 @@ export default {
     },
     handleFavorite(item) {
       this.presenter.addFavorite(item.id || item._id || item.recipess_id || item.title_cleaned);
+    },
+    async handleCook(recipess_id) {
+      try {
+        await this.presenter.addCook(recipess_id);
+        this.$toast.success("Recipe added to cooks");
+      } catch (error) {
+        this.$toast.error("Failed to add recipe to cooks");
+      }
     }
   }
 };

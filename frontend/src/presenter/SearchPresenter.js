@@ -178,4 +178,15 @@ export default class SearchPresenter {
       this.view.$toast.error("Failed to add recipe to favorites");
     }
   }
+
+  async addCook(recipess_id) {
+    try {
+      const response = await this.model.addCook(recipess_id);
+      this.view.$toast.success("Recipe added to cooks");
+      // Optionally, refresh profile or cooks data here if needed
+    } catch (error) {
+      this.view.$toast.error("Failed to add recipe to cooks");
+      throw error;
+    }
+  }
 }
