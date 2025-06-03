@@ -30,9 +30,9 @@ export default class ProfileModel {
       const response = await axios.get("http://localhost:3000/api/users/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // Map total_user_carbon to totalKarmonReduced for frontend display
+      // Map total_user_carbon to totalKarmonReduced for frontend display with formatting
       const userData = response.data;
-      userData.totalKarmonReduced = userData.total_user_carbon || 0;
+      userData.totalKarmonReduced = userData.total_user_carbon ? Number(userData.total_user_carbon.toFixed(3).replace(/(\d)(?=(\d{2})+\.)/g, '$1,')) : 0;
       this.setUser(userData);
     } catch (error) {
       console.error("Failed to fetch user profile:", error);

@@ -4,9 +4,13 @@
       <button class="close-btn" @click="closeModal">×</button>
       <div class="recipe-header">
         <h2>{{ food.name || food.Title_Cleaned }}</h2>
-        <div class="carbon-highlight">
-          Total Carbon: {{ food.total_recipe_carbon ? food.total_recipe_carbon.toFixed(4) : 'N/A' }} g
-        </div>
+          <div class="carbon-highlight">
+            Total Carbon: {{
+              (typeof food.total_recipe_carbon === 'number' && !isNaN(food.total_recipe_carbon))
+                ? food.total_recipe_carbon.toFixed(4)
+                : 'N/A'
+            }} g
+          </div>
       </div>
 
       <div class="recipe-body">
@@ -14,7 +18,7 @@
         <div class="left-column">
           <img
             class="recipe-image"
-            :src="getImageUrl(food.image || food.Image_Name)"
+            :src="getImageUrl(food.image_url || food.image_name || food.image || food.Image_Name)"
             :alt="food.name || 'Recipe image'"
           />
 

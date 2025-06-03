@@ -40,13 +40,13 @@ export default class SearchPresenter {
             ...recipe,
             image: recipe.image || recipe.Image_Name || '',  // Ensure image field
             combined_ingredients: new Set(recipe.total_recipe_ingredients || []),
-            total_carbon: recipe.total_recipe_carbon || 0,
+            total_carbon: recipe.carbon_score || 0,
           };
         } else {
           // Merge ingredients
           (recipe.total_recipe_ingredients || []).forEach(ing => acc[key].combined_ingredients.add(ing));
           // Sum carbon
-          acc[key].total_carbon += recipe.total_recipe_carbon || 0;
+          acc[key].total_carbon += recipe.carbon_score || 0;
         }
         return acc;
       }, {});
@@ -55,7 +55,7 @@ export default class SearchPresenter {
       let mergedRecipes = Object.values(grouped).map(item => ({
         ...item,
         total_recipe_ingredients: Array.from(item.combined_ingredients),
-        total_recipe_carbon: item.total_carbon,
+        total_recipe_carbon: parseFloat(item.total_carbon.toFixed(3))
       }));
 
       // Shuffle merged recipes to make recommendations change each fetch

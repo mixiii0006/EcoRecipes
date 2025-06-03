@@ -66,7 +66,7 @@ exports.runFullPipeline = async (req, res) => {
           id: found._id,
           title: found.title_cleaned,
           image: found.image_name ? `/images/${found.image_name}` : found.url,
-          carbon: found.carbon_score,
+          carbon: found.total_recipe_carbon,
           total_recipe_carbon: found.total_recipe_carbon,
           cleaned_ingredients: found.cleaned_ingredients,
           instructions_cleaned: found.instructions_cleaned,
