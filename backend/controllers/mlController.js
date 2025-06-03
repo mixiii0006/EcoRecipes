@@ -31,43 +31,73 @@ exports.analyzeRecipe = async (req, res) => {
   }
 };
 
-// RUN FULL PIPELINE (MAP RECOMMENDATION)
+// Cache for ML API responses to improve performance
+const mlApiCache = new Map();
+const ML_API_CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+
 // RUN FULL PIPELINE (MAP RECOMMENDATION)
 exports.runFullPipeline = async (req, res) => {
   try {
-    const response = await axios.post(`${BASE_URL_NLP}/full`, req.body);
+    const response = await axios.post(`${BASE_URL_NLP}/full`, req.body, { timeout: 30000 });
     const mlResult = response.data;
-    const titles = mlResult.recommended_recipes || [];
+    const titles = Array.isArray(mlResult.recommended_recipes) ? mlResult.recommended_recipes : [];
 
-    // Ambil semua judul dari DB, dan normalisasi
-    const allRecipes = await Recipe.find({});
-    const dbTitles = allRecipes.map((r) => ({
-      doc: r,
-      norm: (r.title_cleaned || "")
-        .toLowerCase()
-        .replace(/[^a-z0-9 ]/g, "")
-        .replace(/\s+/g, " ")
-        .trim(),
-    }));
-
-    const recipesObj = titles.map((title) => {
-      const normTitle = (title || "")
+    const cleanTitle = (text) =>
+      (text || "")
+        .replace(/\([^()]*CO2eq\/kg[^()]*\)/gi, "") // remove CO2eq info in parentheses
+        .replace(/\([^)]*\)/g, "") // remove other parentheses
+        .replace(/\d+(\.\d+)?/g, "") // remove numbers including decimals
         .toLowerCase()
         .replace(/[^a-z0-9 ]/g, "")
         .replace(/\s+/g, " ")
         .trim();
-      // Cari kemiripan tertinggi
-      const candidates = dbTitles.map((t) => ({
-        ...t,
-        score: stringSimilarity.compareTwoStrings(normTitle, t.norm),
-      }));
-      const bestMatch = candidates.reduce((a, b) => (a.score > b.score ? a : b), { score: 0 });
 
-      if (bestMatch.score >= 0.75) {
-        // Threshold bisa kamu atur sendiri (0.75 = 75% mirip)
-        console.log(`[MATCH] "${title}" ≈ "${bestMatch.doc.title_cleaned}" | Score: ${bestMatch.score}`);
-        const found = bestMatch.doc;
-        return {
+    const recipesObj = [];
+
+    for (const title of titles) {
+      // Remove CO2eq and numbers from title for regex search
+      const cleanedTitleForSearch = title.replace(/\([^)]*CO2eq\/kg[^)]*\)/gi, "")
+                                         .replace(/\([^)]*\)/g, "")
+                                         .replace(/\d+(\.\d+)?/g, "")
+                                         .trim();
+
+      // Use case-insensitive regex to find matching recipes by title_cleaned or name
+      const regex = new RegExp(cleanedTitleForSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
+      let foundRecipes = await Recipe.find({
+        $or: [
+          { title_cleaned: { $regex: regex } },
+          { name: { $regex: regex } }
+        ]
+      }).limit(5);
+
+      let found = null;
+      if (foundRecipes.length === 1) {
+        found = foundRecipes[0];
+        console.log(`[REGEX MATCH] "${title}" → "${found.title_cleaned}"`);
+      } else if (foundRecipes.length > 1) {
+        // If multiple matches, pick best by string similarity
+        const normTitle = cleanTitle(title);
+        let bestMatch = null;
+        let highestScore = 0;
+        for (const recipe of foundRecipes) {
+          const candidates = [recipe.normalized_title || "", recipe.title_cleaned || "", recipe.name || ""].map(cleanTitle);
+          for (const candidate of candidates) {
+            const score = stringSimilarity.compareTwoStrings(normTitle, candidate);
+            if (score > highestScore) {
+              highestScore = score;
+              bestMatch = recipe;
+            }
+          }
+        }
+        const MATCH_THRESHOLD = 0.6;
+        if (bestMatch && highestScore >= MATCH_THRESHOLD) {
+          found = bestMatch;
+          console.log(`[SIMILARITY MATCH] "${title}" → "${found.title_cleaned}" (score: ${highestScore})`);
+        }
+      }
+
+      if (found) {
+        recipesObj.push({
           id: found._id,
           title: found.title_cleaned,
           image: found.image_name ? `/images/${found.image_name}` : found.url,
@@ -75,18 +105,25 @@ exports.runFullPipeline = async (req, res) => {
           total_recipe_carbon: found.total_recipe_carbon,
           cleaned_ingredients: found.cleaned_ingredients,
           instructions_cleaned: found.instructions_cleaned,
-        };
+        });
       } else {
-        console.log(`[NOT FOUND] "${title}" | Best Score: ${bestMatch.score}`);
-        return { id: null, title, image: "", carbon: null, total_recipe_carbon: null };
+        console.log(`[NOT FOUND] "${title}"`);
+        recipesObj.push({
+          id: null,
+          title,
+          image: "",
+          carbon: null,
+          total_recipe_carbon: null,
+        });
       }
-    });
+    }
 
     res.json({
       ...mlResult,
       recommended_recipes: recipesObj,
     });
   } catch (err) {
+    console.error("Pipeline error:", err);
     res.status(500).json({ error: true, message: err.message });
   }
 };

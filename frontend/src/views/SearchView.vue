@@ -36,7 +36,7 @@
             v-for="(item, index) in model.recommendations"
             :key="item.id || item.title_cleaned || item.name"
             :recipess_id="item.id || item._id || ''"
-            :image="item.Image_Name || ''"
+            :image="item.image || ''"
             :name="item.title_cleaned || item.name || ''"
             :duration="parseInt(item.duration) || 0"
             :carbon="item.total_recipe_carbon ? item.total_recipe_carbon.toFixed(4) : 'N/A'"

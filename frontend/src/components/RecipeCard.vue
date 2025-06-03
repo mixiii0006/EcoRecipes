@@ -5,9 +5,9 @@
     </div>
     <div class="food-category-info">
       <h4 class="food-name">{{ name }}</h4>
-      <p class="food-meta">Durasi: {{ duration }} min · Karbon: {{ carbon || 'N/A' }} g</p>
+      <p class="food-meta">Durasi: {{ duration }} min · Karbon: {{ carbon || "N/A" }} g</p>
       <div class="food-actions">
-        <button class="btn cook-btn" @click.stop="handleCook">Masak</button>
+        <button class="btn cook-btn" :disabled="!matched" @click.stop="handleCook">Masak</button>
         <i class="fa-regular fa-heart heart-icon" @click.stop="toggleFavorite"></i>
       </div>
     </div>
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 export default {
   name: "RecipeCard",
@@ -26,24 +26,27 @@ export default {
     duration: { type: Number, default: 0 },
     carbon: { type: [Number, String], default: null },
     rating: { type: Number, default: 0 },
+    matched: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed: {
     imageUrl() {
-      return this.image
-        ? `/foodImages/${this.image}.jpg`
-        : '/foodImages/default.jpg';
+      return this.image || "";
     },
   },
   methods: {
     handleClick() {
-      this.$emit("open");
+      // Emit the open event with the recipe id
+      this.$emit("open", { id: this.recipess_id });
     },
     handleCook() {
       Swal.fire({
-        icon: 'success',
-        title: 'Memasak...',
+        icon: "success",
+        title: "Memasak...",
         text: `Memasak: ${this.name}`,
-        confirmButtonText: 'OK'
+        confirmButtonText: "OK",
       }).then((result) => {
         if (result.isConfirmed) {
           this.$emit("cook", this.recipess_id);
@@ -51,16 +54,16 @@ export default {
         }
       });
     },
-toggleFavorite() {
-  this.$emit('favorite', { recipess_id: this.name, name: this.name, image: this.image });
-  Swal.fire({
-    icon: 'success',
-    title: 'Ditambahkan ke Favorit',
-    text: `Favorit: ${this.name}`,
-    showConfirmButton: false,
-    timer: 1500
-  });
-},
+    toggleFavorite() {
+      this.$emit("favorite", { recipess_id: this.name, name: this.name, image: this.image });
+      Swal.fire({
+        icon: "success",
+        title: "Ditambahkan ke Favorit",
+        text: `Favorit: ${this.name}`,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    },
   },
 };
 </script>
@@ -78,7 +81,7 @@ toggleFavorite() {
 .food-category-card {
   background: #fff;
   border-radius: 16px;
-  padding: 0.75rem;          /* Lebih kecil */
+  padding: 0.75rem; /* Lebih kecil */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.3s;
@@ -86,7 +89,7 @@ toggleFavorite() {
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-height: 270px;         /* Ubah sesuai keinginan, 250px - 300px oke */
+  min-height: 270px; /* Ubah sesuai keinginan, 250px - 300px oke */
   box-sizing: border-box;
 }
 
@@ -102,7 +105,7 @@ toggleFavorite() {
   aspect-ratio: 2 / 1;
   overflow: hidden;
   border-radius: 12px;
-  margin-bottom: 0.7rem;     /* Lebih kecil */
+  margin-bottom: 0.7rem; /* Lebih kecil */
   flex-shrink: 0;
 }
 
@@ -118,7 +121,7 @@ toggleFavorite() {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;               /* Lebih kecil */
+  gap: 0.3rem; /* Lebih kecil */
   min-height: 50px;
 }
 
@@ -150,7 +153,7 @@ toggleFavorite() {
 
 .cook-btn {
   flex: 1;
-  padding: 0.4rem 1rem;      /* Lebih ramping */
+  padding: 0.4rem 1rem; /* Lebih ramping */
   border-radius: 8px;
   background: linear-gradient(to right, #2e7d32, #66bb6a);
   color: white;
@@ -175,7 +178,4 @@ toggleFavorite() {
 .heart-icon:hover {
   color: red;
 }
-
-
 </style>
-

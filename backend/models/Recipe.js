@@ -3,6 +3,7 @@ const RecipeSchema = new mongoose.Schema({
   image_name: String,
   url: String, // URL untuk gambar resep
   title_cleaned: String,
+  normalized_title: String,
   cleaned_ingredients: [String],
   instructions_cleaned: String,
   quantity: Number,

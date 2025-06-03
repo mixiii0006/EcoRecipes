@@ -33,12 +33,13 @@
               <div v-else-if="recommendations.length === 0">No recommendations yet.</div>
               <!-- HAS DATA -->
               <div v-else v-for="(rec, index) in recommendations" :key="index" class="card-link">
-                <RecipeCard
-                  :image="rec.image || rec.Image_Name || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?fit=crop&w=200&q=80'"
-                  :name="rec.title || rec.title_cleaned || rec.name || 'No Title'"
-                  :carbon="rec.carbon || rec.carbon_score || rec.total_recipe_carbon || 25"
-                  @open="goToRecipe(rec)"
-                />
+            <RecipeCard
+              :recipess_id="rec.id || rec._id || ''"
+              :image="rec.image || rec.Image_Name || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?fit=crop&w=200&q=80'"
+              :name="rec.title || rec.title_cleaned || rec.name || 'No Title'"
+              :carbon="rec.carbon || rec.carbon_score || rec.total_recipe_carbon || 25"
+              @open="goToRecipe"
+            />
               </div>
             </div>
           </section>
@@ -166,9 +167,13 @@ export default {
     this.parsedIngredients = this.model.parsedIngredients;
   },
   methods: {
-    goToRecipe(rec) {
-      console.log("goToRecipe dipanggil dengan:", rec);
-      this.presenter.goToRecipe(rec);
+    goToRecipe(payload) {
+      console.log("goToRecipe dipanggil dengan payload:", payload);
+      if (payload && payload.id) {
+        this.presenter.goToRecipe({ id: payload.id });
+      } else {
+        alert("Detail resep tidak ditemukan di database.");
+      }
     },
     closeModal() {
       console.log("closeModal dipanggil");
@@ -177,6 +182,15 @@ export default {
     onIngredientsInput(event) {
       this.model.setIngredients(this.ingredients);
     },
+
+    handleClick() {
+      if (!this.recipess_id) {
+        this.$toast.error("Resep ini belum tersedia di database");
+        return;
+      }
+      this.$emit("open");
+    },
+
     update() {
       this.ingredients = this.model.ingredients;
       this.recommendations = this.model.recommendations;

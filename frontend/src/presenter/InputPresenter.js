@@ -113,6 +113,7 @@ export default class InputPresenter {
 
   async goToRecipe(recipe) {
     const recipeId = recipe.id || recipe._id;
+    console.log("Fetching recipe details for ID:", recipeId);
     if (recipeId) {
       const resp = await axios.get(`http://localhost:3000/api/recipes/${recipeId}`);
       const detail = resp.data;
