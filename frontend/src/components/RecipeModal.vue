@@ -3,8 +3,15 @@
     <div class="modal-content">
       <button class="close-btn" @click="closeModal">×</button>
       <div class="recipe-header">
+<<<<<<< HEAD
         <h2>{{ food.title_cleaned || food.title || food.name || food.Title_Cleaned || "No Title" }}</h2>
         <div class="carbon-highlight">Total Carbon: {{ food.carbon_score ? food.carbon_score.toFixed(4) : "N/A" }} g</div>
+=======
+        <h2>{{ food.name || food.Title_Cleaned }}</h2>
+        <div class="carbon-highlight">
+          Total Carbon: {{ food.total_recipe_carbon ? food.total_recipe_carbon.toFixed(4) : 'N/A' }} g
+        </div>
+>>>>>>> fe8aa86a77526bb91e53067b7bba215c6e728996
       </div>
       <div class="recipe-body">
         <div class="left-column">

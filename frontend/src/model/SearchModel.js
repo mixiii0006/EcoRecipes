@@ -62,4 +62,26 @@ export default class SearchModel {
   setSelectedFood(food) {
     this.selectedFood = food;
   }
+
+  async addCook(recipess_id) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:3000/api/cooks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ recipess_id }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to add cook");
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to add cook:", error);
+      throw error;
+    }
+  }
 }

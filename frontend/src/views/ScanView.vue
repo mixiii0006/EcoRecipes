@@ -53,7 +53,15 @@
             <div class="recipe-grid">
               <div v-if="recommendations.length === 0">No recommendations yet.</div>
               <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
-                <RecipeCard :image="rec.Image_Name || 'https://via.placeholder.com/150'" :name="rec.Title_Cleaned || 'No Title'" :duration="15" :carbon="25" :rating="4" @open="goToRecipe(rec)" />
+                <RecipeCard 
+                  :recipess_id="rec._id || rec.recipess_id || ''"
+                  :image="rec.image_name ? rec.image_name.replace(/\.jpg$|\.png$/i, '') : 'default'" 
+                  :name="rec.title_cleaned || 'No Title'" 
+                  :duration="rec.duration || 15" 
+                  :carbon="rec.carbon_score || 25" 
+                  :rating="4" 
+                  @open="goToRecipe(rec)" 
+                />
               </div>
             </div>
           </section>

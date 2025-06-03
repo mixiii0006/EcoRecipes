@@ -40,13 +40,13 @@ export default class SearchPresenter {
             ...recipe,
             image: recipe.image || recipe.Image_Name || '',  // Ensure image field
             combined_ingredients: new Set(recipe.total_recipe_ingredients || []),
-            total_carbon: recipe.carbon_score || 0,
+            total_carbon: recipe.total_recipe_carbon || 0,
           };
         } else {
           // Merge ingredients
           (recipe.total_recipe_ingredients || []).forEach(ing => acc[key].combined_ingredients.add(ing));
           // Sum carbon
-          acc[key].total_carbon += recipe.carbon_score || 0;
+          acc[key].total_carbon += recipe.total_recipe_carbon || 0;
         }
         return acc;
       }, {});
@@ -55,7 +55,7 @@ export default class SearchPresenter {
       let mergedRecipes = Object.values(grouped).map(item => ({
         ...item,
         total_recipe_ingredients: Array.from(item.combined_ingredients),
-        carbon_score: item.total_carbon,
+        total_recipe_carbon: item.total_carbon,
       }));
 
       // Shuffle merged recipes to make recommendations change each fetch
@@ -138,7 +138,7 @@ export default class SearchPresenter {
         image: data.image || data.Image_Name || '',
         Instructions_Cleaned: data.instructions_cleaned || data.Instructions_Cleaned || data.instructions || '',
         Cleaned_Ingredients: data.cleaned_ingredients || data.Cleaned_Ingredients || data.ingredients || [],
-        carbon_score: data.carbon_score || 0,
+        total_recipe_carbon: data.total_recipe_carbon || 0,
         total_recipe_ingredients: data.total_recipe_ingredients || [],
       };
 
@@ -176,6 +176,21 @@ export default class SearchPresenter {
       this.view.$toast.success("Recipe added to favorites");
     } catch (error) {
       this.view.$toast.error("Failed to add recipe to favorites");
+    }
+  }
+
+  async addCook(recipess_id) {
+    try {
+      const response = await this.model.addCook(recipess_id);
+      this.view.$toast.success("Recipe added to cooks");
+      // Refresh profile data to update total_user_carbon
+      if (this.view.model && this.view.model.presenter) {
+        await this.view.model.presenter.loadProfileData?.();
+      }
+      this.view.update();
+    } catch (error) {
+      this.view.$toast.error("Failed to add recipe to cooks");
+      throw error;
     }
   }
 }

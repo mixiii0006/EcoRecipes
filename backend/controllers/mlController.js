@@ -105,6 +105,7 @@ exports.findSimilarImages = async (req, res) => {
         ...formData.getHeaders(),
       },
     });
+    console.log("Response data from CNN service:", response.data);
     res.json(response.data);
   } catch (err) {
     res.status(500).json({ error: true, message: err.message });

@@ -20,6 +20,7 @@ import Swal from 'sweetalert2';
 export default {
   name: "RecipeCard",
   props: {
+    recipess_id: { type: String, required: true },
     image: { type: String, default: "" },
     name: { type: String, default: "" },
     duration: { type: Number, default: 0 },
@@ -45,6 +46,7 @@ export default {
         confirmButtonText: 'OK'
       }).then((result) => {
         if (result.isConfirmed) {
+          this.$emit("cook", this.recipess_id);
           this.$emit("open"); // Buka modal jika user tekan OK
         }
       });
