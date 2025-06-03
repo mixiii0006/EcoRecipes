@@ -54,11 +54,11 @@
               <div v-if="recommendations.length === 0">No recommendations yet.</div>
               <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
                 <RecipeCard 
-                  :recipess_id="rec._id || rec.recipess_id || ''"
-                  :image="rec.image_name ? rec.image_name.replace(/\.jpg$|\.png$/i, '') : 'default'" 
-                  :name="rec.title_cleaned || 'No Title'" 
+                  :recipess_id="rec.id || rec.recipess_id || ''"
+                  :image="rec.image || 'default'" 
+                  :name="rec.name || 'No Title'" 
                   :duration="rec.duration || 15" 
-                  :carbon="rec.carbon_score || 25" 
+                  :carbon="rec.carbon || 25" 
                   :rating="4" 
                   @open="goToRecipe(rec)" 
                 />

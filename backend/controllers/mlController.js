@@ -30,11 +30,62 @@ exports.analyzeRecipe = async (req, res) => {
 
 exports.runFullPipeline = async (req, res) => {
   try {
-    const text = req.body.text || req.body.ingredients || "";
-    const payload = { text };
-    const response = await axios.post(`${BASE_URL}/full`, req.body, payload);
-    res.json(response.data);
+    const response = await axios.post(`${BASE_URL_NLP}/full`, req.body, { timeout: 10000 }); // 10 seconds timeout
+    const mlResult = response.data;
+    const titles = mlResult.recommended_recipes || [];
+
+    // Ambil semua judul dari DB, dan normalisasi
+    const allRecipes = await Recipe.find({});
+    const dbTitles = allRecipes.map((r) => ({
+      doc: r,
+      norm: (r.title_cleaned || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]/g, "")
+        .replace(/\s+/g, " ")
+        .trim(),
+    }));
+
+    const recipesObj = titles.map((title) => {
+      const normTitle = (title || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+      // Cari kemiripan tertinggi
+      const candidates = dbTitles.map((t) => ({
+        ...t,
+        score: stringSimilarity.compareTwoStrings(normTitle, t.norm),
+      }));
+      const bestMatch = candidates.reduce((a, b) => (a.score > b.score ? a : b), { score: 0 });
+
+      if (bestMatch.score >= 0.75) {
+        // Threshold bisa kamu atur sendiri (0.75 = 75% mirip)
+        console.log(`[MATCH] "${title}" ≈ "${bestMatch.doc.title_cleaned}" | Score: ${bestMatch.score}`);
+        const found = bestMatch.doc;
+        return {
+          id: found._id,
+          title: found.title_cleaned,
+          image: found.image_name ? `/images/${found.image_name}` : found.url,
+          carbon: found.carbon_score,
+          total_recipe_carbon: found.total_recipe_carbon,
+          cleaned_ingredients: found.cleaned_ingredients,
+          instructions_cleaned: found.instructions_cleaned,
+        };
+      } else {
+        console.log(`[NOT FOUND] "${title}" | Best Score: ${bestMatch.score}`);
+        return { id: null, title, image: "", carbon: null, total_recipe_carbon: null };
+      }
+    });
+
+    res.json({
+      ...mlResult,
+      recommended_recipes: recipesObj,
+    });
   } catch (err) {
+    console.error("runFullPipeline error:", err.message);
+    if (err.response) {
+      console.error("runFullPipeline error response data:", err.response.data);
+    }
     res.status(500).json({ error: true, message: err.message });
   }
 };
