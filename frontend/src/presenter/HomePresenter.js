@@ -3,6 +3,7 @@ export default class HomePresenter {
     this.model = model;
     this.view = view;
 
+    // Bind semua handler
     this.view.handleLogout = this.handleLogout.bind(this);
     this.view.startCarousel = this.startCarousel.bind(this);
     this.view.checkMobile = this.checkMobile.bind(this);
@@ -19,8 +20,8 @@ export default class HomePresenter {
       }
       console.log("Token in loadUserData:", token);
       if (!token) {
-        this.model.setUser({});
-        this.view.update();
+        if (this.model && typeof this.model.setUser === 'function') this.model.setUser({});
+        if (this.view && typeof this.view.update === 'function') this.view.update();
         return;
       }
       const response = await fetch("http://localhost:3000/api/users/profile", {
@@ -33,10 +34,9 @@ export default class HomePresenter {
       console.log("Response status:", response.status);
       if (!response.ok) {
         if (response.status === 401) {
-          // Unauthorized, clear token and redirect to login
           localStorage.removeItem("token");
           localStorage.removeItem("username");
-          this.view.$router.push("/login");
+          if (this.view && this.view.$router) this.view.$router.push("/login");
           return;
         }
         throw new Error("Failed to fetch user profile");
@@ -47,36 +47,53 @@ export default class HomePresenter {
         name: data.name,
         totalKarmonReduced: 1234,
       };
-      this.model.setUser(user);
-      this.view.update();
+      if (this.model && typeof this.model.setUser === 'function') this.model.setUser(user);
+      if (this.view && typeof this.view.update === 'function') this.view.update();
     } catch (error) {
       console.error("Error loading user data:", error);
-      this.model.setUser({});
-      this.view.update();
+      if (this.model && typeof this.model.setUser === 'function') this.model.setUser({});
+      if (this.view && typeof this.view.update === 'function') this.view.update();
     }
   }
 
   handleLogout() {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
-    this.view.$router.push("/");
+    if (this.view && this.view.$router) this.view.$router.push("/");
   }
 
   startCarousel() {
+    if (!this.model) return;
+    if (!Array.isArray(this.model.carouselItems) || !this.model.carouselItems.length) {
+      console.warn('Carousel items tidak ada');
+      return;
+    }
     this.carouselInterval = setInterval(() => {
-      this.model.setCurrentIndex((this.model.currentIndex + 1) % this.model.carouselItems.length);
-      this.view.update();
+      if (!this.model) return;
+      if (typeof this.model.setCurrentIndex === 'function') {
+        this.model.setCurrentIndex((this.model.currentIndex + 1) % this.model.carouselItems.length);
+      }
+      if (this.view && typeof this.view.update === 'function') this.view.update();
     }, 4000);
   }
 
   checkMobile() {
-    this.model.setIsMobile(window.innerWidth <= 768);
-    this.view.update();
+    // Perbaiki error di sini:
+    if (this.model && typeof this.model.setIsMobile === 'function') {
+      this.model.setIsMobile(window.innerWidth <= 768);
+    } else {
+      console.warn('HomePresenter: model/setIsMobile not ready', this.model);
+    }
+    if (this.view && typeof this.view.update === 'function') this.view.update();
   }
 
   toggleMenu() {
-    this.model.setIsMenuOpen(!this.model.isMenuOpen);
-    this.view.update();
+    if (this.model && typeof this.model.setIsMenuOpen === 'function') {
+      this.model.setIsMenuOpen(!this.model.isMenuOpen);
+    } else {
+      console.warn('toggleMenu: setIsMenuOpen not found');
+    }
+    if (this.view && typeof this.view.update === 'function') this.view.update();
   }
 
   clearCarouselInterval() {

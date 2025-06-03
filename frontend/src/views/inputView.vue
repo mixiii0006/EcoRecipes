@@ -24,8 +24,15 @@
           <section class="recommendations">
             <h3>Recommendations</h3>
             <div class="recipe-grid">
-              <div v-if="recommendations.length === 0">No recommendations yet.</div>
-              <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
+              <!-- LOADING STATE -->
+              <div v-if="loading" class="loading-container">
+                <div class="spinner"></div>
+                <div>Loading recommendations, please wait...</div>
+              </div>
+              <!-- EMPTY STATE -->
+              <div v-else-if="recommendations.length === 0">No recommendations yet.</div>
+              <!-- HAS DATA -->
+              <div v-else v-for="(rec, index) in recommendations" :key="index" class="card-link">
                 <RecipeCard
                   :image="rec.image || rec.Image_Name || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?fit=crop&w=200&q=80'"
                   :name="rec.title || rec.title_cleaned || rec.name || 'No Title'"
@@ -159,6 +166,14 @@ export default {
     this.parsedIngredients = this.model.parsedIngredients;
   },
   methods: {
+    goToRecipe(rec) {
+      console.log("goToRecipe dipanggil dengan:", rec);
+      this.presenter.goToRecipe(rec);
+    },
+    closeModal() {
+      console.log("closeModal dipanggil");
+      this.presenter.closeModal();
+    },
     onIngredientsInput(event) {
       this.model.setIngredients(this.ingredients);
     },
@@ -174,12 +189,40 @@ export default {
       this.missing = this.model.missing;
       this.parsedIngredients = this.model.parsedIngredients;
       this.$forceUpdate();
+      this.model.setLoading(true);
+      this.model.setLoading(false);
     },
   },
 };
 </script>
 
 <style scoped>
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #b2ddb8;
+  border-top: 4px solid #39914a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .input-ingredients {
   display: flex;
   height: 100vh;
