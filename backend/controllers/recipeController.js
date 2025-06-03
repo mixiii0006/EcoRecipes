@@ -3,9 +3,28 @@ const Recipe = require('../models/Recipe');
 exports.getAllRecipes = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 50; // default 50
-    const recipes = await Recipe.find()
-      .select('title_cleaned carbon_score total_recipe_carbon url image_name')
-      .limit(limit); // tambahkan limit di sini
+    let nameQuery = req.query.name ? req.query.name.toLowerCase().trim() : null;
+
+    console.log("Received name query:", nameQuery);
+
+    let recipes;
+    if (nameQuery) {
+      // Use flexible regex for partial match
+      // Replace spaces with .* to allow flexible matching of words separated by any chars
+      const pattern = nameQuery.replace(/\s+/g, '.*');
+      const regex = new RegExp(`.*${pattern}.*`, 'i');
+      recipes = await Recipe.find({
+        $or: [
+          { title_cleaned: { $regex: regex } },
+          { name: { $regex: regex } }
+        ]
+      }).select('title_cleaned carbon_score total_recipe_carbon url image_name cleaned_ingredients instructions_cleaned duration rating name');
+
+      console.log("Found recipes count:", recipes.length);
+    } else {
+      recipes = await Recipe.find()
+        .limit(limit);
+    }
 
     const formatted = recipes.map(r => {
       let imageUrl = r.url || '';
@@ -18,7 +37,12 @@ exports.getAllRecipes = async (req, res) => {
         title_cleaned: r.title_cleaned,
         carbon_score: r.carbon_score,
         total_recipe_carbon: r.total_recipe_carbon,
-        image: imageUrl || '/foodImages/default.jpg'
+        image: imageUrl || '/foodImages/default.jpg',
+        cleaned_ingredients: r.cleaned_ingredients || [],
+        instructions_cleaned: r.instructions_cleaned || '',
+        duration: r.duration || 0,
+        rating: r.rating || 0,
+        name: r.name || r.title_cleaned
       };
     });
 
