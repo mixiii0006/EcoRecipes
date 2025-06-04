@@ -9,7 +9,7 @@ import SearchView from '../views/SearchView.vue';
 import ProfileView from '../views/profileView.vue';
 import InputIngredients from '../views/inputView.vue';
 import ScanIngredients from "../views/ScanView.vue";
-import RecipeDetail from "../views/recipeView.vue";
+
 
 const routes = [
   {
@@ -51,11 +51,6 @@ const routes = [
     path: "/scan-ingredients",
     name: "ScanIngredients",
     component: ScanIngredients,
-  },
-  {
-    path: "/recipe-detail",
-    name: "RecipeDetail",
-    component: RecipeDetail,
   }
 ];
 

@@ -109,19 +109,29 @@ export default class ScanPresenter {
 
       // Map ML results to recommendations with matched recipe data
       const recommendations = (data.results || []).map((rec) => {
-        // Find matching recipe by filename matching title_cleaned or name (case-insensitive)
         const matchedRecipe = this.cachedRecipeData.find(recipe => {
-          const recipeTitle = (recipe.title_cleaned || recipe.name || "").toLowerCase();
-          return recipeTitle === rec.filename.toLowerCase();
+          const recipeImageName = (recipe.image_name || recipe.Image_Name || "").toLowerCase().replace(/-/g, "");
+          const recFilename = (rec.filename || "").toLowerCase().replace(/-/g, "");
+          return recipeImageName === recFilename;
         });
 
         if (matchedRecipe) {
+          // Extract image filename without extension for RecipeCard
+          let imageFileName = matchedRecipe.image_name || matchedRecipe.Image_Name || rec.filename || "";
+          imageFileName = imageFileName.replace(/\.(jpg|jpeg|png)$/i, "");
+          if (!imageFileName.startsWith("-")) {
+            imageFileName = "-" + imageFileName;
+          }
+          // Normalize imageFileName: lowercase, replace spaces with dashes
+          imageFileName = imageFileName.toLowerCase().replace(/\s+/g, '-');
+
           return {
             id: matchedRecipe.id || matchedRecipe._id || '',
-            title_cleaned: matchedRecipe.title_cleaned || matchedRecipe.name || '',
-            Image_Name: matchedRecipe.image || matchedRecipe.Image_Name || rec.filename,
+            image_name: imageFileName,
+            name: matchedRecipe.title_cleaned || matchedRecipe.name || imageFileName,
+            image: imageFileName,
             duration: matchedRecipe.duration || 0,
-            total_recipe_carbon: matchedRecipe.total_recipe_carbon || 0,
+            carbon: matchedRecipe.total_recipe_carbon || 0,
             rating: matchedRecipe.rating || 0,
             instructions_cleaned: matchedRecipe.instructions_cleaned || matchedRecipe.Instructions_Cleaned || matchedRecipe.instructions || '',
             cleaned_ingredients: matchedRecipe.cleaned_ingredients || matchedRecipe.Cleaned_Ingredients || matchedRecipe.ingredients || [],
@@ -129,18 +139,22 @@ export default class ScanPresenter {
           };
         } else {
           // If no match, fallback to ML data only
+          let imageFileName = rec.filename || "";
+          imageFileName = imageFileName.replace(/\.(jpg|jpeg|png)$/i, "");
+
           return {
-            Image_Name: rec.filename,
+            name: imageFileName,
+            image: imageFileName,
             url: rec.url,
-            title_cleaned: rec.filename,
             duration: 0,
-            total_recipe_carbon: 0,
+            carbon: 0,
             rating: 0,
             id: '',
           };
         }
       });
 
+      console.log("Mapped Recommendations before setting:", recommendations);
       this.model.setRecommendations(recommendations);
       this.view.update();
       console.log("Scan Recommendations:", recommendations);
@@ -151,18 +165,17 @@ export default class ScanPresenter {
 
   async goToRecipe(recipe) {
     try {
-      if (!recipe.title_cleaned && !recipe.name) {
-        alert("Recipe name is missing.");
+      const imageName = recipe.image_name || recipe.image;
+      if (!imageName) {
+        alert("Recipe image_name is missing.");
         return;
       }
-      // Normalize recipe name by inserting spaces before capital letters (camel case split)
-      let rawName = (recipe.title_cleaned || recipe.name).toLowerCase();
-      // Replace concatenated words like 'parsleyred' with 'parsley red' if possible
-      rawName = rawName.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/([a-z])([a-z])([A-Z])/g, '$1$2 $3');
-      const recipeName = encodeURIComponent(rawName.trim());
+      // Normalize imageName by removing dashes and converting to lowercase
+      let rawImageName = imageName.toString().toLowerCase().replace(/-/g, "");
+      const recipeName = encodeURIComponent(rawImageName.trim());
 
-      console.log("Fetching recipe with name query:", recipeName);
-      const response = await fetch(`http://localhost:3000/api/recipes?name=${recipeName}`);
+      console.log("Fetching recipe with image_name query:", recipeName);
+      const response = await fetch(`http://localhost:3000/api/recipes?image_name=${recipeName}`);
       if (!response.ok) {
         alert("Failed to fetch recipe details.");
         return;
@@ -180,7 +193,7 @@ export default class ScanPresenter {
       // Map fields to expected names for RecipeModal
       const mappedData = {
         ...matchedRecipe,
-        name: matchedRecipe.title_cleaned || matchedRecipe.name,
+        name: matchedRecipe.image_name || matchedRecipe.Image_Name || '',
         image: matchedRecipe.image || matchedRecipe.Image_Name || '',
         Instructions_Cleaned: matchedRecipe.instructions_cleaned || matchedRecipe.Instructions_Cleaned || matchedRecipe.instructions || '',
         Cleaned_Ingredients: matchedRecipe.cleaned_ingredients || matchedRecipe.Cleaned_Ingredients || matchedRecipe.ingredients || [],

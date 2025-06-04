@@ -15,6 +15,16 @@ export default class ProfilePresenter {
     this.view.update();
   }
 
+  async addCook(recipess_id) {
+    try {
+      await this.model.addCook(recipess_id);
+      await this.model.fetchCooks();
+      this.view.update();
+    } catch (error) {
+      console.error("Failed to add cook:", error);
+    }
+  }
+
   toggleContent(section) {
     this.model.setIsFoodList(section === "food");
     this.view.update();
