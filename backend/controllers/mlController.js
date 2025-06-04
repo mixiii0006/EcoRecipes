@@ -68,7 +68,7 @@ exports.runFullPipeline = async (req, res) => {
           { title_cleaned: { $regex: regex } },
           { name: { $regex: regex } }
         ]
-      }).limit(5);
+      }).limit(6);
 
       let found = null;
       if (foundRecipes.length === 1) {
