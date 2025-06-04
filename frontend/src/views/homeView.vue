@@ -57,15 +57,37 @@
 
             <section class="food-category-list">
               <h3>Favorite Food</h3>
-              <div class="food-category-scroll">
-                <div class="food-category-card" v-for="index in 2" :key="index">
-                  <div class="food-category-icon">
-                    <router-link to="/recipe-detail">
-                      <img src="/images/bg-profil.jpg" alt="Food Image" />
-                    </router-link>
+              <div class="favorite-slider-container">
+                <button
+                  class="slider-btn"
+                  :disabled="favoriteSliderIndex === 0"
+                  @click="slideLeft"
+                  aria-label="Previous favorites"
+                >
+                  ‹
+                </button>
+                <div class="favorite-slider">
+                  <div
+                    class="food-category-card"
+                    v-for="favorite in visibleFavorites"
+                    :key="favorite.id"
+                    @click="openRecipeModal(favorite)"
+                    style="cursor: pointer; min-width: 100px; max-width: 100px;"
+                  >
+                    <div class="food-category-icon">
+                      <img :src="favorite.image_url" alt="Food Image" />
+                    </div>
+                    <div class="food-category-label multi-line-ellipsis small-title">{{ favorite.title_cleaned }}</div>
                   </div>
-                  <div class="food-category-label">Grilled</div>
                 </div>
+                <button
+                  class="slider-btn"
+                  :disabled="favoriteSliderIndex + favoriteVisibleCount >= model.favoriteFoods.length"
+                  @click="slideRight"
+                  aria-label="Next favorites"
+                >
+                  ›
+                </button>
               </div>
               <span>
                 <router-link to="/profile">See All</router-link>
@@ -75,6 +97,8 @@
         </aside>
       </div>
     </main>
+
+    <RecipeModal v-if="showRecipeModal" :food="selectedRecipe" @close="closeRecipeModal" />
   </div>
 </template>
 
@@ -82,11 +106,13 @@
 import Sidebar from "../components/Sidebar.vue";
 import HomeModel from "../model/HomeModel";
 import HomePresenter from "../presenter/HomePresenter";
+import RecipeModal from "../components/RecipeModal.vue";
 
 export default {
   name: "HomeView",
   components: {
     Sidebar,
+    RecipeModal,
   },
   data() {
     return {
@@ -96,12 +122,25 @@ export default {
       currentIndex: 0,
       isMobile: null,
       isMenuOpen: false,
+      showRecipeModal: false,
+      selectedRecipe: null,
+      favoriteSliderIndex: 0,
+      favoriteVisibleCount: 2,
     };
+  },
+  computed: {
+    visibleFavorites() {
+      return this.model.favoriteFoods.slice(
+        this.favoriteSliderIndex,
+        this.favoriteSliderIndex + this.favoriteVisibleCount
+      );
+    },
   },
   async created() {
     this.presenter = new HomePresenter(this.model, this);
     this.model.setUsername(localStorage.getItem("username") || "");
     await this.presenter.loadUserData();
+    await this.presenter.loadFavoriteFoods();
     this.carouselItems = this.model.carouselItems;
     this.currentIndex = this.model.currentIndex;
     this.isMobile = this.model.isMobile === undefined ? false : this.model.isMobile;
@@ -136,6 +175,24 @@ export default {
     },
     toggleMenu() {
       this.presenter.toggleMenu();
+    },
+    openRecipeModal(recipe) {
+      this.selectedRecipe = recipe;
+      this.showRecipeModal = true;
+    },
+    closeRecipeModal() {
+      this.showRecipeModal = false;
+      this.selectedRecipe = null;
+    },
+    slideLeft() {
+      if (this.favoriteSliderIndex > 0) {
+        this.favoriteSliderIndex--;
+      }
+    },
+    slideRight() {
+      if (this.favoriteSliderIndex + this.favoriteVisibleCount < this.model.favoriteFoods.length) {
+        this.favoriteSliderIndex++;
+      }
     },
     renderPieChart() {
       // Optional: isi logika chart jika dibutuhkan
@@ -485,15 +542,37 @@ export default {
   margin-left: 8px;
 }
 
-.food-category-scroll {
+.favorite-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.favorite-slider {
   display: flex;
   gap: 10px;
-  overflow-x: auto;
-  padding: 8px 0;
+  overflow: hidden;
+  width: 220px; /* 2 items * 100px + gap */
+}
+
+.slider-btn {
+  background-color: transparent;
+  border: none;
+  font-size: 2rem;
+  color: #2e7d32;
+  cursor: pointer;
+  user-select: none;
+  padding: 0 5px;
+}
+
+.slider-btn:disabled {
+  color: #ccc;
+  cursor: default;
 }
 
 .food-category-card {
   min-width: 100px;
+  max-width: 100px;
   background-color: #fff;
   border-radius: 12px;
   padding: 12px 10px;
@@ -504,6 +583,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .food-category-card:hover {
@@ -530,45 +610,15 @@ export default {
 }
 
 .food-category-label {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   color: #2e7d32;
   margin-top: 4px;
   line-height: 1.2;
-}
-
-.food-category-list span {
-  margin-left: 8px;
-}
-
-.food-category-list span a {
-  font-size: 13px;
-  color: #2e7d32;
-  text-decoration: underline;
-}
-
-@media (max-width: 768px) {
-  .main-layout {
-    flex-direction: column;
-  }
-
-  .right-sidebar {
-    width: 100%;
-    margin-top: 1.5rem;
-    padding: 1.25rem;
-    background-color: #eaf5eb;
-    border-radius: 12px;
-    order: 2;
-  }
-
-  .feature-section {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
-  }
-
-  .feature-card {
-    padding: 2rem;
-  }
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

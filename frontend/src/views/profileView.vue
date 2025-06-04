@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div class="profile-container">
     <!-- Header Section with Background and Profile Picture -->
     <div class="profile-header">
@@ -93,15 +93,18 @@
 
         <section class="food-favorite-section">
           <div class="food-list-grid">
-            <RecipeCard
-              v-for="item in isFoodList ? model.cooks : model.favorites"
-              :key="item._id"
-              :name="item.title_cleaned || item.name"
-              :image="item.image"
-              :duration="item.duration || 0"
-              :carbon="item.total_recipe_carbon || 'N/A'"
-              @open="openModal(item)"
-            />
+<RecipeCard
+  v-for="item in isFoodList ? model.cooks : model.favorites"
+  :key="item.id"
+  :recipess_id="item.recipess_id"
+  :name="item.title_cleaned || item.name"
+  :image="item.image_url || item.image"
+  :duration="item.duration || 0"
+  :carbon="item.total_recipe_carbon || 'N/A'"
+  @open="openModal"
+  @favorite="handleToggleFavorite"
+  @cook="handleToggleCook"
+/>
           </div>
         </section>
       </div>
@@ -126,7 +129,7 @@ export default {
     return {
       model: new ProfileModel(),
       presenter: null,
-      user: null,
+      user: {},
       isFoodList: true,
       showModal: false,
       selectedFood: null,
@@ -153,13 +156,48 @@ export default {
     logout() {
       this.presenter.logout();
     },
-    openModal(item) {
-      this.selectedFood = item;
-      this.showModal = true;
+    async openModal(payload) {
+      try {
+        await this.presenter.fetchRecipeDetails(payload.id);
+      } catch (error) {
+        console.error("Error opening modal:", error);
+      }
     },
     closeModal() {
       this.showModal = false;
       this.selectedFood = null;
+    },
+    async handleDeleteRecipe(recipeId) {
+      try {
+        await this.presenter.deleteRecipe(recipeId);
+        this.closeModal();
+      } catch (error) {
+        console.error("Failed to delete recipe:", error);
+      }
+    },
+    async handleToggleFavorite(recipeId) {
+      try {
+        const isFavorite = this.model.favorites.some(fav => fav.recipess_id === recipeId);
+        if (isFavorite) {
+          await this.presenter.removeFavorite(recipeId);
+        } else {
+          await this.presenter.addFavorite(recipeId);
+        }
+      } catch (error) {
+        console.error("Failed to toggle favorite:", error);
+      }
+    },
+    async handleToggleCook(recipeId) {
+      try {
+        const isCook = this.model.cooks.some(cook => cook.recipess_id === recipeId);
+        if (isCook) {
+          await this.presenter.removeCook(recipeId);
+        } else {
+          await this.presenter.addCook(recipeId);
+        }
+      } catch (error) {
+        console.error("Failed to toggle cook:", error);
+      }
     },
   },
 };

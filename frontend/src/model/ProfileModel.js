@@ -79,4 +79,66 @@ export default class ProfileModel {
       throw error;
     }
   }
+
+  async removeFavorite(recipess_id) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.delete(
+        `http://localhost:3000/api/favorites/${recipess_id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to remove favorite:", error);
+      throw error;
+    }
+  }
+
+  async addCook(recipess_id) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "http://localhost:3000/api/cooks",
+        { recipess_id },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to add cook:", error);
+      throw error;
+    }
+  }
+
+  async removeCook(recipess_id) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.delete(
+        `http://localhost:3000/api/cooks/${recipess_id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to remove cook:", error);
+      throw error;
+    }
+  }
+
+  async fetchRecipeById(recipeId) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`http://localhost:3000/api/recipes/${recipeId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch recipe by id:", error);
+      throw error;
+    }
+  }
 }

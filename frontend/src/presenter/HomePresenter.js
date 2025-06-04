@@ -45,13 +45,44 @@ export default class HomePresenter {
       console.log("User data received:", data);
       const user = {
         name: data.name,
-        totalKarmonReduced: data.total_user_carbon ? Number(data.total_user_carbon.toFixed(3).replace(/(\d)(?=(\d{2})+\.)/g, '$1,')) : 0,
+        totalKarmonReduced: data.total_user_carbon ? Number(data.total_user_carbon.toFixed(3).replace(/(\\d)(?=(\\d{2})+\\.)/g, '$1,')) : 0,
       };
       if (this.model && typeof this.model.setUser === 'function') this.model.setUser(user);
       if (this.view && typeof this.view.update === 'function') this.view.update();
     } catch (error) {
       console.error("Error loading user data:", error);
       if (this.model && typeof this.model.setUser === 'function') this.model.setUser({});
+      if (this.view && typeof this.view.update === 'function') this.view.update();
+    }
+  }
+
+  async loadFavoriteFoods() {
+    try {
+      let token = localStorage.getItem("token");
+      if (!token) {
+        this.model.setFavoriteFoods([]);
+        if (this.view && typeof this.view.update === 'function') this.view.update();
+        return;
+      }
+      const response = await fetch("http://localhost:3000/api/favorites", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        console.error("Failed to fetch favorite foods, status:", response.status);
+        this.model.setFavoriteFoods([]);
+        if (this.view && typeof this.view.update === 'function') this.view.update();
+        return;
+      }
+      const favorites = await response.json();
+      this.model.setFavoriteFoods(favorites);
+      if (this.view && typeof this.view.update === 'function') this.view.update();
+    } catch (error) {
+      console.error("Error loading favorite foods:", error);
+      this.model.setFavoriteFoods([]);
       if (this.view && typeof this.view.update === 'function') this.view.update();
     }
   }

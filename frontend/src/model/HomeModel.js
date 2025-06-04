@@ -25,6 +25,7 @@ export default class HomeModel {
     ];
     this.isMobile = false;
     this.isMenuOpen = false;
+    this.favoriteFoods = [];
   }
 
   setUsername(username) {
@@ -45,5 +46,9 @@ export default class HomeModel {
 
   setIsMenuOpen(isOpen) {
     this.isMenuOpen = isOpen;
+  }
+
+  setFavoriteFoods(favorites) {
+    this.favoriteFoods = favorites;
   }
 }
