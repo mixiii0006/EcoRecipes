@@ -60,8 +60,12 @@ export default {
     getImageUrl(img) {
       if (!img) return "/assets/default-recipe.jpg";
       if (img.startsWith("http")) return img;
-      if (img.endsWith(".jpg") || img.endsWith(".png")) return `/images/${img}`;
-      return `/images/${img}.jpg`;
+      // Extract filename from path if any
+      const filename = img.split("/").pop();
+      if (filename.endsWith(".jpg") || filename.endsWith(".png")) {
+        return `/foodImages/${filename}`;
+      }
+      return `/foodImages/${filename}.jpg`;
     },
   },
   computed: {

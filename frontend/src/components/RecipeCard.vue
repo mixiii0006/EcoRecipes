@@ -33,7 +33,16 @@ export default {
   },
   computed: {
     imageUrl() {
-      return this.image || "";
+      console.log("RecipeCard image prop:", this.image);
+      if (!this.image) return "";
+      // If image is a full URL or starts with /, return as is
+      if (this.image.startsWith("http") || this.image.startsWith("/")) {
+        console.log("RecipeCard imageUrl (full URL):", this.image);
+        return this.image;
+      }
+      const url = `/foodImages/${this.image}`;
+      console.log("RecipeCard imageUrl (local):", url);
+      return url;
     },
   },
   methods: {

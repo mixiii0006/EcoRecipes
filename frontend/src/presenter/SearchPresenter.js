@@ -26,6 +26,17 @@ export default class SearchPresenter {
       const data = await response.json();
       console.log("Fetched recipes data:", data);
 
+      // Function to convert title to kebab-case filename with .jpg extension
+      const titleToFilename = (title) => {
+        return title
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '') // Remove accents
+          .replace(/[^a-z0-9\s-]/g, '') // Remove invalid chars
+          .trim()
+          .replace(/\s+/g, '-') + '.jpg';
+      };
+
       // Filter recipes by searchText matching title_cleaned or name (case-insensitive)
       const filteredData = data.filter(recipe => {
         const name = (recipe.title_cleaned || recipe.name || "").toLowerCase();
@@ -36,9 +47,10 @@ export default class SearchPresenter {
       const grouped = filteredData.reduce((acc, recipe) => {
         const key = recipe.title_cleaned;
         if (!acc[key]) {
+          const imageFilename = titleToFilename(recipe.title_cleaned || recipe.name || '');
           acc[key] = {
             ...recipe,
-            image: recipe.image || recipe.Image_Name || '',  // Ensure image field
+            image: imageFilename,  // Use generated image filename for local images
             combined_ingredients: new Set(recipe.total_recipe_ingredients || []),
             total_carbon: recipe.carbon_score || 0,
           };
