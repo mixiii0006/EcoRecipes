@@ -28,7 +28,7 @@ exports.getAllRecipes = async (req, res) => {
         title_cleaned: r.title_cleaned,
         carbon_score: r.carbon_score,
         total_recipe_carbon: r.total_recipe_carbon,
-        image: r.url || "", // langsung ambil URL dari database
+        image: r.image_name ? `/foodImages/${r.image_name}` : '/foodImages/default.jpg',
         cleaned_ingredients: r.cleaned_ingredients || [],
         instructions_cleaned: r.instructions_cleaned || "",
         duration: r.duration || 0,
@@ -57,7 +57,7 @@ exports.getRecipeById = async (req, res) => {
     title_cleaned: recipe.title_cleaned,
     cleaned_ingredients: recipe.cleaned_ingredients,
     instructions_cleaned: recipe.instructions_cleaned,
-    image: recipe.url,
+    image: recipe.image_name || "", // no url
     quantity: recipe.quantity,
     unit: recipe.unit,
     pure_name: recipe.pure_name,

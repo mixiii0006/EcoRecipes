@@ -10,6 +10,7 @@ export default class LoginPresenter {
     this.view.handleEmailVerified = this.handleEmailVerified.bind(this);
   }
 
+  
   async handleLogin() {
     try {
       const response = await axios.post("http://localhost:3000/api/auth/login", {
