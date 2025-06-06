@@ -163,7 +163,7 @@ export default {
 
 .recipe-image {
   width: 100%;
-  max-height: 250px;
+  max-height: 300px;
   object-fit: cover;
   border-radius: 12px;
   margin-bottom: 1rem;
