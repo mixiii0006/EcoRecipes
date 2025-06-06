@@ -119,9 +119,10 @@ export default class ScanPresenter {
           // Extract image filename without extension for RecipeCard
           let imageFileName = matchedRecipe.image_name || matchedRecipe.Image_Name || rec.filename || "";
           imageFileName = imageFileName.replace(/\.(jpg|jpeg|png)$/i, "");
-          if (!imageFileName.startsWith("-")) {
-            imageFileName = "-" + imageFileName;
-          }
+          // Remove adding leading dash to match actual filenames
+          // if (!imageFileName.startsWith("-")) {
+          //   imageFileName = "-" + imageFileName;
+          // }
           // Normalize imageFileName: lowercase, replace spaces with dashes
           imageFileName = imageFileName.toLowerCase().replace(/\s+/g, '-');
 

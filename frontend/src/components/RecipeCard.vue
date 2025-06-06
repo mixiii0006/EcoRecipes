@@ -52,6 +52,11 @@ export default {
     },
   },
   methods: {
+    onImageError(event) {
+      event.target.src = "/foodImages/default.jpg";
+    },
+  },
+  methods: {
     handleClick() {
       // Emit the open event with the recipe id
       this.$emit("open", { id: this.recipess_id });

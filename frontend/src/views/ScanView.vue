@@ -55,7 +55,7 @@
               <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
                 <RecipeCard 
                   :recipess_id="rec.id || rec.recipess_id || ''"
-                  :image="rec.image || 'default'" 
+                  :image="normalizeImagePath(rec.image) || 'default'" 
                   :name="rec.name || 'No Title'" 
                   :duration="rec.duration || 15" 
                   :carbon="rec.carbon || 25" 
@@ -130,6 +130,14 @@ export default {
     this.recentSearches = this.model.recentSearches;
   },
   methods: {
+    normalizeImagePath(img) {
+      if (!img) return "";
+      if (img.startsWith("/foodImages/")) {
+        img = img.slice("/foodImages/".length);
+      }
+      // Normalize: lowercase and replace spaces with dashes
+      return img.toLowerCase().replace(/\s+/g, '-');
+    },
     update() {
       this.images = this.model.images;
       this.recommendations = this.model.recommendations;
