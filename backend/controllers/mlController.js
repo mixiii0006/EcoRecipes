@@ -100,7 +100,11 @@ exports.runFullPipeline = async (req, res) => {
         recipesObj.push({
           id: found._id,
           title: found.title_cleaned,
-          image: found.image_name ? `/images/${found.image_name}` : found.url,
+          image: found.image_name
+            ? `/foodImages/${found.image_name}`
+            : found.url && (found.url.startsWith("http") || found.url.startsWith("/"))
+            ? found.url
+            : "/foodImages/default.jpg",
           carbon: found.carbon_score,
           total_recipe_carbon: found.total_recipe_carbon,
           cleaned_ingredients: found.cleaned_ingredients,
@@ -118,6 +122,10 @@ exports.runFullPipeline = async (req, res) => {
       }
     }
 
+    console.log("Recommended recipes with images:");
+    recipesObj.forEach((rec, idx) => {
+      console.log(`Recipe ${idx}: id=${rec.id}, image=${rec.image}`);
+    });
     res.json({
       ...mlResult,
       recommended_recipes: recipesObj,

@@ -40,6 +40,12 @@ export default {
         console.log("RecipeCard imageUrl (full URL):", this.image);
         return this.image;
       }
+      // Append .jpg if no extension present
+      if (!/\.(jpg|jpeg|png|gif)$/i.test(this.image)) {
+        const url = `/foodImages/${this.image}.jpg`;
+        console.log("RecipeCard imageUrl (local with appended .jpg):", url);
+        return url;
+      }
       const url = `/foodImages/${this.image}`;
       console.log("RecipeCard imageUrl (local):", url);
       return url;
