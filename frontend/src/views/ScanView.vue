@@ -65,7 +65,7 @@
                     :duration="rec.duration || 15"
                     :carbon="rec.carbon || 25"
                     :rating="rec.rating || 0"
-                    @open="() => goToRecipe(rec)"
+                    @open="() => { if (rec.id) goToRecipe(rec); }"
                     :class="{ 'disabled-card': !rec.id }"
                   />
                 </div>
@@ -128,6 +128,7 @@ export default {
     // sync initial state
     this.images = this.model.images;
     this.recommendations = this.model.recommendations;
+    console.log("Initial recommendations:", this.recommendations);
     this.showModal = this.model.showModal;
     this.selectedRecipe = this.model.selectedRecipe;
     this.recentSearches = this.model.recentSearches;
@@ -164,6 +165,7 @@ export default {
       this.presenter.submitImages();
     },
     goToRecipe(rec) {
+      console.log("ScanView.goToRecipe called with rec:", rec);
       this.presenter.goToRecipe(rec);
     },
     closeModal() {
@@ -663,5 +665,10 @@ export default {
     padding: 0.6rem 1rem;
     font-size: 0.9rem;
   }
+}
+.disabled-card {
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 </style>
