@@ -10,6 +10,33 @@ export default class RegisterPresenter {
   }
 
   async handleRegister() {
+    // Validasi kosong
+    if (
+      !this.model.name.trim() ||
+      !this.model.email.trim() ||
+      !this.model.password ||
+      !this.model.confirmPassword
+    ) {
+      Swal.fire({
+        icon: "warning",
+        title: "Incomplete Form",
+        text: "Please fill in all fields.",
+      });
+      return;
+    }
+
+    // Validasi email sederhana
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.model.email)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Invalid Email",
+        text: "Please enter a valid email address.",
+      });
+      return;
+    }
+
+    // Validasi password cocok
     if (this.model.password !== this.model.confirmPassword) {
       Swal.fire({
         icon: "warning",
@@ -21,8 +48,8 @@ export default class RegisterPresenter {
 
     try {
       await axios.post("http://localhost:3000/api/auth/register", {
-        name: this.model.name,
-        email: this.model.email,
+        name: this.model.name.trim(),
+        email: this.model.email.trim(),
         password: this.model.password,
         confirmPassword: this.model.confirmPassword,
       });

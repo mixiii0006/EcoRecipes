@@ -6,125 +6,123 @@ const stringSimilarity = require("string-similarity");
 const BASE_URL_NLP = "https://capstone-ml-production.up.railway.app";
 const BASE_URL_CNN = "https://capstone-ml-gambar.up.railway.app";
 
-// PREDICT CARBON
-exports.predictCarbon = async (req, res) => {
-  try {
-    const response = await axios.post(`${BASE_URL_NLP}/carbon`, req.body);
-    res.json(response.data);
-  } catch (err) {
-    res.status(500).json({ error: true, message: err.message });
-  }
-};
-
-// ANALYZE RECIPE
-exports.analyzeRecipe = async (req, res) => {
-  try {
-    console.log("analyzeRecipe req.body:", req.body);
-    const text = req.body.text || req.body.ingredients || "";
-    const payload = { text };
-    const response = await axios.post(`${BASE_URL_NLP}/recipes`, payload);
-    res.json(response.data);
-  } catch (err) {
-    console.error("analyzeRecipe error:", err.message);
-    console.error("analyzeRecipe error response data:", err.response ? err.response.data : "No response data");
-    res.status(500).json({ error: true, message: err.message });
-  }
-};
-
-// Cache for ML API responses to improve performance
-const mlApiCache = new Map();
-const ML_API_CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
-
-// RUN FULL PIPELINE (MAP RECOMMENDATION)
 exports.runFullPipeline = async (req, res) => {
   try {
-    const response = await axios.post(`${BASE_URL_NLP}/full`, req.body, { timeout: 30000 });
-    const mlResult = response.data;
-    const titles = Array.isArray(mlResult.recommended_recipes) ? mlResult.recommended_recipes : [];
+    // 1) call your NLP full pipeline
+    const { data: mlResult } = await axios.post(
+      `${BASE_URL_NLP}/full`,
+      req.body,
+      { timeout: 30000 }
+    );
 
+    const mlRecs = Array.isArray(mlResult.recommended_recipes)
+      ? mlResult.recommended_recipes
+      : [];
+
+    // helper: normalize a string for fuzzy matching
     const cleanTitle = (text) =>
       (text || "")
-        .replace(/\([^()]*CO2eq\/kg[^()]*\)/gi, "") // remove CO2eq info in parentheses
-        .replace(/\([^)]*\)/g, "") // remove other parentheses
-        .replace(/\d+(\.\d+)?/g, "") // remove numbers including decimals
+        .replace(/\([^()]CO2eq\/kg[^()]\)/gi, "")
+        .replace(/\([^)]*\)/g, "")
+        .replace(/\d+(\.\d+)?/g, "")
         .toLowerCase()
         .replace(/[^a-z0-9 ]/g, "")
         .replace(/\s+/g, " ")
         .trim();
 
-    const recipesObj = [];
+    const recommendations = [];
 
-    for (const title of titles) {
-      // Remove CO2eq and numbers from title for regex search
-      const cleanedTitleForSearch = title.replace(/\([^)]*CO2eq\/kg[^)]*\)/gi, "")
-                                         .replace(/\([^)]*\)/g, "")
-                                         .replace(/\d+(\.\d+)?/g, "")
-                                         .trim();
+    for (const mlRec of mlRecs) {
+      const rawTitle = mlRec.title || "";
+      // strip out parenthetical CO2 and numbers for search
+      const titleForSearch = rawTitle
+        .replace(/\([^)]CO2eq\/kg[^)]\)/gi, "")
+        .replace(/\([^)]*\)/g, "")
+        .replace(/\d+(\.\d+)?/g, "")
+        .trim();
 
-      // Use case-insensitive regex to find matching recipes by title_cleaned or name
-      const regex = new RegExp(cleanedTitleForSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
-      let foundRecipes = await Recipe.find({
+      // 2) try a case-insensitive regex search on title_cleaned or name
+      const safe = titleForSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+      let found = await Recipe.findOne({
         $or: [
-          { title_cleaned: { $regex: regex } },
-          { name: { $regex: regex } }
+          { title_cleaned: { $regex: safe, $options: "i" } },
+          { name:          { $regex: safe, $options: "i" } }
         ]
-      }).limit(6);
+      });
 
-      let found = null;
-      if (foundRecipes.length === 1) {
-        found = foundRecipes[0];
-        console.log(`[REGEX MATCH] "${title}" → "${found.title_cleaned}"`);
-      } else if (foundRecipes.length > 1) {
-        // If multiple matches, pick best by string similarity
-        const normTitle = cleanTitle(title);
-        let bestMatch = null;
-        let highestScore = 0;
-        for (const recipe of foundRecipes) {
-          const candidates = [recipe.normalized_title || "", recipe.title_cleaned || "", recipe.name || ""].map(cleanTitle);
-          for (const candidate of candidates) {
-            const score = stringSimilarity.compareTwoStrings(normTitle, candidate);
-            if (score > highestScore) {
-              highestScore = score;
-              bestMatch = recipe;
+      // 3) fallback fuzzy matching if regex returned multiple or none
+      if (!found) {
+        const candidates = await Recipe.find({
+          $or: [
+            { title_cleaned: { $regex: safe, $options: "i" } },
+            { name:          { $regex: safe, $options: "i" } }
+          ]
+        }).limit(10);
+
+        const norm = cleanTitle(rawTitle);
+        let best = null, bestScore = 0;
+        for (const c of candidates) {
+          for (const str of [c.title_cleaned, c.name]) {
+            const score = stringSimilarity.compareTwoStrings(
+              norm,
+              cleanTitle(str)
+            );
+            if (score > bestScore) {
+              bestScore = score;
+              best = c;
             }
           }
         }
-        const MATCH_THRESHOLD = 0.6;
-        if (bestMatch && highestScore >= MATCH_THRESHOLD) {
-          found = bestMatch;
-          console.log(`[SIMILARITY MATCH] "${title}" → "${found.title_cleaned}" (score: ${highestScore})`);
+        // use if similarity ≥ 0.6
+        if (best && bestScore >= 0.6) {
+          console.log(
+            `[SIMILARITY MATCH] "${rawTitle}" → "${best.title_cleaned}" (score: ${bestScore.toFixed(
+              2
+            )})`
+          );
+          found = best;
         }
       }
 
+      // 4) compose the final object, including leftovers & missing from ML
       if (found) {
-        recipesObj.push({
+        recommendations.push({
           id: found._id,
           title: found.title_cleaned,
-          image: found.image_name ? `/images/${found.image_name}` : found.url,
+          image: found.image_name
+            ? `/foodImages/${found.image_name}`
+            : found.url?.startsWith("http")
+            ? found.url
+            : "/foodImages/default.jpg",
           carbon: found.carbon_score,
           total_recipe_carbon: found.total_recipe_carbon,
           cleaned_ingredients: found.cleaned_ingredients,
           instructions_cleaned: found.instructions_cleaned,
+          leftovers: Array.isArray(mlRec.leftovers) ? mlRec.leftovers : [],
+          missing:   Array.isArray(mlRec.missing)   ? mlRec.missing   : []
         });
       } else {
-        console.log(`[NOT FOUND] "${title}"`);
-        recipesObj.push({
+        console.warn(`[NOT FOUND] "${rawTitle}"`);
+        recommendations.push({
           id: null,
-          title,
+          title: rawTitle,
           image: "",
           carbon: null,
           total_recipe_carbon: null,
+          leftovers: Array.isArray(mlRec.leftovers) ? mlRec.leftovers : [],
+          missing:   Array.isArray(mlRec.missing)   ? mlRec.missing   : []
         });
       }
     }
 
-    res.json({
-      ...mlResult,
-      recommended_recipes: recipesObj,
+    // 5) send back total_carbon + our enriched recommendations
+    return res.json({
+      total_carbon: mlResult.total_carbon,
+      recommended_recipes: recommendations
     });
   } catch (err) {
-    console.error("Pipeline error:", err);
-    res.status(500).json({ error: true, message: err.message });
+    console.error("runFullPipeline error:", err);
+    return res.status(500).json({ error: true, message: err.message });
   }
 };
 
