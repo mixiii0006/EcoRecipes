@@ -64,7 +64,7 @@
           <div class="card1">
             <section class="statistics">
               <h3>Statistic</h3>
-              <div>Jejak Karbon: {{ (totalCarbon * 100).toFixed(2) }}%</div>
+              <div>Jejak Karbon: {{ (totalCarbon).toFixed(2) }}%</div>
             </section>
           </div>
 
