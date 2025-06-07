@@ -126,113 +126,111 @@ export default class ScanPresenter {
       console.log("Raw CNN data:", data);
 
       // Fetch resep list sekali saja
-      if (!this.cachedRecipeData.length) {
-        const recipeResp = await fetch("http://localhost:3000/api/recipes");
-        if (!recipeResp.ok) throw new Error("Gagal fetch recipes");
-        this.cachedRecipeData = await recipeResp.json();
-      }
+if (!this.cachedRecipeData.length) {
+  const recipeResp = await fetch("http://localhost:3000/api/recipes");
+  if (!recipeResp.ok) throw new Error("Gagal fetch recipes");
+  this.cachedRecipeData = await recipeResp.json();
+  console.log("[DEBUG] Sample cachedRecipeData:", this.cachedRecipeData.slice(0, 3));
+}
 
-      const recommendations = (data.results || []).map((rec) => {
-        const recFilenameNorm = this.stripExtensionAndNormalize(rec.filename || "");
-        console.log("[DEBUG] normalized CNN filename:", recFilenameNorm);
+const recommendations = (data.results || []).map((rec, index) => {
+  const recFilenameNorm = this.stripExtensionAndNormalize(rec.filename || "");
+  console.log("[DEBUG] normalized CNN filename:", recFilenameNorm);
 
-        // 1) Exact-match image_name
-        let matchedRecipe = this.cachedRecipeData.find((recipe) => {
-          const imgRaw = recipe.image_name || recipe.Image_Name || "";
-          const imgNorm = this.stripExtensionAndNormalize(imgRaw);
-          return imgNorm === recFilenameNorm;
-        });
+  // 1) Exact-match image_name
+  let matchedRecipe = this.cachedRecipeData.find((recipe) => {
+    const imgRaw = recipe.image_name || recipe.Image_Name || "";
+    const imgNorm = this.stripExtensionAndNormalize(imgRaw);
+    return imgNorm === recFilenameNorm;
+  });
 
-      // 2) Exact-match title_cleaned
-      if (!matchedRecipe) {
-        // Skip this step to only match by image_name
-        // matchedRecipe = this.cachedRecipeData.find((recipe) => {
-        //   const titleRaw = recipe.title_cleaned || recipe.title || recipe.name || "";
-        //   const titleNorm = this.stripExtensionAndNormalize(titleRaw);
-        //   return titleNorm === recFilenameNorm;
-        // });
-      }
+  // 2) Exact-match title_cleaned
+  if (!matchedRecipe) {
+    matchedRecipe = this.cachedRecipeData.find((recipe) => {
+      const titleRaw = recipe.title_cleaned || recipe.title || recipe.name || "";
+      const titleNorm = this.stripExtensionAndNormalize(titleRaw);
+      return titleNorm === recFilenameNorm;
+    });
+  }
 
-      // 3) Partial-keyword matching
-      if (!matchedRecipe) {
-        // Skip this step to only match by image_name
-        // const keywords = recFilenameNorm.split("-");
-        // for (const recipe of this.cachedRecipeData) {
-        //   const titleRaw = recipe.title_cleaned || recipe.title || recipe.name || "";
-        //   const titleNorm = this.stripExtensionAndNormalize(titleRaw);
+  // 3) Partial-keyword matching
+  if (!matchedRecipe) {
+    const keywords = recFilenameNorm.split("-");
+    for (const recipe of this.cachedRecipeData) {
+      const titleRaw = recipe.title_cleaned || recipe.title || recipe.name || "";
+      const titleNorm = this.stripExtensionAndNormalize(titleRaw);
 
-        //   let count = 0;
-        //   keywords.forEach((w) => {
-        //     if (w && titleNorm.includes(w)) count++;
-        //   });
-        //   const ratio = count / keywords.length;
-        //   if (ratio >= 0.4) {
-        //     matchedRecipe = recipe;
-        //     console.log("[DEBUG] match partial-keyword:", recFilenameNorm, "<–> DB:", titleNorm, `(ratio: ${ratio.toFixed(2)})`);
-        //     break;
-        //   }
-        // }
-      }
-
-      // 4) Fuzzy matching via title_cleaned
-      if (!matchedRecipe) {
-        // Skip this step to only match by image_name
-        // let bestMatch = null;
-        // let highestScore = 0;
-        // for (const recipe of this.cachedRecipeData) {
-        //   const titleRaw = recipe.title_cleaned || recipe.title || recipe.name || "";
-        //   const titleNorm = this.stripExtensionAndNormalize(titleRaw);
-        //   if (!titleNorm) continue;
-
-        //   const score = stringSimilarity.compareTwoStrings(recFilenameNorm, titleNorm);
-        //   if (score > highestScore) {
-        //     highestScore = score;
-        //     bestMatch = recipe;
-        //   }
-        // }
-        // if (bestMatch && highestScore >= this.SIMILARITY_THRESHOLD) {
-        //   matchedRecipe = bestMatch;
-        //   console.log(`[DEBUG] match fuzzy: "${recFilenameNorm}" → "${this.stripExtensionAndNormalize(bestMatch.title_cleaned || bestMatch.title || bestMatch.name || "")}" (score: ${highestScore.toFixed(3)})`);
-        // }
-      }
-
-        // 5) Buat objek rekomendasi
-        if (matchedRecipe) {
-          let imageName = matchedRecipe.image_name || matchedRecipe.Image_Name || rec.filename || "";
-          imageName = imageName.replace(/\.(jpe?g|png)$/i, "");
-          imageName = imageName.toLowerCase().replace(/\s+/g, "-");
-
-          return {
-            id: matchedRecipe._id || matchedRecipe.id || "",
-            image_name: imageName,
-            name: matchedRecipe.title_cleaned || matchedRecipe.name || imageName,
-            image: imageName,
-            duration: matchedRecipe.duration || 0,
-            carbon: matchedRecipe.total_recipe_carbon || 0,
-            rating: matchedRecipe.rating || 0,
-            instructions_cleaned: matchedRecipe.instructions_cleaned || matchedRecipe.Instructions_Cleaned || matchedRecipe.instructions || "",
-            cleaned_ingredients: matchedRecipe.cleaned_ingredients || matchedRecipe.Cleaned_Ingredients || matchedRecipe.ingredients || [],
-            url: rec.url,
-          };
-        } else {
-          console.warn("[DEBUG] Tidak ditemukan recipe untuk:", rec.filename);
-          let imageName = rec.filename?.replace(/\.(jpe?g|png)$/i, "") || "";
-          const imageNorm = imageName.toLowerCase().trim().replace(/\s+/g, "-");
-          // fallback: assign first recipe id to avoid empty id
-          const fallbackId = this.cachedRecipeData.length > 0 ? (this.cachedRecipeData[0]._id || this.cachedRecipeData[0].id || "") : "";
-          return {
-            id: fallbackId,
-            name: imageNorm,
-            image: imageNorm,
-            url: rec.url,
-            duration: 0,
-            carbon: 0,
-            rating: 0,
-            instructions_cleaned: "",
-            cleaned_ingredients: [],
-          };
-        }
+      let count = 0;
+      keywords.forEach((w) => {
+        if (w && titleNorm.includes(w)) count++;
       });
+      const ratio = count / keywords.length;
+      if (ratio >= 0.4) {
+        matchedRecipe = recipe;
+        console.log("[DEBUG] match partial-keyword:", recFilenameNorm, "<–> DB:", titleNorm, `(ratio: ${ratio.toFixed(2)})`);
+        break;
+      }
+    }
+  }
+
+  // 4) Fuzzy matching via title_cleaned
+  if (!matchedRecipe) {
+    let bestMatch = null;
+    let highestScore = 0;
+    for (const recipe of this.cachedRecipeData) {
+      const titleRaw = recipe.title_cleaned || recipe.title || recipe.name || "";
+      const titleNorm = this.stripExtensionAndNormalize(titleRaw);
+      if (!titleNorm) continue;
+
+      const score = stringSimilarity.compareTwoStrings(recFilenameNorm, titleNorm);
+      if (score > highestScore) {
+        highestScore = score;
+        bestMatch = recipe;
+      }
+    }
+    if (bestMatch && highestScore >= this.SIMILARITY_THRESHOLD) {
+      matchedRecipe = bestMatch;
+      console.log(`[DEBUG] match fuzzy: "${recFilenameNorm}" → "${this.stripExtensionAndNormalize(bestMatch.title_cleaned || bestMatch.title || bestMatch.name || "")}" (score: ${highestScore.toFixed(3)})`);
+    }
+  }
+
+  // 5) Buat objek rekomendasi
+  if (matchedRecipe) {
+    let imageName = matchedRecipe.image_name || matchedRecipe.Image_Name || rec.filename || "";
+    imageName = imageName.replace(/\.(jpe?g|png)$/i, "");
+    imageName = imageName.toLowerCase().replace(/\s+/g, "-");
+
+    return {
+      id: matchedRecipe._id || matchedRecipe.id || "",
+      image_name: imageName,
+      name: matchedRecipe.title_cleaned || matchedRecipe.name || imageName,
+      image: imageName,
+      duration: matchedRecipe.duration || 0,
+      carbon: matchedRecipe.total_recipe_carbon || 0,
+      rating: matchedRecipe.rating || 0,
+      instructions_cleaned: matchedRecipe.instructions_cleaned || matchedRecipe.Instructions_Cleaned || matchedRecipe.instructions || "",
+      cleaned_ingredients: matchedRecipe.cleaned_ingredients || matchedRecipe.Cleaned_Ingredients || matchedRecipe.ingredients || [],
+      url: rec.url,
+    };
+  } else {
+    console.warn("[DEBUG] Tidak ditemukan recipe untuk:", rec.filename);
+    let imageName = rec.filename?.replace(/\.(jpe?g|png)$/i, "") || "";
+    const imageNorm = imageName.toLowerCase().trim().replace(/\s+/g, "-");
+    // fallback: assign unique id per recommendation to avoid duplicate ids
+    const fallbackId = `temp-id-${index}`;
+    return {
+      id: fallbackId,
+      name: imageNorm,
+      image: imageNorm,
+      url: rec.url,
+      duration: 0,
+      carbon: 0,
+      rating: 0,
+      instructions_cleaned: "",
+      cleaned_ingredients: [],
+    };
+  }
+});
 
       console.log("Mapped Recommendations:", recommendations);
       recommendations.forEach((rec, idx) => {
@@ -261,55 +259,30 @@ export default class ScanPresenter {
     }
   }
 
-  async goToRecipe(recipe) {
-    try {
-      console.log("ScanPresenter.goToRecipe called with recipe:", recipe);
-      const recipeId = recipe.id || recipe.recipess_id || recipe._id;
-      if (!recipeId) {
-        alert("Recipe ID is missing.");
-        return;
-      }
-      console.log("Mengambil detail recipe ID:", recipeId);
-
-      // Use cachedRecipeData to find recipeData
-      const recipeData = this.cachedRecipeData.find((r) => r._id === recipeId || r.id === recipeId || r.recipess_id === recipeId);
-      if (!recipeData) {
-        alert("Detail resep tidak ditemukan di database.");
-        return;
-      }
-
-      const resp = await fetch(`http://localhost:3000/api/recipes/${recipeId}`);
-      if (!resp.ok) {
-        alert("Gagal mengambil detail resep.");
-        return;
-      }
-      const detail = await resp.json();
-
-      console.log("Fetched detail for recipeId:", recipeId, detail);
-
-      // Mapping data untuk RecipeModal
-      const mappedData = {
-        ...detail,
-        name: detail.title || detail.name || "",
-        image: (detail.image || "").replace(/^\/foodImages\//, "").replace(/\.(jpe?g|png)$/i, ""),
-        instructions_cleaned: detail.instructions_cleaned || detail.Instructions_Cleaned || detail.instructions || "",
-        cleaned_ingredients: detail.cleaned_ingredients || detail.Cleaned_Ingredients || detail.ingredients || [],
-        total_recipe_carbon: detail.total_recipe_carbon || 0,
-        duration: detail.duration || 0,
-        rating: detail.rating || 0,
-      };
-
-      console.log("Mapped recipe untuk modal:", mappedData);
-      // Clone object to force Vue reactivity
-      const clonedData = JSON.parse(JSON.stringify(mappedData));
-      this.model.setSelectedRecipe(clonedData);
-      this.model.setShowModal(true);
-      this.view.update();
-    } catch (err) {
-      console.error("Error di goToRecipe():", err);
-      alert("Error mengambil detail resep: " + err.message);
-    }
+async goToRecipe(recipe) {
+  try {
+    console.log("ScanPresenter.goToRecipe called with recipe:", recipe);
+    // Directly use the passed recipe object for modal without fetching from backend
+    const mappedData = {
+      ...recipe,
+      name: recipe.name || recipe.title || "",
+      image: recipe.image || recipe.image_name || "",
+      instructions_cleaned: recipe.instructions_cleaned || recipe.Instructions_Cleaned || recipe.instructions || "",
+      cleaned_ingredients: recipe.cleaned_ingredients || recipe.Cleaned_Ingredients || recipe.ingredients || [],
+      total_recipe_carbon: recipe.total_recipe_carbon || 0,
+      duration: recipe.duration || 0,
+      rating: recipe.rating || 0,
+    };
+    console.log("Using passed recipe data for modal:", mappedData);
+    const clonedData = JSON.parse(JSON.stringify(mappedData));
+    this.model.setSelectedRecipe(clonedData);
+    this.model.setShowModal(true);
+    this.view.update();
+  } catch (err) {
+    console.error("Error di goToRecipe():", err);
+    alert("Error mengambil detail resep: " + err.message);
   }
+}
 
   closeModal() {
     this.model.setShowModal(false);

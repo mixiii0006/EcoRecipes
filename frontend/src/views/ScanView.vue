@@ -98,7 +98,7 @@
     </main>
 
     <!-- modal -->
-    <RecipeModal v-if="showModal" :food="selectedRecipe" @close="closeModal" />
+<RecipeModal v-if="showModal" :key="selectedRecipe ? selectedRecipe.id : 'modal'" :food="selectedRecipe" @close="closeModal" />
   </div>
 </template>
 
@@ -141,14 +141,14 @@ export default {
       }
       return img.toLowerCase().replace(/\s+/g, "-");
     },
-    update() {
-      this.images = this.model.images;
-      this.recommendations = this.model.recommendations;
-      this.showModal = this.model.showModal;
-      this.selectedRecipe = this.model.selectedRecipe;
-      this.recentSearches = this.model.recentSearches;
-      this.$forceUpdate();
-    },
+update() {
+  this.images = this.model.images;
+  this.recommendations = this.model.recommendations;
+  this.showModal = this.model.showModal;
+  this.selectedRecipe = this.model.selectedRecipe ? JSON.parse(JSON.stringify(this.model.selectedRecipe)) : null;
+  this.recentSearches = this.model.recentSearches;
+  this.$forceUpdate();
+},
     onFileChange(e, idx) {
       this.presenter.onFileChange(e, idx);
     },
