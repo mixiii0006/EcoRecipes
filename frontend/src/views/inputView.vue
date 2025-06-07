@@ -33,13 +33,13 @@
               <div v-else-if="recommendations.length === 0">No recommendations yet.</div>
               <!-- HAS DATA -->
               <div v-else v-for="(rec, index) in recommendations" :key="index" class="card-link">
-            <RecipeCard
-              :recipess_id="rec.id || rec._id || ''"
-              :image="rec.image || rec.Image_Name || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?fit=crop&w=200&q=80'"
-              :name="rec.title || rec.title_cleaned || rec.name || 'No Title'"
-              :carbon="rec.carbon || rec.carbon_score || rec.total_recipe_carbon || 25"
-              @open="goToRecipe"
-            />
+                <RecipeCard
+                  :recipess_id="rec.id || rec._id || ''"
+                  :image="normalizeImagePath(rec.image || rec.Image_Name) || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?fit=crop&w=200&q=80'"
+                  :name="rec.title || rec.title_cleaned || rec.name || 'No Title'"
+                  :carbon="rec.carbon || rec.carbon_score || rec.total_recipe_carbon || 25"
+                  @open="goToRecipe"
+                />
               </div>
             </div>
           </section>
@@ -64,7 +64,7 @@
           <div class="card1">
             <section class="statistics">
               <h3>Statistic</h3>
-              <div>Jejak Karbon: {{ (totalCarbon * 100).toFixed(2) }}%</div>
+              <div>Jejak Karbon: {{ (totalCarbon).toFixed(2) }}%</div>
             </section>
           </div>
 
@@ -85,16 +85,6 @@
                 <li v-for="(item, index) in missing" :key="index">{{ item }}</li>
               </ul>
               <div v-else>No missing ingredients</div>
-            </section>
-          </div>
-
-          <div class="card">
-            <section class="parsed-ingredients">
-              <h3>Parsed Ingredients</h3>
-              <ul v-if="parsedIngredients.length > 0">
-                <li v-for="(item, index) in parsedIngredients" :key="index">{{ item.text || JSON.stringify(item) }}</li>
-              </ul>
-              <div v-else>No parsed ingredients</div>
             </section>
           </div>
 
@@ -150,7 +140,6 @@ export default {
       selectedRecipe: null,
       leftovers: [],
       missing: [],
-      parsedIngredients: [],
     };
   },
   created() {
@@ -164,9 +153,16 @@ export default {
     this.selectedRecipe = this.model.selectedRecipe;
     this.leftovers = this.model.leftovers;
     this.missing = this.model.missing;
-    this.parsedIngredients = this.model.parsedIngredients;
+    console.log("Initial recommendations:", this.recommendations);
   },
   methods: {
+    normalizeImagePath(img) {
+      if (!img) return "";
+      if (img.startsWith("/foodImages/")) {
+        return img.slice("/foodImages/".length);
+      }
+      return img;
+    },
     goToRecipe(payload) {
       console.log("goToRecipe dipanggil dengan payload:", payload);
       if (payload && payload.id) {
@@ -201,7 +197,6 @@ export default {
       this.selectedRecipe = this.model.selectedRecipe;
       this.leftovers = this.model.leftovers;
       this.missing = this.model.missing;
-      this.parsedIngredients = this.model.parsedIngredients;
       this.$forceUpdate();
       this.model.setLoading(true);
       this.model.setLoading(false);

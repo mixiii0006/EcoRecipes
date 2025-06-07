@@ -9,20 +9,14 @@ const BASE_URL_CNN = "https://capstone-ml-gambar.up.railway.app";
 exports.runFullPipeline = async (req, res) => {
   try {
     // 1) call your NLP full pipeline
-    const { data: mlResult } = await axios.post(
-      `${BASE_URL_NLP}/full`,
-      req.body,
-      { timeout: 30000 }
-    );
+    const { data: mlResult } = await axios.post(`${BASE_URL_NLP}/full`, req.body, { timeout: 30000 });
 
-    const mlRecs = Array.isArray(mlResult.recommended_recipes)
-      ? mlResult.recommended_recipes
-      : [];
+    const mlRecs = Array.isArray(mlResult.recommended_recipes) ? mlResult.recommended_recipes : [];
 
     // helper: normalize a string for fuzzy matching
     const cleanTitle = (text) =>
       (text || "")
-        .replace(/\([^()]CO2eq\/kg[^()]\)/gi, "")
+        .replace(/\([^()]*CO2eq\/kg[^()]*\)/gi, "")
         .replace(/\([^)]*\)/g, "")
         .replace(/\d+(\.\d+)?/g, "")
         .toLowerCase()
@@ -36,7 +30,7 @@ exports.runFullPipeline = async (req, res) => {
       const rawTitle = mlRec.title || "";
       // strip out parenthetical CO2 and numbers for search
       const titleForSearch = rawTitle
-        .replace(/\([^)]CO2eq\/kg[^)]\)/gi, "")
+        .replace(/\([^)]*CO2eq\/kg[^)]*\)/gi, "")
         .replace(/\([^)]*\)/g, "")
         .replace(/\d+(\.\d+)?/g, "")
         .trim();
@@ -44,29 +38,21 @@ exports.runFullPipeline = async (req, res) => {
       // 2) try a case-insensitive regex search on title_cleaned or name
       const safe = titleForSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
       let found = await Recipe.findOne({
-        $or: [
-          { title_cleaned: { $regex: safe, $options: "i" } },
-          { name:          { $regex: safe, $options: "i" } }
-        ]
+        $or: [{ title_cleaned: { $regex: safe, $options: "i" } }, { name: { $regex: safe, $options: "i" } }],
       });
 
       // 3) fallback fuzzy matching if regex returned multiple or none
       if (!found) {
         const candidates = await Recipe.find({
-          $or: [
-            { title_cleaned: { $regex: safe, $options: "i" } },
-            { name:          { $regex: safe, $options: "i" } }
-          ]
+          $or: [{ title_cleaned: { $regex: safe, $options: "i" } }, { name: { $regex: safe, $options: "i" } }],
         }).limit(10);
 
         const norm = cleanTitle(rawTitle);
-        let best = null, bestScore = 0;
+        let best = null,
+          bestScore = 0;
         for (const c of candidates) {
           for (const str of [c.title_cleaned, c.name]) {
-            const score = stringSimilarity.compareTwoStrings(
-              norm,
-              cleanTitle(str)
-            );
+            const score = stringSimilarity.compareTwoStrings(norm, cleanTitle(str));
             if (score > bestScore) {
               bestScore = score;
               best = c;
@@ -75,11 +61,7 @@ exports.runFullPipeline = async (req, res) => {
         }
         // use if similarity ≥ 0.6
         if (best && bestScore >= 0.6) {
-          console.log(
-            `[SIMILARITY MATCH] "${rawTitle}" → "${best.title_cleaned}" (score: ${bestScore.toFixed(
-              2
-            )})`
-          );
+          console.log(`[SIMILARITY MATCH] "${rawTitle}" → "${best.title_cleaned}" (score: ${bestScore.toFixed(2)})`);
           found = best;
         }
       }
@@ -89,17 +71,13 @@ exports.runFullPipeline = async (req, res) => {
         recommendations.push({
           id: found._id,
           title: found.title_cleaned,
-          image: found.image_name
-            ? `/foodImages/${found.image_name}`
-            : found.url?.startsWith("http")
-            ? found.url
-            : "/foodImages/default.jpg",
+          image: found.image_name ? `/foodImages/${found.image_name}` : found.url?.startsWith("http") ? found.url : "/foodImages/default.jpg",
           carbon: found.carbon_score,
           total_recipe_carbon: found.total_recipe_carbon,
           cleaned_ingredients: found.cleaned_ingredients,
           instructions_cleaned: found.instructions_cleaned,
           leftovers: Array.isArray(mlRec.leftovers) ? mlRec.leftovers : [],
-          missing:   Array.isArray(mlRec.missing)   ? mlRec.missing   : []
+          missing: Array.isArray(mlRec.missing) ? mlRec.missing : [],
         });
       } else {
         console.warn(`[NOT FOUND] "${rawTitle}"`);
@@ -110,7 +88,7 @@ exports.runFullPipeline = async (req, res) => {
           carbon: null,
           total_recipe_carbon: null,
           leftovers: Array.isArray(mlRec.leftovers) ? mlRec.leftovers : [],
-          missing:   Array.isArray(mlRec.missing)   ? mlRec.missing   : []
+          missing: Array.isArray(mlRec.missing) ? mlRec.missing : [],
         });
       }
     }
@@ -118,7 +96,7 @@ exports.runFullPipeline = async (req, res) => {
     // 5) send back total_carbon + our enriched recommendations
     return res.json({
       total_carbon: mlResult.total_carbon,
-      recommended_recipes: recommendations
+      recommended_recipes: recommendations,
     });
   } catch (err) {
     console.error("runFullPipeline error:", err);

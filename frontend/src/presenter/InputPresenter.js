@@ -75,6 +75,12 @@ export default class InputPresenter {
     try {
       const response = await this.runFullPipeline({ text: this.model.ingredients });
       console.log("runFullPipeline response:", response);
+      if (response && response.recommended_recipes) {
+        console.log("Recommended recipes images:");
+        response.recommended_recipes.forEach((rec, idx) => {
+          console.log(`Recipe ${idx}: image = ${rec.image}`);
+        });
+      }
 
       if (response) {
         this.model.setRecommendations(response.recommended_recipes || []);

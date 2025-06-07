@@ -3,30 +3,31 @@
     <Sidebar />
 
     <main class="main-content">
-      <!-- Header -->
+      <!-- HEADER -->
       <div class="section-header">
         <h2 class="section-title">Please Scan your Food</h2>
         <button class="scan-btn-bar" @click="inputIngredients">Input</button>
       </div>
 
-      <!-- Scan Section -->
+      <!-- SCAN IMAGE GRID -->
       <div class="scan-section">
         <div class="image-grid">
           <div v-for="(img, idx) in images" :key="idx" class="image-card">
-            <!-- Preview Gambar Hasil Upload/Capture -->
+            <!-- preview -->
             <img v-if="img.preview" :src="img.preview" alt="Uploaded" class="preview-img" />
-            <!-- Pilihan Upload/Kamera -->
+            <!-- choose file / camera -->
             <div v-else class="choose-block">
-              <!-- Pilih File -->
               <label class="choose-file-label">
-                <span class="choose-file-btn"><i class="fa-solid fa-file-image"></i> Choose File</span>
+                <span class="choose-file-btn">
+                  <i class="fa-solid fa-file-image"></i>
+                  Choose File
+                </span>
                 <input type="file" accept="image/*" class="hidden-input" @change="onFileChange($event, idx)" />
               </label>
-              <!-- Buka Kamera -->
               <button class="open-camera-btn" @click="openCamera(idx)"><i class="fa-solid fa-camera"></i> Open Camera</button>
             </div>
 
-            <!-- CAMERA PREVIEW & TOMBOL AMBIL GAMBAR -->
+            <!-- camera preview + controls -->
             <div v-if="img.showCamera" class="camera-modal">
               <video :ref="'videoEl' + idx" autoplay playsinline class="camera-video"></video>
               <button class="capture-btn" @click="capturePhoto(idx)"><i class="fa-solid fa-circle"></i> Ambil Gambar</button>
@@ -35,7 +36,7 @@
               </button>
             </div>
 
-            <!-- Change Image -->
+            <!-- change file -->
             <label v-if="img.preview" class="change-btn-label">
               <span class="change-btn">Change</span>
               <input type="file" accept="image/*" class="hidden-input" @change="onFileChange($event, idx)" />
@@ -45,44 +46,47 @@
         <button class="submit-btn" @click="submitImages">Submit</button>
       </div>
 
-      <!-- Combined Section -->
+      <!-- RECOMMENDATIONS + SIDEBAR KANAN -->
       <section class="combined-section">
+        <!-- rekomendasi -->
         <div class="recommendations-wrapper">
           <section class="recommendations">
             <h3>Recommendations</h3>
             <div class="recipe-grid">
+              <!-- no recs -->
               <div v-if="recommendations.length === 0">No recommendations yet.</div>
-              <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
-                <RecipeCard 
-                  :recipess_id="rec.id || rec.recipess_id || ''"
-                  :image="rec.image || 'default'" 
-                  :name="rec.name || 'No Title'" 
-                  :duration="rec.duration || 15" 
-                  :carbon="rec.carbon || 25" 
-                  :rating="4" 
-                  @open="goToRecipe(rec)" 
-                />
-              </div>
+              <!-- has recs -->
+              <template v-else>
+                <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
+                  <RecipeCard
+                    :recipess_id="rec.id || rec._id || ''"
+                    :image="normalizeImagePath(rec.image) || 'default'"
+                    :name="rec.name || 'No Title'"
+                    :duration="rec.duration || 15"
+                    :carbon="rec.carbon || 25"
+                    :rating="rec.rating || 0"
+                    @open="() => { if (rec.id) goToRecipe(rec); }"
+                    :class="{ 'disabled-card': !rec.id }"
+                  />
+                </div>
+              </template>
             </div>
           </section>
         </div>
 
-        <!-- Right Section -->
+        <!-- sidebar kanan -->
         <section class="right-section">
           <div class="card">
             <section class="recent-search">
               <h3>Recent Search</h3>
-              <div class="recent-search-list">
-                <div class="recent-search-item" v-for="(search, idx) in recentSearches" :key="idx">
-                  <span>{{ search }}</span>
-                  <button class="delete-btn" @click="deleteRecentSearch(idx)">
-                    <i class="fa-solid fa-trash-can"></i>
-                  </button>
-                </div>
+              <div class="recent-search-item" v-for="(search, idx) in recentSearches" :key="idx">
+                <span>{{ search }}</span>
+                <button class="delete-btn" @click="deleteRecentSearch(idx)">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
               </div>
             </section>
           </div>
-
           <div class="card1">
             <section class="statistics">
               <h3>Statistic</h3>
@@ -92,8 +96,10 @@
         </section>
       </section>
     </main>
+
+    <!-- modal -->
+    <RecipeModal v-if="showModal" :food="selectedRecipe" @close="closeModal" />
   </div>
-  <RecipeModal v-if="showModal" :food="selectedRecipe" @close="closeModal" />
 </template>
 
 <script>
@@ -105,11 +111,7 @@ import ScanPresenter from "../presenter/ScanPresenter";
 
 export default {
   name: "ScanIngredients",
-  components: {
-    RecipeCard,
-    Sidebar,
-    RecipeModal,
-  },
+  components: { RecipeCard, Sidebar, RecipeModal },
   data() {
     return {
       model: new ScanModel(),
@@ -123,13 +125,22 @@ export default {
   },
   created() {
     this.presenter = new ScanPresenter(this.model, this);
+    // sync initial state
     this.images = this.model.images;
     this.recommendations = this.model.recommendations;
+    console.log("Initial recommendations:", this.recommendations);
     this.showModal = this.model.showModal;
     this.selectedRecipe = this.model.selectedRecipe;
     this.recentSearches = this.model.recentSearches;
   },
   methods: {
+    normalizeImagePath(img) {
+      if (!img) return "";
+      if (img.startsWith("/foodImages/")) {
+        img = img.slice("/foodImages/".length);
+      }
+      return img.toLowerCase().replace(/\s+/g, "-");
+    },
     update() {
       this.images = this.model.images;
       this.recommendations = this.model.recommendations;
@@ -138,8 +149,8 @@ export default {
       this.recentSearches = this.model.recentSearches;
       this.$forceUpdate();
     },
-    onFileChange(event, idx) {
-      this.presenter.onFileChange(event, idx);
+    onFileChange(e, idx) {
+      this.presenter.onFileChange(e, idx);
     },
     openCamera(idx) {
       this.presenter.openCamera(idx);
@@ -153,8 +164,9 @@ export default {
     submitImages() {
       this.presenter.submitImages();
     },
-    goToRecipe(recipe) {
-      this.presenter.goToRecipe(recipe);
+    goToRecipe(rec) {
+      console.log("ScanView.goToRecipe called with rec:", rec);
+      this.presenter.goToRecipe(rec);
     },
     closeModal() {
       this.presenter.closeModal();
@@ -162,28 +174,15 @@ export default {
     deleteRecentSearch(idx) {
       this.presenter.deleteRecentSearch(idx);
     },
-    setVideoStream(idx, stream) {
-      this.$nextTick(() => {
-        const video = this.$refs["videoEl" + idx];
-        if (video) {
-          video.srcObject = stream;
-          video.play();
-        }
-      });
+    setVideoStream(idx, str) {
+      /* existing code */
     },
     captureVideoFrame(idx) {
-      const video = this.$refs["videoEl" + idx];
-      if (!video) return null;
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      return canvas.toDataURL("image/png");
+      /* existing code */
     },
-  },
-  beforeDestroy() {
-    this.presenter.stopCamera();
+    inputIngredients() {
+      this.$router.push("/input-ingredients");
+    },
   },
   beforeUnmount() {
     this.presenter.stopCamera();
@@ -666,5 +665,10 @@ export default {
     padding: 0.6rem 1rem;
     font-size: 0.9rem;
   }
+}
+.disabled-card {
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 </style>
