@@ -10,7 +10,7 @@ connectDB();
 
 const results = [];
 
-fs.createReadStream(path.join(__dirname, 'all_recipes.csv'), { encoding: 'utf8' }) 
+fs.createReadStream(path.join(__dirname, 'all_recipes.csv'), { encoding: 'utf8' })
   .pipe(csv())
   .on('data', (data) => results.push(data))
   .on('end', async () => {

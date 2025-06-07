@@ -51,4 +51,25 @@ export default class HomeModel {
   setFavoriteFoods(favorites) {
     this.favoriteFoods = favorites;
   }
+
+  async fetchRecipeById(recipeId) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:3000/api/recipes/${recipeId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch recipe details");
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching recipe by ID:", error);
+      throw error;
+    }
+  }
 }

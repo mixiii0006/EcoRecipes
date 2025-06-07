@@ -37,10 +37,16 @@ export default {
       if (!this.image) return "";
       // If image is a full URL or starts with /, return as is
       if (this.image.startsWith("http") || this.image.startsWith("/")) {
+        // Append .jpg if missing extension
+        if (!this.image.match(/\.(jpg|jpeg|png|gif)$/i)) {
+          const imageWithExt = this.image + ".jpg";
+          console.log("RecipeCard imageUrl (full URL with appended .jpg):", imageWithExt);
+          return imageWithExt;
+        }
         console.log("RecipeCard imageUrl (full URL):", this.image);
         return this.image;
       }
-      const url = `/foodImages/${this.image}`;
+      const url = `/foodImages/${this.image}.jpg`;
       console.log("RecipeCard imageUrl (local):", url);
       return url;
     },

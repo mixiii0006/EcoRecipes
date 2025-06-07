@@ -52,7 +52,7 @@
 
             <!-- Emisi Karbon Card -->
             <div class="carbon-card">
-              <p><strong>Total Amount of Carbon</strong><br />Successfully Reduced: {{ model.user ? model.user.totalKarmonReduced : 0 }}</p>
+              <p><strong>Total Amount of Carbon</strong><br />Successfully Reduced: {{ model.user ? model.user.totalCarbonReduced : 0 }}</p>
             </div>
 
             <section class="food-category-list">
@@ -75,7 +75,7 @@
                     style="cursor: pointer; min-width: 100px; max-width: 100px;"
                   >
                     <div class="food-category-icon">
-                      <img :src="favorite.image_url" alt="Food Image" />
+                      <img :src="`/foodImages/${favorite.image_name}.jpg `" alt="Food Image" />
                     </div>
                     <div class="food-category-label multi-line-ellipsis small-title">{{ favorite.title_cleaned }}</div>
                   </div>

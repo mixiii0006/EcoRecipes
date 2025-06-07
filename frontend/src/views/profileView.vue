@@ -1,4 +1,4 @@
- <template>
+<template>
   <div class="profile-container">
     <!-- Header Section with Background and Profile Picture -->
     <div class="profile-header">
@@ -13,8 +13,8 @@
 
         <!-- Tombol Dashboard -->
         <div class="dashboard-controls">
-          <button @click="goToDashboard">Dashboard</button>
-          <button @click="logout" class="logout">Logout</button>
+          <button @click="goToDashboard"><i class="fa-solid fa-house"></i> Dashboard</button>
+          <button @click="logout" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
         </div>
 
         <!-- Konten kiri bawah -->
@@ -24,7 +24,7 @@
             alt="Profile Picture"
             class="profile-img"
           />
-          <h2 class="profile-name">Natasya salsabilla</h2>
+          <h2 class="profile-name">{{ user.name }}</h2>
         </div>
       </div>
     </div>
@@ -34,7 +34,8 @@
       <!-- Information Section with Form -->
       <div class="information">
         <div class="highlighted-karmon">
-          Total Amount of Carbon Successfully Reduced: {{ user.totalKarmonReduced }}
+          Total Amount of Carbon Successfully Reduced:
+          {{ user.totalCarbonReduced }}
         </div>
         <h3>Information</h3>
         <form class="info-form">
@@ -45,30 +46,6 @@
           <div class="form-group">
             <label for="email">Email:</label>
             <input type="email" id="email" v-model="user.email" readonly />
-          </div>
-          <div class="form-group">
-            <label for="gender">Gender:</label>
-            <input type="text" id="gender" v-model="user.gender" readonly />
-          </div>
-          <div class="form-group">
-            <label for="favoriteFoodCount">Number of Favorite Foods:</label>
-            <input
-              type="number"
-              id="favoriteFoodCount"
-              v-model="user.favoriteFoodCount"
-              readonly
-            />
-          </div>
-          <div class="form-group">
-            <label for="cookedFoodCount"
-              >Amount of Food Cooked:</label
-            >
-            <input
-              type="number"
-              id="cookedFoodCount"
-              v-model="user.cookedFoodCount"
-              readonly
-            />
           </div>
         </form>
       </div>
@@ -93,18 +70,18 @@
 
         <section class="food-favorite-section">
           <div class="food-list-grid">
-<RecipeCard
-  v-for="item in isFoodList ? model.cooks : model.favorites"
-  :key="item.id"
-  :recipess_id="item.recipess_id"
-  :name="item.title_cleaned || item.name"
-  :image="item.image_url || item.image"
-  :duration="item.duration || 0"
-  :carbon="item.total_recipe_carbon || 'N/A'"
-  @open="openModal"
-  @favorite="handleToggleFavorite"
-  @cook="handleToggleCook"
-/>
+            <RecipeCard
+              v-for="item in isFoodList ? model.cooks : model.favorites"
+              :key="item.id"
+              :recipess_id="item.recipess_id"
+              :name="item.title_cleaned || item.name"
+              :image="item.image_name"
+              :duration="item.duration || 0"
+              :carbon="item.total_recipe_carbon || 'N/A'"
+              @open="openModal"
+              @favorite="handleToggleFavorite"
+              @cook="handleToggleCook"
+            />
           </div>
         </section>
       </div>
@@ -177,7 +154,9 @@ export default {
     },
     async handleToggleFavorite(recipeId) {
       try {
-        const isFavorite = this.model.favorites.some(fav => fav.recipess_id === recipeId);
+        const isFavorite = this.model.favorites.some(
+          (fav) => fav.recipess_id === recipeId
+        );
         if (isFavorite) {
           await this.presenter.removeFavorite(recipeId);
         } else {
@@ -189,7 +168,9 @@ export default {
     },
     async handleToggleCook(recipeId) {
       try {
-        const isCook = this.model.cooks.some(cook => cook.recipess_id === recipeId);
+        const isCook = this.model.cooks.some(
+          (cook) => cook.recipess_id === recipeId
+        );
         if (isCook) {
           await this.presenter.removeCook(recipeId);
         } else {
@@ -220,7 +201,7 @@ export default {
 
 .highlighted-karmon {
   position: relative;
-  background:  #4caf50;
+  background: #4caf50;
   color: white;
   font-weight: 700;
   font-size: 1.5rem;
@@ -419,7 +400,6 @@ input[readonly] {
     font-size: 0.95rem;
   }
 }
-
 
 /* Food and Favorite Section */
 .food-favorite-section {
@@ -630,8 +610,6 @@ input[readonly] {
     grid-template-columns: repeat(1, 1fr);
     gap: 15px;
   }
-
-  
 
   .toggle-buttons {
     justify-content: center;
