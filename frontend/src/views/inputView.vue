@@ -39,6 +39,8 @@
                   :name="rec.title || rec.title_cleaned || rec.name || 'No Title'"
                   :carbon="rec.carbon || rec.carbon_score || rec.total_recipe_carbon || 25"
                   @open="goToRecipe"
+                  @favorite="handleToggleFavorite"
+                  @cook="handleToggleCook"
                 />
               </div>
             </div>
@@ -142,8 +144,10 @@ export default {
       missing: [],
     };
   },
-  created() {
+  async created() {
     this.presenter = new InputPresenter(this.model, this);
+    await this.presenter.fetchFavorites();
+    await this.presenter.fetchCooks();
     this.ingredients = this.model.ingredients;
     this.recommendations = this.model.recommendations;
     this.totalCarbon = this.model.totalCarbon;
@@ -177,6 +181,22 @@ export default {
     },
     onIngredientsInput(event) {
       this.model.setIngredients(this.ingredients);
+    },
+
+    async handleToggleFavorite(recipeId) {
+      try {
+        await this.presenter.handleToggleFavorite(recipeId);
+      } catch (error) {
+        console.error("Failed to toggle favorite:", error);
+      }
+    },
+
+    async handleToggleCook(recipeId) {
+      try {
+        await this.presenter.handleToggleCook(recipeId);
+      } catch (error) {
+        console.error("Failed to toggle cook:", error);
+      }
     },
 
     handleClick() {

@@ -76,7 +76,7 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           this.$emit("cook", this.recipess_id);
-          this.$emit("open"); // Buka modal jika user tekan OK
+          this.$emit("open", { id: this.recipess_id }); // Buka modal jika user tekan OK
         }
       });
     },

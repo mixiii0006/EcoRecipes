@@ -10,6 +10,9 @@ export default class InputModel {
     this.leftovers = [];
     this.missing = [];
     this.parsedIngredients = [];
+
+    this.favorites = [];
+    this.cooks = [];
   }
 
   setIngredients(ingredients) {
@@ -50,6 +53,14 @@ export default class InputModel {
 
   setParsedIngredients(parsedIngredients) {
     this.parsedIngredients = Array.isArray(parsedIngredients) ? parsedIngredients : [];
+  }
+
+  setFavorites(favorites) {
+    this.favorites = Array.isArray(favorites) ? favorites : [];
+  }
+
+  setCooks(cooks) {
+    this.cooks = Array.isArray(cooks) ? cooks : [];
   }
 
   addRecentSearch(search) {
