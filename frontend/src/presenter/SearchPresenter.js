@@ -135,7 +135,11 @@ export default class SearchPresenter {
       const mappedData = {
         ...data,
         name: data.title_cleaned || data.name,
-        image: data.image_name || data.Image_Name || '',
+        image: data.image_name
+          ? data.image_name.toLowerCase().replace(/\s+/g, "-")
+          : data.Image_Name
+          ? data.Image_Name.toLowerCase().replace(/\s+/g, "-")
+          : data.image || "",
         Instructions_Cleaned: data.instructions_cleaned || data.Instructions_Cleaned || data.instructions || '',
         Cleaned_Ingredients: data.cleaned_ingredients || data.Cleaned_Ingredients || data.ingredients || [],
         total_recipe_carbon: data.total_recipe_carbon || 0,
