@@ -12,21 +12,28 @@ export default class SearchModel {
     this.carouselItems = [
       {
         title: "Makan Apa Hari Ini??",
-        description: "Siap sedia wawasan dengan bahan lokal. Satu masakanmu mendekatkan keberlanjutan di setiap hidangan.",
-        ingredients: "Ayam, Sayur, Cabai, Bawang",
-        image: "https://source.unsplash.com/featured/?food",
+        description: "Pilih makanan lokal, kurangi jejak karbon! Menggunakan bahan dari sekitar membantu mengurangi emisi transportasi.",
+        image: "/foodImages/-candy-corn-pumpkin-blondies-51254510.jpg",
       },
       {
-        title: "Inspirasi Masakan Nusantara",
-        description: "Ciptakan sajian lezat dari dapurmu dengan bumbu tradisional Indonesia.",
-        ingredients: "Ikan, Serai, Kunyit, Daun Jeruk",
-        image: "https://source.unsplash.com/featured/?indonesian-food",
+        title: "Jejak Karbon di Meja Makan",
+        description: "Tahukah kamu? Daging merah punya jejak karbon lebih tinggi dari sayuran dan biji-bijian. Kurangi sedikit, bantu selamatkan bumi!",
+        image: "/foodImages/-carbonnade-a-la-flamande-short-ribs-358557.jpg",
       },
       {
-        title: "Menu Sehat Hari Ini",
-        description: "Masakan sehat dan lezat bisa dimulai dari bahan lokal berkualitas.",
-        ingredients: "Tahu, Tempe, Brokoli, Wortel",
-        image: "https://source.unsplash.com/featured/?healthy-food",
+        title: "Masak Bijak, Bumi Terjaga",
+        description: "Gunakan bahan musiman dan minim olahan. Selain sehat, ini juga mengurangi energi produksi dan distribusi.",
+        image: "/foodImages/-fried-chicken-51238060.jpg",
+      },
+      {
+        title: "Piringmu, Pilihanmu",
+        description: "Makanan nabati meninggalkan jejak karbon lebih rendah. Ganti satu porsi dagingmu dengan alternatif nabati, yuk!",
+        image: "/foodImages/-hazelnut-butter-and-coffee-meringues-51260360.jpg",
+      },
+      {
+        title: "Masakan Hemat Emisi",
+        description: "Kurangi makanan terbuang! Sisa bahan bisa jadi sup, tumisan, atau kaldu—hemat uang dan bantu bumi.",
+        image: "/foodImages/-pumpkin-gruyere-gratin-with-thyme-51252910.jpg",
       },
     ];
   }

@@ -1,54 +1,86 @@
+import { reactive } from "vue";
+
+const state = reactive({
+  images: [
+    { file: null, preview: null, showCamera: false },
+    { file: null, preview: null, showCamera: false },
+    { file: null, preview: null, showCamera: false },
+    { file: null, preview: null, showCamera: false },
+  ],
+  cameraStream: null,
+  currentCameraIdx: null,
+  recommendations: [],
+  loading: false,
+  showModal: false,
+  selectedRecipe: null,
+  recentSearches: [],
+});
+
 export default class ScanModel {
-  constructor() {
-    this.images = [
-      { file: null, preview: null, showCamera: false },
-      { file: null, preview: null, showCamera: false },
-      { file: null, preview: null, showCamera: false },
-      { file: null, preview: null, showCamera: false },
-    ];
-    this.cameraStream = null;
-    this.currentCameraIdx = null;
-    this.recommendations = [];
-    this.showModal = false;
-    this.selectedRecipe = null;
-    this.recentSearches = [];
+  get images() {
+    return state.images;
+  }
+  get cameraStream() {
+    return state.cameraStream;
+  }
+  get currentCameraIdx() {
+    return state.currentCameraIdx;
+  }
+  get recommendations() {
+    return state.recommendations;
+  }
+  get loading() {
+    return state.loading;
+  }
+  get showModal() {
+    return state.showModal;
+  }
+  get selectedRecipe() {
+    return state.selectedRecipe;
+  }
+  get recentSearches() {
+    return state.recentSearches;
   }
 
   setImage(idx, file, preview) {
-    this.images[idx].file = file;
-    this.images[idx].preview = preview;
-    this.images[idx].showCamera = false;
+    state.images[idx].file = file;
+    state.images[idx].preview = preview;
+    state.images[idx].showCamera = false;
   }
 
   setShowCamera(idx, show) {
-    this.images[idx].showCamera = show;
+    state.images[idx].showCamera = show;
   }
 
   setCameraStream(stream) {
-    this.cameraStream = stream;
+    state.cameraStream = stream;
   }
 
   setCurrentCameraIdx(idx) {
-    this.currentCameraIdx = idx;
+    state.currentCameraIdx = idx;
   }
 
   setRecommendations(recommendations) {
-    this.recommendations = recommendations;
+    state.recommendations = recommendations;
+  }
+
+  setLoading(loading) {
+    state.loading = loading;
   }
 
   setShowModal(show) {
-    this.showModal = show;
+    state.showModal = show;
   }
 
   setSelectedRecipe(recipe) {
-    this.selectedRecipe = recipe;
+    state.selectedRecipe = recipe;
   }
 
   setRecentSearches(searches) {
-    this.recentSearches = searches;
+    state.recentSearches = searches;
   }
 
   deleteRecentSearch(idx) {
-    this.recentSearches.splice(idx, 1);
+    state.recentSearches.splice(idx, 1);
   }
 }

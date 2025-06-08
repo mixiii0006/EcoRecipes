@@ -423,7 +423,7 @@ input[readonly] {
   display: flex;
   justify-content: flex-start;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .toggle-buttons button {
@@ -493,27 +493,6 @@ input[readonly] {
   user-select: none;
 }
 
-.toggle-buttons {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 15px;
-}
-
-.toggle-buttons button {
-  padding: 10px 20px;
-  background-color: #73b06f;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  font-size: 1rem;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-}
-
-.toggle-buttons button.active {
-  background-color: #2e7d32;
-}
 
 .food-list-grid {
   display: grid;
@@ -613,6 +592,7 @@ input[readonly] {
 
   .toggle-buttons {
     justify-content: center;
+    margin-top: 25px;
   }
 
   /* Additional improvements for mobile */

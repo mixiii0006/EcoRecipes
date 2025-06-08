@@ -105,10 +105,26 @@ export default class ScanPresenter {
 
   // … bagian import, constructor, etc. sama seperti sebelumnya …
 
+  // Utility to naturalize recipe names by replacing dashes with spaces and capitalizing words
+  naturalizeName(name) {
+    if (!name) return "";
+    // Remove trailing numbers and spaces
+    let cleaned = name.replace(/\s*\d+$/, "");
+    return cleaned
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
   async submitImages() {
+    this.model.setLoading(true);
+    this.view.update();
+    console.log("[DEBUG] Loading set to true");
     const imagesToSubmit = this.model.images.filter((img) => img.file);
     if (!imagesToSubmit.length) {
       alert("Silakan upload atau capture minimal satu gambar!");
+      this.model.setLoading(false);
+      this.view.update();
+      console.log("[DEBUG] Loading set to false due to no images");
       return;
     }
 
@@ -125,164 +141,104 @@ export default class ScanPresenter {
       const data = await response.json();
       console.log("Raw CNN data:", data);
 
-      // Fetch resep list sekali saja
-if (!this.cachedRecipeData.length) {
-  const recipeResp = await fetch("http://localhost:3000/api/recipes");
-  if (!recipeResp.ok) throw new Error("Gagal fetch recipes");
-  this.cachedRecipeData = await recipeResp.json();
-  console.log("[DEBUG] Sample cachedRecipeData:", this.cachedRecipeData.slice(0, 3));
-}
+      // Use raw CNN data results directly for recommendations
+      const recommendations = (data.results || []).map((rec, index) => {
+        let imageName = rec.filename || "";
+        imageName = imageName.replace(/\.(jpe?g|png)$/i, "");
+        imageName = imageName.toLowerCase().replace(/\s+/g, "-");
+        const naturalName = this.naturalizeName(imageName);
 
-const recommendations = (data.results || []).map((rec, index) => {
-  const recFilenameNorm = this.stripExtensionAndNormalize(rec.filename || "");
-  console.log("[DEBUG] normalized CNN filename:", recFilenameNorm);
-
-  // 1) Exact-match image_name
-  let matchedRecipe = this.cachedRecipeData.find((recipe) => {
-    const imgRaw = recipe.image_name || recipe.Image_Name || "";
-    const imgNorm = this.stripExtensionAndNormalize(imgRaw);
-    return imgNorm === recFilenameNorm;
-  });
-
-  // 2) Exact-match title_cleaned
-  if (!matchedRecipe) {
-    matchedRecipe = this.cachedRecipeData.find((recipe) => {
-      const titleRaw = recipe.title_cleaned || recipe.title || recipe.name || "";
-      const titleNorm = this.stripExtensionAndNormalize(titleRaw);
-      return titleNorm === recFilenameNorm;
-    });
-  }
-
-  // 3) Partial-keyword matching
-  if (!matchedRecipe) {
-    const keywords = recFilenameNorm.split("-");
-    for (const recipe of this.cachedRecipeData) {
-      const titleRaw = recipe.title_cleaned || recipe.title || recipe.name || "";
-      const titleNorm = this.stripExtensionAndNormalize(titleRaw);
-
-      let count = 0;
-      keywords.forEach((w) => {
-        if (w && titleNorm.includes(w)) count++;
+        return {
+          id: `temp-id-${index}`, // assign unique non-empty id
+          image_name: imageName,
+          name: naturalName,
+          image: imageName,
+          duration: 0,
+          carbon: rec.total_recipe_carbon || 0,
+          rating: 0,
+          instructions_cleaned: rec.instructions_cleaned || "",
+          cleaned_ingredients: rec.cleaned_ingredients || [],
+          url: rec.url || "",
+        };
       });
-      const ratio = count / keywords.length;
-      if (ratio >= 0.4) {
-        matchedRecipe = recipe;
-        console.log("[DEBUG] match partial-keyword:", recFilenameNorm, "<–> DB:", titleNorm, `(ratio: ${ratio.toFixed(2)})`);
-        break;
-      }
-    }
-  }
-
-  // 4) Fuzzy matching via title_cleaned
-  if (!matchedRecipe) {
-    let bestMatch = null;
-    let highestScore = 0;
-    for (const recipe of this.cachedRecipeData) {
-      const titleRaw = recipe.title_cleaned || recipe.title || recipe.name || "";
-      const titleNorm = this.stripExtensionAndNormalize(titleRaw);
-      if (!titleNorm) continue;
-
-      const score = stringSimilarity.compareTwoStrings(recFilenameNorm, titleNorm);
-      if (score > highestScore) {
-        highestScore = score;
-        bestMatch = recipe;
-      }
-    }
-    if (bestMatch && highestScore >= this.SIMILARITY_THRESHOLD) {
-      matchedRecipe = bestMatch;
-      console.log(`[DEBUG] match fuzzy: "${recFilenameNorm}" → "${this.stripExtensionAndNormalize(bestMatch.title_cleaned || bestMatch.title || bestMatch.name || "")}" (score: ${highestScore.toFixed(3)})`);
-    }
-  }
-
-  // 5) Buat objek rekomendasi
-  if (matchedRecipe) {
-    let imageName = matchedRecipe.image_name || matchedRecipe.Image_Name || rec.filename || "";
-    imageName = imageName.replace(/\.(jpe?g|png)$/i, "");
-    imageName = imageName.toLowerCase().replace(/\s+/g, "-");
-
-    return {
-      id: matchedRecipe._id || matchedRecipe.id || "",
-      image_name: imageName,
-      name: matchedRecipe.title_cleaned || matchedRecipe.name || imageName,
-      image: imageName,
-      duration: matchedRecipe.duration || 0,
-      carbon: matchedRecipe.total_recipe_carbon || 0,
-      rating: matchedRecipe.rating || 0,
-      instructions_cleaned: matchedRecipe.instructions_cleaned || matchedRecipe.Instructions_Cleaned || matchedRecipe.instructions || "",
-      cleaned_ingredients: matchedRecipe.cleaned_ingredients || matchedRecipe.Cleaned_Ingredients || matchedRecipe.ingredients || [],
-      url: rec.url,
-    };
-  } else {
-    console.warn("[DEBUG] Tidak ditemukan recipe untuk:", rec.filename);
-    let imageName = rec.filename?.replace(/\.(jpe?g|png)$/i, "") || "";
-    const imageNorm = imageName.toLowerCase().trim().replace(/\s+/g, "-");
-    // fallback: assign unique id per recommendation to avoid duplicate ids
-    const fallbackId = `temp-id-${index}`;
-    return {
-      id: fallbackId,
-      name: imageNorm,
-      image: imageNorm,
-      url: rec.url,
-      duration: 0,
-      carbon: 0,
-      rating: 0,
-      instructions_cleaned: "",
-      cleaned_ingredients: [],
-    };
-  }
-});
 
       console.log("Mapped Recommendations:", recommendations);
       recommendations.forEach((rec, idx) => {
         console.log(`Recommendation[${idx}]: id=${rec.id}, name=${rec.name}`);
       });
 
-      // Check for duplicate IDs
-      const idSet = new Set();
-      const duplicates = [];
-      recommendations.forEach((rec) => {
-        if (idSet.has(rec.id)) {
-          duplicates.push(rec.id);
-        } else {
-          idSet.add(rec.id);
-        }
-      });
-      if (duplicates.length > 0) {
-        console.warn("Duplicate recommendation IDs found:", duplicates);
-      }
-
+      this.model.setLoading(false);
+      this.view.update();
       this.model.setRecommendations(recommendations);
       this.view.update();
     } catch (error) {
       console.error("Error di submitImages():", error);
       alert("Gagal mendapatkan rekomendasi: " + error.message);
+      this.model.setLoading(false);
+      this.view.update();
     }
   }
 
-async goToRecipe(recipe) {
-  try {
-    console.log("ScanPresenter.goToRecipe called with recipe:", recipe);
-    // Directly use the passed recipe object for modal without fetching from backend
-    const mappedData = {
-      ...recipe,
-      name: recipe.name || recipe.title || "",
-      image: recipe.image || recipe.image_name || "",
-      instructions_cleaned: recipe.instructions_cleaned || recipe.Instructions_Cleaned || recipe.instructions || "",
-      cleaned_ingredients: recipe.cleaned_ingredients || recipe.Cleaned_Ingredients || recipe.ingredients || [],
-      total_recipe_carbon: recipe.total_recipe_carbon || 0,
-      duration: recipe.duration || 0,
-      rating: recipe.rating || 0,
-    };
-    console.log("Using passed recipe data for modal:", mappedData);
-    const clonedData = JSON.parse(JSON.stringify(mappedData));
-    this.model.setSelectedRecipe(clonedData);
-    this.model.setShowModal(true);
-    this.view.update();
-  } catch (err) {
-    console.error("Error di goToRecipe():", err);
-    alert("Error mengambil detail resep: " + err.message);
+  async goToRecipe(recipe) {
+    try {
+      console.log("ScanPresenter.goToRecipe called with recipe:", recipe);
+      if (!recipe.id) {
+        alert("Recipe ID not found or unavailable.");
+        return;
+      }
+      // Handle temporary IDs gracefully
+      if (recipe.id.startsWith("temp-id-")) {
+        // Open modal with available data without fetching backend
+        this.model.setSelectedRecipe({
+          id: recipe.id,
+          name: recipe.name,
+          image: recipe.image,
+          instructions_cleaned: recipe.instructions_cleaned || "",
+          cleaned_ingredients: recipe.cleaned_ingredients || [],
+          total_recipe_carbon: recipe.carbon || 0,
+          duration: recipe.duration || 0,
+          rating: recipe.rating || 0,
+          url: recipe.url || "",
+        });
+        this.model.setShowModal(true);
+        this.view.update();
+        return;
+      }
+      // Fetch full recipe details from backend by ID
+      const response = await fetch(`http://localhost:3000/api/recipes/${recipe.id}`);
+      if (!response.ok) throw new Error("Failed to fetch recipe details");
+      const data = await response.json();
+      console.log("Fetched recipe details:", data);
+
+      // Convert instructions and ingredients to strings if they are arrays
+      let instructions = data.instructions_cleaned || data.Instructions_Cleaned || data.instructions || "";
+      if (Array.isArray(instructions)) {
+        instructions = instructions.join(". ");
+      }
+
+      let ingredients = data.cleaned_ingredients || data.Cleaned_Ingredients || data.ingredients || [];
+      if (Array.isArray(ingredients)) {
+        ingredients = ingredients.join(", ");
+      }
+
+      const mappedData = {
+        ...data,
+        name: data.name || data.title || "",
+        image: data.image || data.image_name || "",
+        instructions_cleaned: instructions,
+        cleaned_ingredients: ingredients,
+        total_recipe_carbon: data.total_recipe_carbon || 0,
+        duration: data.duration || 0,
+        rating: data.rating || 0,
+      };
+      this.model.setSelectedRecipe(mappedData);
+      this.model.setShowModal(true);
+      this.view.update();
+    } catch (err) {
+      console.error("Error di goToRecipe():", err);
+      alert("Error mengambil detail resep: " + err.message);
+    }
   }
-}
 
   closeModal() {
     this.model.setShowModal(false);

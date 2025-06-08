@@ -53,47 +53,36 @@
           <section class="recommendations">
             <h3>Recommendations</h3>
             <div class="recipe-grid">
-              <!-- no recs -->
+            <template v-if="loading">
+              <div class="loading-container">
+                <div class="spinner"></div>
+                <div>Loading recommendations, please wait...</div>
+              </div>
+            </template>
+            <template v-else>
               <div v-if="recommendations.length === 0">No recommendations yet.</div>
-              <!-- has recs -->
-              <template v-else>
+              <div v-else>
                 <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
-                  <RecipeCard
-                    :recipess_id="rec.id || rec._id || ''"
-                    :image="normalizeImagePath(rec.image) || 'default'"
-                    :name="rec.name || 'No Title'"
-                    :duration="rec.duration || 15"
-                    :carbon="rec.carbon || 25"
-                    :rating="rec.rating || 0"
-                    @open="() => { if (rec.id) goToRecipe(rec); }"
-                    :class="{ 'disabled-card': !rec.id }"
-                  />
+<RecipeCard
+  :recipess_id="rec.id || rec._id || ''"
+  :image="normalizeImagePath(rec.image) || 'default'"
+  :name="rec.name || 'No Title'"
+  :duration="rec.duration || 15"
+  :carbon="rec.carbon || 25"
+  :rating="rec.rating || 0"
+  :ingredients="rec.cleaned_ingredients || []"
+  :instructions="rec.instructions_cleaned || ''"
+  @open="() => { if (rec.id) goToRecipe(rec); }"
+  @cook="handleCook"
+  @favorite="handleFavorite"
+  :class="{ 'disabled-card': !rec.id }"
+/>
                 </div>
-              </template>
+              </div>
+            </template>
             </div>
           </section>
         </div>
-
-        <!-- sidebar kanan -->
-        <section class="right-section">
-          <div class="card">
-            <section class="recent-search">
-              <h3>Recent Search</h3>
-              <div class="recent-search-item" v-for="(search, idx) in recentSearches" :key="idx">
-                <span>{{ search }}</span>
-                <button class="delete-btn" @click="deleteRecentSearch(idx)">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
-              </div>
-            </section>
-          </div>
-          <div class="card1">
-            <section class="statistics">
-              <h3>Statistic</h3>
-              <div>Jejak Karbon: 25%</div>
-            </section>
-          </div>
-        </section>
       </section>
     </main>
 
@@ -118,6 +107,7 @@ export default {
       presenter: null,
       images: [],
       recommendations: [],
+      loading: false,
       showModal: false,
       selectedRecipe: null,
       recentSearches: [],
@@ -141,14 +131,15 @@ export default {
       }
       return img.toLowerCase().replace(/\s+/g, "-");
     },
-update() {
-  this.images = this.model.images;
-  this.recommendations = this.model.recommendations;
-  this.showModal = this.model.showModal;
-  this.selectedRecipe = this.model.selectedRecipe ? JSON.parse(JSON.stringify(this.model.selectedRecipe)) : null;
-  this.recentSearches = this.model.recentSearches;
-  this.$forceUpdate();
-},
+    update() {
+      this.images = this.model.images;
+      this.recommendations = this.model.recommendations;
+      this.loading = this.model.loading;
+      this.showModal = this.model.showModal;
+      this.selectedRecipe = this.model.selectedRecipe ? JSON.parse(JSON.stringify(this.model.selectedRecipe)) : null;
+      this.recentSearches = this.model.recentSearches;
+      this.$forceUpdate();
+    },
     onFileChange(e, idx) {
       this.presenter.onFileChange(e, idx);
     },
@@ -174,6 +165,16 @@ update() {
     deleteRecentSearch(idx) {
       this.presenter.deleteRecentSearch(idx);
     },
+    handleCook(recipess_id) {
+      console.log("handleCook called with id:", recipess_id);
+      // Implement cook logic here, e.g., call presenter method
+      this.presenter.handleCook(recipess_id);
+    },
+    handleFavorite(recipess_id) {
+      console.log("handleFavorite called with id:", recipess_id);
+      // Implement favorite logic here, e.g., call presenter method
+      this.presenter.handleFavorite(recipess_id);
+    },
     setVideoStream(idx, str) {
       /* existing code */
     },
@@ -191,6 +192,31 @@ update() {
 </script>
 
 <style scoped>
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #b2ddb8;
+  border-top: 4px solid #39914a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 .scan-ingredients {
   display: flex;
   height: 100vh;
@@ -216,16 +242,17 @@ update() {
   flex: 1;
 }
 .scan-btn-bar {
-  background: linear-gradient(to right, #236038, #73b06f);
-  color: #fff;
-  font-size: 1rem;
-  padding: 0.8rem 1.5rem;
-  border-radius: 12px;
+ align-self: center;
+  background: linear-gradient(to right, #235f3a, #73b06f);
+  color: white;
   border: none;
+  padding: 0.8rem 2.5rem;
+  border-radius: 18px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
+  font-size: 1.2rem;
+  margin-top: 1.5rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
 }
 .scan-btn-bar:hover {
   background: #388e3c;
@@ -271,9 +298,9 @@ update() {
 .image-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 2.5rem;
+  gap: 1.5rem;
   width: 100%;
-  max-width: 850px;
+  max-width: 100%;
   margin: 0 auto;
   justify-items: center;
 }
@@ -437,11 +464,30 @@ update() {
   font-family: "Poppins", sans-serif;
   font-weight: 600;
 }
-@media (max-width: 1200px) {
+
+@media (max-width: 1100px) {
   .image-grid {
     max-width: 670px;
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
+  }
+   .main-content {
+    margin-left: 0 !important;
+    margin-top: 75px;
+    padding: 1rem;
+  }
+  .input-ingredients {
+    flex-direction: column;
+  }
+
+  .scan-btn-bar {
+    width: 90%;
+   margin-right: 30px;
+   margin-left: 30px;
+  }
+
+  .submit-btn {
+    width: 94%;
   }
 }
 @media (max-width: 700px) {
@@ -457,6 +503,9 @@ update() {
     grid-template-columns: 1fr 1fr;
     gap: 1.1rem;
     max-width: 360px;
+  }
+  .recipe-grid {
+    grid-template-columns: 1fr !important;
   }
   .image-card {
     width: 120px;
@@ -515,6 +564,13 @@ update() {
   display: flex;
   gap: 1.5rem;
   width: 100%;
+  flex-wrap: wrap;
+}
+
+.recommendations-wrapper {
+  flex: 3;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .recommendations-wrapper {
@@ -527,15 +583,12 @@ update() {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
-.recommendations h3 {
-  padding-left: 1rem;
-}
-
 .recipe-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
+  max-width: 100%;
+  width: 100%;
 }
 
 .right-section {
@@ -622,53 +675,50 @@ update() {
   }
 }
 
-@media (max-width: 900px) {
-  .combined-section {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  .recommendations-wrapper,
-  .right-section {
-    width: 100%;
-    flex: unset;
+@media (max-width: 1200px) {
+  .image-grid {
+    max-width: 670px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
   }
 }
-
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .main-content {
     padding: 0.5rem;
   }
   .scan-section {
-    padding: 1rem;
-    gap: 0.7rem;
-    margin-bottom: 1rem;
+    padding: 0.5rem;
+    gap: 1rem;
+    border-radius: 10px;
   }
-  .image-card {
-    width: 100px;
-    height: 100px;
+  .image-grid {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+    max-width: 360px;
   }
   .recipe-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding-left: 0;
-    padding-right: 0;
+    grid-template-columns: 1fr !important;
+    gap: 1.1rem;
   }
-  .recent-search-item {
-    padding: 0.5rem 0.7rem;
-    font-size: 0.95rem;
-  }
-  .card,
-  .card1 {
-    padding: 0.7rem;
+  .image-card {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
   }
   .submit-btn {
     padding: 0.6rem 1rem;
     font-size: 0.9rem;
+    border-radius: 12px;
   }
 }
 .disabled-card {
   pointer-events: none;
   cursor: not-allowed;
   opacity: 0.6;
+}
+.card-link {
+  display: block;
+  width: 100%;
+  max-width: 100%;
 }
 </style>

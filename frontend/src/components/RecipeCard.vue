@@ -26,6 +26,8 @@ export default {
     duration: { type: Number, default: 0 },
     carbon: { type: [Number, String], default: null },
     rating: { type: Number, default: 0 },
+    ingredients: { type: Array, default: () => [] },
+    instructions: { type: String, default: "" },
     matched: {
       type: Boolean,
       default: true,
@@ -58,11 +60,15 @@ export default {
     },
   },
   methods: {
-    onImageError(event) {
-      event.target.src = "/foodImages/default.jpg";
+    formatIngredients() {
+      if (!this.ingredients || this.ingredients.length === 0) return "No ingredients";
+      return this.ingredients.join(", ");
     },
   },
   methods: {
+    onImageError(event) {
+      event.target.src = "/foodImages/default.jpg";
+    },
     handleClick() {
       // Emit the open event with the recipe id
       this.$emit("open", { id: this.recipess_id });

@@ -46,69 +46,6 @@
             </div>
           </section>
         </div>
-
-        <!-- Right Section -->
-        <section class="right-section">
-          <div class="card">
-            <section class="recent-search">
-              <h3>Recent Search</h3>
-              <div class="recent-search-list">
-                <div class="recent-search-item" v-for="(search, idx) in recentSearches" :key="idx">
-                  <span>{{ search }}</span>
-                  <button class="delete-btn" @click="deleteRecentSearch(idx)">
-                    <i class="fa-solid fa-trash-can"></i>
-                  </button>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          <div class="card1">
-            <section class="statistics">
-              <h3>Statistic</h3>
-              <div>Jejak Karbon: {{ (totalCarbon).toFixed(2) }}%</div>
-            </section>
-          </div>
-
-          <div class="card">
-            <section class="leftovers">
-              <h3>Leftovers</h3>
-              <ul v-if="leftovers.length > 0">
-                <li v-for="(item, index) in leftovers" :key="index">{{ item }}</li>
-              </ul>
-              <div v-else>No leftovers</div>
-            </section>
-          </div>
-
-          <div class="card">
-            <section class="missing">
-              <h3>Missing Ingredients</h3>
-              <ul v-if="missing.length > 0">
-                <li v-for="(item, index) in missing" :key="index">{{ item }}</li>
-              </ul>
-              <div v-else>No missing ingredients</div>
-            </section>
-          </div>
-
-          <div class="card" v-if="selectedRecipe">
-            <section class="selected-recipe">
-              <h3>Selected Recipe</h3>
-              <div><strong>Title:</strong> {{ selectedRecipe.title || "N/A" }}</div>
-              <div>
-                <strong>Ingredients:</strong>
-                <ul>
-                  <li v-for="(ing, idx) in selectedRecipe.ingredients" :key="idx">{{ ing }}</li>
-                </ul>
-              </div>
-              <div>
-                <strong>Instructions:</strong>
-                <ol>
-                  <li v-for="(step, idx) in selectedRecipe.instructions" :key="idx">{{ step }}</li>
-                </ol>
-              </div>
-            </section>
-          </div>
-        </section>
       </section>
     </main>
     <RecipeModal v-if="showModal" :food="selectedRecipe" @close="closeModal" />
@@ -414,7 +351,7 @@ export default {
 
 .recipe-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
 }
 
@@ -493,10 +430,20 @@ export default {
 @media (max-width: 1100px) {
   .main-content {
     margin-left: 0 !important;
+    margin-top: 75px;
     padding: 1rem;
   }
   .input-ingredients {
     flex-direction: column;
+  }
+  .scan-btn-bar {
+    width: 90%;
+   margin-right: 30px;
+   margin-left: 30px;
+  }
+
+  .submit-btn {
+    width: 94%;
   }
 }
 
@@ -537,9 +484,6 @@ export default {
   .card1 {
     padding: 0.7rem;
   }
-  .submit-btn {
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
-  }
+ 
 }
 </style>
