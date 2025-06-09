@@ -1,21 +1,24 @@
 <template>
   <div class="scan-ingredients">
+    <!-- Sidebar -->
     <Sidebar />
 
+    <!-- Main Content Area -->
     <main class="main-content">
-      <!-- HEADER -->
+      <!-- Section Header Baris: Judul kiri, Tombol kanan -->
       <div class="section-header">
         <h2 class="section-title">Please Scan your Food</h2>
         <button class="scan-btn-bar" @click="inputIngredients">Input</button>
       </div>
 
-      <!-- SCAN IMAGE GRID -->
+      <!-- Scan Image Section -->
       <div class="scan-section">
         <div class="image-grid">
           <div v-for="(img, idx) in images" :key="idx" class="image-card">
-            <!-- preview -->
+            <!-- Image Preview -->
             <img v-if="img.preview" :src="img.preview" alt="Uploaded" class="preview-img" />
-            <!-- choose file / camera -->
+
+            <!-- File Choose / Camera Trigger -->
             <div v-else class="choose-block">
               <label class="choose-file-label">
                 <span class="choose-file-btn">
@@ -24,72 +27,77 @@
                 </span>
                 <input type="file" accept="image/*" class="hidden-input" @change="onFileChange($event, idx)" />
               </label>
-              <button class="open-camera-btn" @click="openCamera(idx)"><i class="fa-solid fa-camera"></i> Open Camera</button>
+              <button class="open-camera-btn" @click="openCamera(idx)">
+                <i class="fa-solid fa-camera"></i> Open Camera
+              </button>
             </div>
 
-            <!-- camera preview + controls -->
+            <!-- Camera Preview -->
             <div v-if="img.showCamera" class="camera-modal">
               <video :ref="'videoEl' + idx" autoplay playsinline class="camera-video"></video>
-              <button class="capture-btn" @click="capturePhoto(idx)"><i class="fa-solid fa-circle"></i> Ambil Gambar</button>
+              <button class="capture-btn" @click="capturePhoto(idx)">
+                <i class="fa-solid fa-circle"></i> Ambil Gambar
+              </button>
               <button class="close-camera-btn" @click="closeCamera(idx)">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
 
-            <!-- change file -->
+            <!-- Change File -->
             <label v-if="img.preview" class="change-btn-label">
               <span class="change-btn">Change</span>
               <input type="file" accept="image/*" class="hidden-input" @change="onFileChange($event, idx)" />
             </label>
           </div>
         </div>
+
         <button class="submit-btn" @click="submitImages">Submit</button>
       </div>
 
-      <!-- RECOMMENDATIONS + SIDEBAR KANAN -->
+      <!-- Recommendations + Right Section -->
       <section class="combined-section">
-        <!-- rekomendasi -->
         <div class="recommendations-wrapper">
           <section class="recommendations">
             <h3>Recommendations</h3>
             <div class="recipe-grid">
-            <template v-if="loading">
-              <div class="loading-container">
+              <!-- LOADING STATE -->
+              <div v-if="loading" class="loading-container">
                 <div class="spinner"></div>
                 <div>Loading recommendations, please wait...</div>
               </div>
-            </template>
-            <template v-else>
-              <div v-if="recommendations.length === 0">No recommendations yet.</div>
-              <div v-else>
-                <div v-for="(rec, index) in recommendations" :key="index" class="card-link">
-<RecipeCard
-  :recipess_id="rec.id || rec._id || ''"
-  :image="normalizeImagePath(rec.image) || 'default'"
-  :name="rec.name || 'No Title'"
-  :duration="rec.duration || 15"
-  :carbon="rec.carbon || 25"
-  :rating="rec.rating || 0"
-  :ingredients="rec.cleaned_ingredients || []"
-  :instructions="rec.instructions_cleaned || ''"
-  @open="() => { if (rec.id) goToRecipe(rec); }"
-  @cook="handleCook"
-  @favorite="handleFavorite"
-  :class="{ 'disabled-card': !rec.id }"
-/>
-                </div>
+
+              <!-- EMPTY STATE -->
+              <div v-else-if="recommendations.length === 0">
+                No recommendations yet.
               </div>
-            </template>
+
+              <!-- HAS DATA -->
+              <div v-else v-for="(rec, index) in recommendations" :key="index" class="card-link">
+                <RecipeCard
+                  :recipess_id="rec.id || rec._id || ''"
+                  :image="normalizeImagePath(rec.image || rec.Image_Name) || 'default'"
+                  :name="rec.name || rec.title || rec.title_cleaned || 'No Title'"
+                  :duration="rec.duration || 15"
+                  :carbon="rec.carbon || rec.carbon_score || rec.total_recipe_carbon || 25"
+                  :ingredients="rec.cleaned_ingredients || []"
+                  :instructions="rec.instructions_cleaned || ''"
+                  @open="() => { if (rec.id) goToRecipe(rec); }"
+                  @cook="handleCook"
+                  @favorite="handleFavorite"
+                  :class="{ 'disabled-card': !rec.id }"
+                />
+              </div>
             </div>
           </section>
         </div>
       </section>
     </main>
 
-    <!-- modal -->
-<RecipeModal v-if="showModal" :key="selectedRecipe ? selectedRecipe.id : 'modal'" :food="selectedRecipe" @close="closeModal" />
+    <!-- Recipe Modal -->
+    <RecipeModal v-if="showModal" :key="selectedRecipe ? selectedRecipe.id : 'modal'" :food="selectedRecipe" @close="closeModal" />
   </div>
 </template>
+
 
 <script>
 import RecipeCard from "../components/RecipeCard.vue";
