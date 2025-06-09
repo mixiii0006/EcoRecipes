@@ -266,73 +266,86 @@ export default {
   height: auto;
 }
 
-/* ===== RESPONSIVE (<=768px) ===== */
-@media (max-width: 768px) {
-  .main-section {
-    margin-left: 0;
-    margin-top: 60px;
-    padding-top: 0;
-  }
+  /* ===== RESPONSIVE (<=768px) ===== */
+  @media (max-width: 768px) {
+    .main-section {
+      margin-left: 0;
+      margin-top: 60px;
+      padding-top: 0;
+    }
 
-  .main-layout {
-    flex-direction: column;
-  }
+    .main-layout {
+      flex-direction: column;
+    }
 
-  .main-content {
-    flex: none;
-    width: 100%;
-  }
+    .main-content {
+      flex: none;
+      width: 100%;
+    }
 
-  .right-sidebar {
-    width: 100%;
-    padding: 1.25rem;
-    border-radius: 12px;
-    background-color: #eaf5eb;
-    display: flex;
-    flex: none;
-    margin-left: -18px;
-    flex-direction: column;
-  }
+    .right-sidebar {
+      width: 100%;
+      padding: 1.25rem;
+      border-radius: 12px;
+      background-color: #eaf5eb;
+      display: flex;
+      flex: none;
+      margin-left: -18px;
+      flex-direction: column;
+    }
 
-  .hero-carousel {
-    padding: 1rem;
-    height: auto;
-  }
+    .hero-carousel {
+      padding: 1rem;
+      height: auto;
+    }
 
-  .carousel-item {
-    flex-direction: column;
-    gap: 1rem;
-  }
+    .carousel-item {
+      flex-direction: column;
+      gap: 1rem;
+    }
 
-  .hero-img {
-    width: 100%;
-    height: auto;
-    max-height: 200px;
-    border-radius: 10px;
-  }
+    .hero-img {
+      width: 100%;
+      height: auto;
+      max-height: 350px; /* increased from 200px */
+      border-radius: 10px;
+    }
 
-  .hero-text {
-    max-width: 100%;
-  }
+    /* Hide carousel image on mobile */
+    @media (max-width: 768px) {
+      .hero-img {
+        display: none;
+      }
+    }
 
-  .action-buttons {
-    flex-direction: column;
-  }
+    .hero-text {
+      max-width: 100%;
+    }
 
-  .big-btn {
-    width: 100%;
-  }
+    .feature-section {
+      flex-direction: column; /* stack Input and Scan vertically */
+      gap: 1rem; /* add spacing between cards */
+      margin: 20px 0;
+    }
 
-  .nutrition-card {
-    min-height: 250px;
-  }
+    .action-buttons {
+      flex-direction: column;
+    }
 
-  #nutritionChart {
-    width: 100% !important;
-    height: auto !important;
-    max-height: 250px;
+    .big-btn {
+      width: 100%;
+    }
+
+    .nutrition-card {
+      min-height: 250px;
+    }
+
+    #nutritionChart {
+      width: 100% !important;
+      height: auto !important;
+      max-height: 250px;
+    }
   }
-}
 
 /* ===== HERO SECTION ===== */
 .hero-carousel {

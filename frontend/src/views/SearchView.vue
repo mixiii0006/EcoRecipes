@@ -513,5 +513,10 @@ export default {
   .recipe-image {
     max-height: 250px;
   }
+
+  /* Hide carousel images on mobile */
+  .hero-img {
+    display: none;
+  }
 }
 </style>
