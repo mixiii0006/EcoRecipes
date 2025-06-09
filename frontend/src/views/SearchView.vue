@@ -31,7 +31,7 @@
       <section class="food-category-list">
         <h3>Recommendations</h3>
         <div v-if="loadingRecommendations" class="loading-message">Loading recommendations...</div>
-      <div v-else class="food-category-grid">
+        <div v-else class="food-category-grid">
           <RecipeCard
             v-for="(item, index) in model.recommendations"
             :key="item.id || item.title_cleaned || item.name"
@@ -70,7 +70,7 @@ export default {
     return {
       model: new SearchModel(),
       presenter: null,
-      query: '',
+      query: "",
       carouselItems: [],
       loadingRecommendations: false,
       showModal: false,
@@ -81,8 +81,8 @@ export default {
   created() {
     this.presenter = new SearchPresenter(this.model, this);
     this.model.username = localStorage.getItem("username") || "";
-    this.presenter.fetchRecommendations('');
-    this.query = this.model.searchText;  // Use searchText instead of query
+    this.presenter.fetchRecommendations("");
+    this.query = this.model.searchText; // Use searchText instead of query
     this.carouselItems = this.model.carouselItems;
     this.loadingRecommendations = this.model.loadingRecommendations;
     this.showModal = this.model.showModal;
@@ -135,8 +135,8 @@ export default {
       } catch (error) {
         this.$toast.error("Failed to add recipe to cooks");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
