@@ -94,18 +94,17 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
+  bottom: 0;                
   width: 222px;
-  height: 93%;
   background-color: #f9f9f9;
-  padding: 2rem 1rem;
+  padding: 2rem 1rem; 
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   border-top-right-radius: 30px;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
   font-family: "Poppins", sans-serif;
   border-right: 2px solid #e0e0e0;
-  z-index: 1000; /* Sidebar di atas overlay */
+  z-index: 1000;
 }
 
 .logo {
@@ -116,6 +115,8 @@ export default {
 }
 
 .menu {
+  flex: 1 1 auto;        
+  overflow-y: auto;     
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -139,20 +140,20 @@ export default {
 }
 
 .logout-btn {
+  margin-top: auto;       
+  margin-bottom: 1rem;   
   align-self: center;
   background: linear-gradient(to right, #235f3a, #73b06f);
   color: white;
   padding: 0.75rem 2rem;
   border-radius: 25px;
   border: none;
-  margin-bottom: 10px;
   font-weight: bold;
   cursor: pointer;
   font-size: 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: auto;
 }
 
 @media (max-width: 768px) {
@@ -160,7 +161,6 @@ export default {
     z-index: 1000;
     background-color: #f9f9f9;
     width: 222px;
-    height: 100%;
     position: fixed;
     top: 0;
     left: 0;
