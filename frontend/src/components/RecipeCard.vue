@@ -1,5 +1,5 @@
 <template>
-  <div class="recipe-card" @click="handleClick">
+   <div class="food-category-card" @click="handleClick">
     <div class="food-category-image">
       <img :src="imageUrl" :alt="name" @error="onImageError" />
     </div>
@@ -81,6 +81,32 @@ export default {
 </script>
 
 <style scoped>
+.food-category-card {
+  /* gradient border */
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background-image:
+    linear-gradient(#fff, #fff),                  /* isi putih */
+    linear-gradient(to right, #aac5b5, #94da8f);  /* border hijau gradasi */
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+
+  /* layout as before */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0.75rem;
+  box-sizing: border-box;
+
+  /* shadow & transisi */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.food-category-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
 .food-category-image {
   width: 100%;
   aspect-ratio: 2 / 1;

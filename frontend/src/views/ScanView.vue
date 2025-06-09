@@ -1,57 +1,38 @@
 <template>
   <div class="scan-ingredients">
-    <!-- Sidebar -->
     <Sidebar />
 
-    <!-- Main Content Area -->
     <main class="main-content">
-      <!-- Section Header Baris: Judul kiri, Tombol kanan -->
       <div class="section-header">
         <h2 class="section-title">Please Scan your Food</h2>
         <button class="scan-btn-bar" @click="inputIngredients">Input</button>
       </div>
 
-      <!-- Scan Image Section -->
       <div class="scan-section">
-        <div class="image-grid">
-          <div v-for="(img, idx) in images" :key="idx" class="image-card">
-            <!-- Image Preview -->
-            <img v-if="img.preview" :src="img.preview" alt="Uploaded" class="preview-img" />
+        <!-- IMAGE PREVIEW / UPLOAD -->
+        <div class="image-card">
+          <img v-if="images[0]?.preview" :src="images[0].preview" alt="Uploaded" class="preview-img" />
 
-            <!-- File Choose / Camera Trigger -->
-            <div v-else class="choose-block">
-              <label class="choose-file-label">
-                <span class="choose-file-btn">
-                  <i class="fa-solid fa-file-image"></i>
-                  Choose File
-                </span>
-                <input type="file" accept="image/*" class="hidden-input" @change="onFileChange($event, idx)" />
-              </label>
-              <button class="open-camera-btn" @click="openCamera(idx)">
-                <i class="fa-solid fa-camera"></i> Open Camera
-              </button>
-            </div>
-
-            <!-- Camera Preview -->
-            <div v-if="img.showCamera" class="camera-modal">
-              <video :ref="'videoEl' + idx" autoplay playsinline class="camera-video"></video>
-              <button class="capture-btn" @click="capturePhoto(idx)">
-                <i class="fa-solid fa-circle"></i> Ambil Gambar
-              </button>
-              <button class="close-camera-btn" @click="closeCamera(idx)">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
-            </div>
-
-            <!-- Change File -->
-            <label v-if="img.preview" class="change-btn-label">
-              <span class="change-btn">Change</span>
-              <input type="file" accept="image/*" class="hidden-input" @change="onFileChange($event, idx)" />
-            </label>
+          <div v-else class="placeholder">
+            <i class="fa-solid fa-file-image fa-3x"></i>
+            <p>No image chosen</p>
           </div>
         </div>
 
-        <button class="submit-btn" @click="submitImages">Submit</button>
+        <!-- CHOOSE / CHANGE BUTTON -->
+        <div class="image-controls">
+          <label class="upload-btn">
+            <input type="file" accept="image/*" class="hidden-input" @change="onFileChange($event, 0)" />
+            <span v-if="!images[0]?.preview"> <i class="fa-solid fa-file-image"></i> Choose Image </span>
+            <span v-else> <i class="fa-solid fa-repeat"></i> Change Image </span>
+          </label>
+        </div>
+
+        <!-- SUBMIT -->
+        <button class="submit-btn" @click="submitImages">
+          <i class="fa-solid fa-paper-plane"></i>
+          Submit
+        </button>
       </div>
 
       <!-- Recommendations + Right Section -->
@@ -67,9 +48,7 @@
               </div>
 
               <!-- EMPTY STATE -->
-              <div v-else-if="recommendations.length === 0">
-                No recommendations yet.
-              </div>
+              <div v-else-if="recommendations.length === 0">No recommendations yet.</div>
 
               <!-- HAS DATA -->
               <div v-else v-for="(rec, index) in recommendations" :key="index" class="card-link">
@@ -81,7 +60,11 @@
                   :carbon="rec.carbon || rec.carbon_score || rec.total_recipe_carbon || 25"
                   :ingredients="rec.cleaned_ingredients || []"
                   :instructions="rec.instructions_cleaned || ''"
-                  @open="() => { if (rec.id) goToRecipe(rec); }"
+                  @open="
+                    () => {
+                      if (rec.id) goToRecipe(rec);
+                    }
+                  "
                   @cook="handleCook"
                   @favorite="handleFavorite"
                   :class="{ 'disabled-card': !rec.id }"
@@ -97,7 +80,6 @@
     <RecipeModal v-if="showModal" :key="selectedRecipe ? selectedRecipe.id : 'modal'" :food="selectedRecipe" @close="closeModal" />
   </div>
 </template>
-
 
 <script>
 import RecipeCard from "../components/RecipeCard.vue";
@@ -200,13 +182,13 @@ export default {
 </script>
 
 <style scoped>
+/* Loading Spinner */
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 32px 0;
 }
-
 .spinner {
   width: 40px;
   height: 40px;
@@ -216,61 +198,19 @@ export default {
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
-
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
+  to {
     transform: rotate(360deg);
   }
 }
 
+/* Layout */
 .scan-ingredients {
   display: flex;
   height: 100vh;
   font-family: "Poppins", sans-serif;
   background-color: #f8f8f8;
 }
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  gap: 1rem;
-  background: transparent;
-}
-
-.section-title {
-  font-family: "Poppins", "Segoe UI", sans-serif;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #2e7d32;
-  margin: 0;
-  letter-spacing: 0.01em;
-  line-height: 1.2;
-  flex: 1;
-}
-
-.scan-btn-bar {
-  align-self: center;
-  background: linear-gradient(to right, #235f3a, #73b06f);
-  color: white;
-  border: none;
-  padding: 0.8rem 2.5rem;
-  border-radius: 18px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  margin-top: 1.5rem;
-  font-family: "Poppins", sans-serif;
-  font-weight: 600;
-}
-
-.scan-btn-bar:hover {
-  background: #388e3c;
-}
-
 .main-content {
   flex: 1;
   padding: 2rem;
@@ -280,381 +220,181 @@ export default {
   margin-left: 270px;
 }
 
+/* Header */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2e7d32;
+  margin: 0;
+  flex: 1;
+}
+.scan-btn-bar {
+  background: linear-gradient(to right, #235f3a, #73b06f);
+  color: #fff;
+  border: none;
+  padding: 0.8rem 2.5rem;
+  border-radius: 18px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.scan-btn-bar:hover {
+  background: #388e3c;
+}
+
+/* Scan Section */
 .scan-section {
   width: 100%;
+  max-width: 700px;
+  margin: 0 auto 2rem;
   padding: 1.5rem;
-  margin-inline: auto;
-  background-color: #ffffff;
+  background: #fff;
   border-radius: 24px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  margin-bottom: 2rem;
-  box-sizing: border-box;
+  gap: 1.5rem;
   align-items: center;
+  box-sizing: border-box;
 }
 
+/* Image Grid – single card */
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
+  grid-template-columns: 1fr;
   justify-items: center;
+  width: 100%;
+  max-width: 400px;
 }
 
 .image-card {
-  width: 180px;
-  height: 220px;
-  border: 1.7px solid #ccc;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 16/9;
+  border: 1px solid #ccc;
   border-radius: 18px;
   overflow: hidden;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(80, 120, 80, 0.03);
+  background: #fafafa;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
-  position: relative;
-  transition: border 0.2s;
+  justify-content: center;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(80,120,80,0.03);
 }
-
 .image-card:hover {
   border-color: #73b06f;
 }
-
-.hidden-input {
-  display: none;
-}
-
-.choose-file-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-}
-
-.choose-file-btn,
-.open-camera-btn {
-  color: black;
-  padding: 0.5rem 0.5rem;
-  border-radius: 10px;
-  border-color: #04702a;
-  font-size: 1rem;
-  font-weight: 400;
-  transition: background 0.15s;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(80, 120, 80, 0.09);
-  border: 1px solid #466d44;
-}
-
-.choose-file-btn:hover,
-.open-camera-btn:hover {
-  background: #2e7d32;
-}
-
 .preview-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.change-btn-label {
-  position: absolute;
-  bottom: 14px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  cursor: pointer;
-}
-
-.change-btn {
-  background: rgba(55, 140, 80, 0.92);
-  color: #fff;
-  padding: 0.28rem 1.05rem;
-  border-radius: 8px;
-  font-size: 0.98rem;
-  font-weight: 500;
-  transition: background 0.15s;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(80, 120, 80, 0.11);
-}
-
-.change-btn:hover {
-  background: #145425;
-}
-
-.camera-modal {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.96);
+.placeholder {
+  color: #999;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* ===== IMAGE CONTROLS (Choose / Change) ===== */
+.image-controls {
+  margin-bottom: 1.5rem;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  border: 2px solid #73b06f;       /* → tambahkan ini untuk border yang terlihat */
+  color: #110101;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.upload-btn:hover {
+  background: #f0f9f3;
+}
+/* Choose File Block */
+.choose-block {
+  flex: 1;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  z-index: 20;
-  border-radius: 18px;
 }
-
-.camera-video {
-  width: 100%;
-  height: 140px;
-  border-radius: 8px;
-  background: #111;
-  object-fit: cover;
+.choose-file-label {
+  cursor: pointer;
 }
-
-.capture-btn {
-  margin: 0.7rem 0 0.2rem 0;
+.choose-file-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  color: #2e7d32;
+  border: 1px solid #04702a;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+.choose-file-btn:hover {
   background: #2e7d32;
   color: #fff;
-  border: none;
-  border-radius: 9px;
-  padding: 0.4rem 1.2rem;
-  font-size: 1.1rem;
-  cursor: pointer;
-  font-family: inherit;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.4em;
 }
 
-.capture-btn i {
-  font-size: 1.4em;
-  margin-right: 7px;
-}
-
-.close-camera-btn {
-  background: #f6f6f6;
-  color: #d11a1a;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  padding: 0.1rem 0.7rem;
-  cursor: pointer;
-  margin-top: 0.3rem;
-  margin-bottom: 0.1rem;
-}
-
-.choose-block {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.change-block {
   width: 100%;
-  gap: 0.5rem;
-  justify-content: center;
+  text-align: center;
+  padding: 1rem 0;
+  background: #fafafa;
 }
 
+/* Hidden File Input */
+.hidden-input {
+  display: none;
+}
+
+/* Submit Button */
 .submit-btn {
-  align-self: center;
   background: linear-gradient(to right, #235f3a, #73b06f);
-  color: white;
+  color: #fff;
   border: none;
   padding: 0.8rem 2.5rem;
   border-radius: 18px;
   cursor: pointer;
   font-size: 1.2rem;
-  margin-top: 1.5rem;
-  font-family: "Poppins", sans-serif;
   font-weight: 600;
 }
+.submit-btn:hover {
+  opacity: 0.9;
+}
 
+/* Recommendations & Recipe Grid – unchanged */
 .combined-section {
   display: flex;
   gap: 1.5rem;
-  width: 100%;
   flex-wrap: wrap;
 }
-
 .recommendations-wrapper {
   flex: 3;
-  max-width: 100%;
-  min-width: 0;
 }
-
 .recommendations {
-  background-color: #fff;
+  background: #fff;
   padding: 0.5rem 1rem 1rem;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 .recipe-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Default 4 kolom */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1.5rem;
-  max-width: 100%;
-  width: 100%;
-}
-
-.right-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.card, .card1 {
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.card1 {
-  background: linear-gradient(to bottom, #235f3a, #73b06f);
-  color: white;
-}
-
-.recent-search h3 {
-  font-weight: bold;
-  margin: 1rem 0;
-  font-family: "Poppins", sans-serif;
-}
-
-.recent-search-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.recent-search-item {
-  color: black;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #f4f4f4;
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  font-family: "Poppins", sans-serif;
-  font-size: 1rem;
-}
-
-.delete-btn {
-  background: none;
-  border: none;
-  color: #2e7d32;
-  font-size: 1.2rem;
-  cursor: pointer;
-}
-
-.delete-btn:hover {
-  color: #1b5e20;
-}
-
-.statistics h3 {
-  font-weight: bold;
-  margin: 0.5rem 0;
-}
-
-.statistics div {
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.disabled-card {
-  pointer-events: none;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.card-link {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-}
-
-/* RESPONSIVE */
-@media (max-width: 1200px) {
-  .image-grid {
-    max-width: 670px;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-  }
-}
-
-@media (max-width: 1100px) {
-  .main-content {
-    margin-left: 0 !important;
-    margin-top: 75px;
-    padding: 1rem;
-  }
-  .input-ingredients {
-    flex-direction: column;
-  }
-  .scan-btn-bar {
-    width: 90%;
-    margin: 0 30px;
-  }
-  .submit-btn {
-    width: 94%;
-  }
-  .scan-ingredients {
-    flex-direction: column;
-  }
-}
-
-@media (max-width: 900px) {
-  .recipe-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-@media (max-width: 700px) {
-  .section-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.7rem;
-  }
-  .section-title {
-    font-size: 1.22rem;
-    text-align: center;
-  }
-  .scan-btn-bar {
-    width: 100%;
-    font-size: 1.12rem;
-  }
-  .main-content {
-    padding: 0.5rem;
-  }
-  .scan-section {
-    padding: 0.5rem;
-    gap: 1rem;
-    border-radius: 10px;
-  }
-  .image-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 1.1rem;
-    max-width: 360px;
-  }
-  .recipe-grid {
-    grid-template-columns: 1fr !important;
-    gap: 1.1rem;
-  }
-  .image-card {
-    width: 120px;
-    height: 130px;
-    border-radius: 10px;
-  }
-  .choose-file-btn {
-    padding: 0.4rem 0.7rem;
-    font-size: 0.88rem;
-    border-radius: 8px;
-    margin-top: 32%;
-  }
-  .submit-btn {
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
-    border-radius: 12px;
-  }
 }
 </style>
