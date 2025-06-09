@@ -8,12 +8,10 @@ const BASE_URL_CNN = "https://capstone-ml-gambar.up.railway.app";
 
 exports.runFullPipeline = async (req, res) => {
   try {
-    // 1) call your NLP full pipeline
     const { data: mlResult } = await axios.post(`${BASE_URL_NLP}/full`, req.body, { timeout: 30000 });
 
     const mlRecs = Array.isArray(mlResult.recommended_recipes) ? mlResult.recommended_recipes : [];
 
-    // helper: normalize a string for fuzzy matching
     const cleanTitle = (text) =>
       (text || "")
         .replace(/\([^()]*CO2eq\/kg[^()]*\)/gi, "")
@@ -28,20 +26,17 @@ exports.runFullPipeline = async (req, res) => {
 
     for (const mlRec of mlRecs) {
       const rawTitle = mlRec.title || "";
-      // strip out parenthetical CO2 and numbers for search
       const titleForSearch = rawTitle
         .replace(/\([^)]*CO2eq\/kg[^)]*\)/gi, "")
         .replace(/\([^)]*\)/g, "")
         .replace(/\d+(\.\d+)?/g, "")
         .trim();
 
-      // 2) try a case-insensitive regex search on title_cleaned or name
       const safe = titleForSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
       let found = await Recipe.findOne({
         $or: [{ title_cleaned: { $regex: safe, $options: "i" } }, { name: { $regex: safe, $options: "i" } }],
       });
 
-      // 3) fallback fuzzy matching if regex returned multiple or none
       if (!found) {
         const candidates = await Recipe.find({
           $or: [{ title_cleaned: { $regex: safe, $options: "i" } }, { name: { $regex: safe, $options: "i" } }],
@@ -59,14 +54,12 @@ exports.runFullPipeline = async (req, res) => {
             }
           }
         }
-        // use if similarity ≥ 0.6
         if (best && bestScore >= 0.6) {
           console.log(`[SIMILARITY MATCH] "${rawTitle}" → "${best.title_cleaned}" (score: ${bestScore.toFixed(2)})`);
           found = best;
         }
       }
 
-      // 4) compose the final object, including leftovers & missing from ML
       if (found) {
         recommendations.push({
           id: found._id,
@@ -92,8 +85,6 @@ exports.runFullPipeline = async (req, res) => {
         });
       }
     }
-
-    // 5) send back total_carbon + our enriched recommendations
     return res.json({
       total_carbon: mlResult.total_carbon,
       recommended_recipes: recommendations,

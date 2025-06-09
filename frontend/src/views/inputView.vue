@@ -83,8 +83,8 @@ export default {
   },
   async created() {
     this.presenter = new InputPresenter(this.model, this);
-    await this.presenter.fetchFavorites();
-    await this.presenter.fetchCooks();
+    await this.presenter.getFavorites();
+    await this.presenter.getCooks();
     this.ingredients = this.model.ingredients;
     this.recommendations = this.model.recommendations;
     this.totalCarbon = this.model.totalCarbon;

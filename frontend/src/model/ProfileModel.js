@@ -24,7 +24,7 @@ export default class ProfileModel {
     this.cooks = cooks;
   }
 
-  async fetchUserProfile() {
+  async getUserProfile() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:3000/api/users/profile", {
@@ -34,11 +34,11 @@ export default class ProfileModel {
       userData.totalCarbonReduced = userData.total_user_carbon ? Number(userData.total_user_carbon.toFixed(3).replace(/(\d)(?=(\d{2})+\.)/g, '$1,')) : 0;
       this.setUser(userData);
     } catch (error) {
-      console.error("Failed to fetch user profile:", error);
+      console.error("Failed to get user profile:", error);
     }
   }
 
-  async fetchFavorites() {
+  async getFavorites() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:3000/api/favorites", {
@@ -46,11 +46,11 @@ export default class ProfileModel {
       });
       this.setFavorites(response.data);
     } catch (error) {
-      console.error("Failed to fetch favorites:", error);
+      console.error("Failed to get favorites:", error);
     }
   }
 
-  async fetchCooks() {
+  async getCooks() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:3000/api/cooks", {
@@ -58,12 +58,16 @@ export default class ProfileModel {
       });
       this.setCooks(response.data);
     } catch (error) {
-      console.error("Failed to fetch cooks:", error);
+      console.error("Failed to get cooks:", error);
     }
   }
 
   async addFavorite(recipess_id) {
     try {
+      // Check if favorite already exists
+      if (this.favorites.some(fav => fav.recipess_id === recipess_id)) {
+        throw new Error("Recipe already in favorites list");
+      }
       const token = localStorage.getItem("token");
       const response = await axios.post(
         "http://localhost:3000/api/favorites",
@@ -79,24 +83,12 @@ export default class ProfileModel {
     }
   }
 
-  async removeFavorite(recipess_id) {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.delete(
-        `http://localhost:3000/api/favorites/${recipess_id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Failed to remove favorite:", error);
-      throw error;
-    }
-  }
-
   async addCook(recipess_id) {
     try {
+      // Check if cook already exists
+      if (this.cooks.some(cook => cook.recipess_id === recipess_id)) {
+        throw new Error("Recipe already in cooks list");
+      }
       const token = localStorage.getItem("token");
       const response = await axios.post(
         "http://localhost:3000/api/cooks",
@@ -112,23 +104,7 @@ export default class ProfileModel {
     }
   }
 
-  async removeCook(recipess_id) {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.delete(
-        `http://localhost:3000/api/cooks/${recipess_id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Failed to remove cook:", error);
-      throw error;
-    }
-  }
-
-  async fetchRecipeById(recipeId) {
+  async getRecipeById(recipeId) {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(`http://localhost:3000/api/recipes/${recipeId}`, {
@@ -136,7 +112,7 @@ export default class ProfileModel {
       });
       return response.data;
     } catch (error) {
-      console.error("Failed to fetch recipe by id:", error);
+      console.error("Failed to get recipe by id:", error);
       throw error;
     }
   }

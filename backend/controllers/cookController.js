@@ -7,6 +7,11 @@ exports.addCook = async (req, res) => {
     const user_id = req.user._id;
     const recipess_id = req.body.recipess_id;
 
+    const existingCook = await Cook.findOne({ user_id, recipess_id });
+    if (existingCook) {
+      return res.status(400).json({ message: 'Recipe already in cooks list' });
+    }
+
     const newCook = await Cook.create({ user_id, recipess_id });
 
     const recipe = await Recipe.findById(recipess_id);
@@ -35,14 +40,9 @@ exports.getCooks = async (req, res) => {
       title_cleaned: c.recipess_id.title_cleaned,
       carbon_score: c.recipess_id.carbon_score,
       total_recipe_carbon: c.recipess_id.total_recipe_carbon,
-      image_url: c.recipess_id.url, // ✅ gunakan url dari database
-      image_name: c.recipess_id.image_name, // ✅ tetap sertakan image_name
+      image_url: c.recipess_id.url, 
+      image_name: c.recipess_id.image_name, 
       cooked_at: c.cooked_at
     }));
   res.json(formatted);
-};
-
-exports.deleteCook = async (req, res) => {
-  await Cook.deleteOne({ _id: req.params.id, user_id: req.user._id });
-  res.json({ message: 'Cook record deleted' });
 };

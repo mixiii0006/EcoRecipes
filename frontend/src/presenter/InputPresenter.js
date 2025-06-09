@@ -14,54 +14,19 @@ export default class InputPresenter {
     this.view.deleteRecentSearch = this.deleteRecentSearch.bind(this);
     this.view.goToRecipe = this.goToRecipe.bind(this);
     this.view.closeModal = this.closeModal.bind(this);
-    this.view.checkHealth = this.checkHealth.bind(this);
-    this.view.predictCarbon = this.predictCarbon.bind(this);
-    this.view.analyzeRecipe = this.analyzeRecipe.bind(this);
     this.view.runFullPipeline = this.runFullPipeline.bind(this);
-
     this.view.handleToggleFavorite = this.handleToggleFavorite.bind(this);
     this.view.handleToggleCook = this.handleToggleCook.bind(this);
 
     this.profileModel = new ProfileModel();
     this.profilePresenter = new ProfilePresenter(this.profileModel, this.view);
 
-    // Fetch favorites and cooks on initialization to avoid undefined errors
-    this.fetchFavorites();
-    this.fetchCooks();
+    this.getFavorites();
+    this.getCooks();
   }
 
   scanIngredients() {
     this.view.$router.push("/scan-ingredients");
-  }
-
-  async checkHealth() {
-    try {
-      const response = await axios.get("http://localhost:3000/api/ml/health");
-      alert(`ML API Health: ${response.data.status || "OK"}`);
-    } catch (error) {
-      alert("Failed to check ML API health.");
-    }
-  }
-
-  async predictCarbon(ingredients) {
-    try {
-      const response = await axios.post("http://localhost:3000/api/ml/carbon", { ingredients });
-      return response.data;
-    } catch (error) {
-      alert("Failed to predict carbon footprint.");
-      return null;
-    }
-  }
-
-  async analyzeRecipe(recipe) {
-    try {
-      // Send ingredients directly, not nested in recipe object
-      const response = await axios.post("http://localhost:3000/api/ml/recipes", recipe);
-      return response.data;
-    } catch (error) {
-      alert("Failed to analyze recipe.");
-      return null;
-    }
   }
 
   async runFullPipeline(data) {
@@ -113,7 +78,7 @@ export default class InputPresenter {
 
       this.addRecentSearch(this.model.ingredients);
     } catch (error) {
-      alert("Failed to fetch recommendations. Please try again.");
+      alert("Failed to get recommendations. Please try again.");
     } finally {
       this.model.setLoading(false);
       this.view.update();
@@ -126,11 +91,17 @@ export default class InputPresenter {
         (fav) => fav.recipess_id === recipeId
       );
       if (isFavorite) {
-        await this.removeFavorite(recipeId);
-      } else {
-        await this.addFavorite(recipeId);
+        await import('sweetalert2').then(({ default: Swal }) => {
+          Swal.fire({
+            icon: 'info',
+            title: 'Info',
+            text: 'Recipe is already in favorites',
+          });
+        });
+        return;
       }
-      await this.fetchFavorites();
+      await this.addFavorite(recipeId);
+      await this.getFavorites();
       this.view.update();
       await this.profilePresenter.loadProfileData();
     } catch (error) {
@@ -144,11 +115,17 @@ export default class InputPresenter {
         (cook) => cook.recipess_id === recipeId
       );
       if (isCook) {
-        await this.removeCook(recipeId);
-      } else {
-        await this.addCook(recipeId);
+        await import('sweetalert2').then(({ default: Swal }) => {
+          Swal.fire({
+            icon: 'info',
+            title: 'Info',
+            text: 'Recipe is already in cooks',
+          });
+        });
+        return;
       }
-      await this.fetchCooks();
+      await this.addCook(recipeId);
+      await this.getCooks();
       this.view.update();
       await this.profilePresenter.loadProfileData();
     } catch (error) {
@@ -156,69 +133,51 @@ export default class InputPresenter {
     }
   }
 
-  async fetchFavorites() {
+  async getFavorites() {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/favorites", {
-        headers: { Authorization: `Bearer ${token}` },
+      const { data } = await axios.get("http://localhost:3000/api/favorites", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      if (!response.ok) throw new Error("Failed to fetch favorites");
-      const data = await response.json();
       this.model.setFavorites(data);
     } catch (error) {
-      console.error("Failed to fetch favorites:", error);
+      console.error("Failed to get favorites:", error);
     }
   }
 
-  async fetchCooks() {
+  async getCooks() {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/cooks", {
-        headers: { Authorization: `Bearer ${token}` },
+      const { data } = await axios.get("http://localhost:3000/api/cooks", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      if (!response.ok) throw new Error("Failed to fetch cooks");
-      const data = await response.json();
       this.model.setCooks(data);
     } catch (error) {
-      console.error("Failed to fetch cooks:", error);
+      console.error("Failed to get cooks:", error);
     }
   }
 
   async addFavorite(recipess_id) {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/favorites", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ recipess_id }),
-      });
-      if (!response.ok) throw new Error("Failed to add favorite");
-      const result = await response.json();
-      await this.profilePresenter.loadProfileData();
-      return result;
-    } catch (error) {
-      console.error("Failed to add favorite:", error);
-      throw error;
-    }
-  }
-
-  async removeFavorite(recipess_id) {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:3000/api/favorites/${recipess_id}`,
+      const { data } = await axios.post(
+        "http://localhost:3000/api/favorites",
+        { recipess_id },
         {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-      if (!response.ok) throw new Error("Failed to remove favorite");
-      return await response.json();
+      await this.profilePresenter.loadProfileData();
+      return data;
     } catch (error) {
-      console.error("Failed to remove favorite:", error);
+      console.error("Failed to add favorite:", error);
       throw error;
     }
   }
@@ -226,38 +185,20 @@ export default class InputPresenter {
   async addCook(recipess_id) {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/cooks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ recipess_id }),
-      });
-      if (!response.ok) throw new Error("Failed to add cook");
-      const result = await response.json();
-      await this.profilePresenter.loadProfileData();
-      return result;
-    } catch (error) {
-      console.error("Failed to add cook:", error);
-      throw error;
-    }
-  }
-
-  async removeCook(recipess_id) {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:3000/api/cooks/${recipess_id}`,
+      const { data } = await axios.post(
+        "http://localhost:3000/api/cooks",
+        { recipess_id },
         {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-      if (!response.ok) throw new Error("Failed to remove cook");
-      return await response.json();
+      await this.profilePresenter.loadProfileData();
+      return data;
     } catch (error) {
-      console.error("Failed to remove cook:", error);
+      console.error("Failed to add cook:", error);
       throw error;
     }
   }
@@ -278,7 +219,7 @@ export default class InputPresenter {
       return;
     }
     const recipeId = recipe.id || recipe._id;
-    console.log("Fetching recipe details for ID:", recipeId);
+    console.log("get recipe details for ID:", recipeId);
     try {
       const resp = await axios.get(`http://localhost:3000/api/recipes/${recipeId}`);
       const detail = resp.data;
@@ -286,8 +227,8 @@ export default class InputPresenter {
       this.model.setShowModal(true);
       this.view.update();
     } catch (error) {
-      alert("Failed to fetch recipe details.");
-      console.error("Error fetching recipe details:", error);
+      alert("Failed to get recipe details.");
+      console.error("Error get recipe details:", error);
     }
   }
 

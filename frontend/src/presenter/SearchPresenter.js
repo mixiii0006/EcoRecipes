@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export default class SearchPresenter {
   constructor(model, view) {
     this.model = model;
@@ -11,20 +13,17 @@ export default class SearchPresenter {
     this.view.openModal = this.openModal.bind(this);
   }
 
-  async fetchRecommendations(searchText) {
+  async getRecommendations(searchText) {
     try {
       this.model.setLoadingRecommendations(true);
-      const response = await fetch("http://localhost:3000/api/recipes?limit=200");
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        alert(errorData.error || "Failed to get recipes from backend.");
-        this.model.setRecommendations([]);
-        this.model.setLoadingRecommendations(false);
-        this.view.update();
-        return;
-      }
-      const data = await response.json();
-      console.log("Fetched recipes data:", data);
+      const response = await axios.get("http://localhost:3000/api/recipes", {
+  params: { limit: 200 },
+  headers: {
+    "Content-Type": "application/json",
+  }
+});
+const data = response.data;
+      console.log("Get recipes data:", data);
 
       // Filter recipes by searchText matching title_cleaned or name (case-insensitive)
       const filteredData = data.filter(recipe => {
@@ -58,7 +57,6 @@ export default class SearchPresenter {
         total_recipe_carbon: parseFloat(item.total_carbon.toFixed(3))
       }));
 
-      // Shuffle merged recipes to make recommendations change each fetch
       function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -81,7 +79,21 @@ export default class SearchPresenter {
       this.model.setLoadingRecommendations(false);
       this.view.update();
     } catch (error) {
-      alert("Error connecting to backend: " + error.message);
+      console.error("Error get recommendations:", error);
+      let errorMessage = "Error connecting to backend";
+      
+      if (error.response) {
+        // Server responded with error status
+        errorMessage = error.response.data?.error || `Server error: ${error.response.status}`;
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage = "No response from server. Please check your connection.";
+      } else {
+        // Something else happened
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
       this.model.setRecommendations([]);
       this.model.setLoadingRecommendations(false);
       this.view.update();
@@ -93,7 +105,7 @@ export default class SearchPresenter {
     const searchText = event.target.value;
     this.searchTimeout = setTimeout(() => {
       this.model.setSearchText(searchText);
-      this.fetchRecommendations(searchText);
+      this.getRecommendations(searchText);
     }, 300);
   }
 
@@ -124,12 +136,13 @@ export default class SearchPresenter {
         alert("Recipe data is invalid.");
         return;
       }
-      const response = await fetch(`http://localhost:3000/api/recipes/${recipe.id}`);
-      if (!response.ok) {
-        alert("Failed to fetch recipe details.");
-        return;
-      }
-      const data = await response.json();
+      const response = await axios.get(`http://localhost:3000/api/recipes/${recipe.id}`, {
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      const data = response.data;
 
       // Map fields to expected names for RecipeModal
       const mappedData = {
@@ -150,49 +163,91 @@ export default class SearchPresenter {
       this.model.setShowModal(true);
       this.view.update();
     } catch (error) {
-      alert("Error fetching recipe details: " + error.message);
+      console.error("Error opening modal:", error);
+      let errorMessage = "Error get recipe details";
+      
+      if (error.response) {
+        errorMessage = error.response.data?.error || `Failed to get recipe details: ${error.response.status}`;
+      } else if (error.request) {
+        errorMessage = "No response from server. Please check your connection.";
+      } else {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
     }
   }
 
-  async fetchRecipeById(id) {
+  async getRecipeById(id) {
     try {
-      const response = await fetch(`http://localhost:3000/api/recipes/${id}`);
-      if (!response.ok) {
-        alert("Failed to fetch recipe details.");
-        return null;
-      }
-      const data = await response.json();
+      const response = await axios.get(`http://localhost:3000/api/recipes/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      const data = response.data;
       this.model.setSelectedFood(data);
       this.view.update();
       return data;
     } catch (error) {
-      alert("Error fetching recipe details: " + error.message);
+      console.error("Error get recipe by ID:", error);
+      let errorMessage = "Error get recipe details";
+      
+      if (error.response) {
+        errorMessage = error.response.data?.error || `Failed to get recipe details: ${error.response.status}`;
+      } else if (error.request) {
+        errorMessage = "No response from server. Please check your connection.";
+      } else {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
       return null;
     }
   }
 
   async addFavorite(recipess_id) {
     try {
-      // Import ProfileModel here to call addFavorite
+      // Call backend to add favorite
       const ProfileModel = (await import("../model/ProfileModel")).default;
       const profileModel = new ProfileModel();
       await profileModel.addFavorite(recipess_id);
-      this.view.$toast.success("Recipe added to favorites");
+      // Refresh favorites list in profileModel
+      await profileModel.getFavorites();
+      // Update this.model.favorites to keep duplicate check accurate
+      this.model.favorites = profileModel.favorites;
+      this.view.update();
+      // Return true only if added successfully (not duplicate)
+      return true;
     } catch (error) {
-      this.view.$toast.error("Failed to add recipe to favorites");
+      // If duplicate error, do not update model or return success
+      if (error.response && error.response.status === 400) {
+        throw error;
+      }
+      console.error("Error adding favorite:", error);
+      throw error;
     }
   }
 
   async addCook(recipess_id) {
     try {
-      const response = await this.model.addCook(recipess_id);
-      this.view.$toast.success("Recipe added to cooks");
-      // Refresh profile data to update total_user_carbon
-      if (this.view.model && this.view.model.presenter) {
-        await this.view.model.presenter.loadProfileData?.();
-      }
+      // Call backend to add cook
+      const ProfileModel = (await import("../model/ProfileModel")).default;
+      const profileModel = new ProfileModel();
+      await profileModel.addCook(recipess_id);
+      // Refresh cooks list in profileModel
+      await profileModel.getCooks();
+      // Update this.model.cooks to keep duplicate check accurate
+      this.model.cooks = profileModel.cooks;
       this.view.update();
+      // Return true only if added successfully (not duplicate)
+      return true;
     } catch (error) {
+      // If duplicate error, do not update model or return success
+      if (error.response && error.response.status === 400) {
+        throw error;
+      }
       this.view.$toast.error("Failed to add recipe to cooks");
       throw error;
     }

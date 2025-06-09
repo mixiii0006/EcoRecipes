@@ -1,6 +1,5 @@
-// file: src/presenter/ScanPresenter.js
-
 import stringSimilarity from "string-similarity";
+import axios from "axios";
 
 export default class ScanPresenter {
   constructor(model, view) {
@@ -133,12 +132,10 @@ export default class ScanPresenter {
     formData.append("file", imagesToSubmit[0].file);
 
     try {
-      const response = await fetch("http://localhost:3000/api/ml/", {
-        method: "POST",
-        body: formData,
+      const response = await axios.post("http://localhost:3000/api/ml/findSimilarImages", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-      if (!response.ok) throw new Error("Scan gagal");
-      const data = await response.json();
+      const data = response.data;
       console.log("Raw CNN data:", data);
 
       // Use raw CNN data results directly for recommendations
@@ -188,7 +185,6 @@ export default class ScanPresenter {
       }
       // Handle temporary IDs gracefully
       if (recipe.id.startsWith("temp-id-")) {
-        // Open modal with available data without fetching backend
         this.model.setSelectedRecipe({
           id: recipe.id,
           name: recipe.name,
@@ -204,11 +200,10 @@ export default class ScanPresenter {
         this.view.update();
         return;
       }
-      // Fetch full recipe details from backend by ID
-      const response = await fetch(`http://localhost:3000/api/recipes/${recipe.id}`);
-      if (!response.ok) throw new Error("Failed to fetch recipe details");
-      const data = await response.json();
-      console.log("Fetched recipe details:", data);
+
+      const response = await axios.get(`http://localhost:3000/api/recipes/${recipe.id}`);
+      const data = response.data;
+      console.log("Get recipe details:", data);
 
       // Convert instructions and ingredients to strings if they are arrays
       let instructions = data.instructions_cleaned || data.Instructions_Cleaned || data.instructions || "";
@@ -249,5 +244,69 @@ export default class ScanPresenter {
   deleteRecentSearch(idx) {
     this.model.deleteRecentSearch(idx);
     this.view.update();
+  }
+
+  async handleToggleFavorite(recipeId) {
+    try {
+      const isFavorite = this.model.favorites.some(
+        (fav) => fav.recipess_id === recipeId
+      );
+      if (isFavorite) {
+        await import('sweetalert2').then(({ default: Swal }) => {
+          Swal.fire({
+            icon: 'info',
+            title: 'Info',
+            text: 'Recipe is already in favorites',
+          });
+        });
+        return;
+      }
+      const ProfileModel = (await import("../model/ProfileModel")).default;
+      const profileModel = new ProfileModel();
+      await profileModel.addFavorite(recipeId);
+      await import('sweetalert2').then(({ default: Swal }) => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Recipe added to favorites',
+        });
+      });
+      await this.profilePresenter?.loadProfileData?.();
+      this.view.update();
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
+    }
+  }
+
+  async handleToggleCook(recipeId) {
+    try {
+      const isCook = this.model.cooks.some(
+        (cook) => cook.recipess_id === recipeId
+      );
+      if (isCook) {
+        await import('sweetalert2').then(({ default: Swal }) => {
+          Swal.fire({
+            icon: 'info',
+            title: 'Info',
+            text: 'Recipe is already in cooks',
+          });
+        });
+        return;
+      }
+      const ProfileModel = (await import("../model/ProfileModel")).default;
+      const profileModel = new ProfileModel();
+      await profileModel.addCook(recipeId);
+      await import('sweetalert2').then(({ default: Swal }) => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Recipe added to cooks',
+        });
+      });
+      await this.profilePresenter?.loadProfileData?.();
+      this.view.update();
+    } catch (error) {
+      console.error("Failed to toggle cook:", error);
+    }
   }
 }

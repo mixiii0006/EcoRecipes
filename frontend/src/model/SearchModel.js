@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export default class SearchModel {
   constructor() {
     this.username = "";
@@ -36,6 +38,8 @@ export default class SearchModel {
         image: "/foodImages/-pumpkin-gruyere-gratin-with-thyme-51252910.jpg",
       },
     ];
+    this.favorites = [];
+    this.cooks = [];
   }
 
   setQuery(query) {
@@ -70,25 +74,68 @@ export default class SearchModel {
     this.selectedFood = food;
   }
 
+  setFavorites(favorites) {
+    this.favorites = favorites;
+  }
+
+  setCooks(cooks) {
+    this.cooks = cooks;
+  }
+
+  async getFavorites() {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:3000/api/favorites", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      this.setFavorites(response.data);
+    } catch (error) {
+      console.error("Failed to get favorites:", error);
+    }
+  }
+
+  async getCooks() {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:3000/api/cooks", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      this.setCooks(response.data);
+    } catch (error) {
+      console.error("Failed to get cooks:", error);
+    }
+  }
+
   async addCook(recipess_id) {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/cooks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ recipess_id }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to add cook");
-      }
-      return await response.json();
+      const response = await axios.post("http://localhost:3000/api/cooks",
+        { recipess_id },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
     } catch (error) {
       console.error("Failed to add cook:", error);
-      throw error;
+
+      let errorMessage = "Failed to add cook";
+
+      if (error.response) {
+        // Server responded with error status
+        errorMessage = error.response.data?.message || error.response.data?.error || `Server error: ${error.response.status}`;
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage = "No response from server. Please check your connection.";
+      } else {
+        // Something else happened
+        errorMessage = error.message;
+      }
+
+      throw new Error(errorMessage);
     }
   }
 }

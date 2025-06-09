@@ -6,22 +6,37 @@
     <main class="main-content">
       <!-- Top Search Bar & Buttons -->
       <div class="top-bar">
-        <input type="text" v-model="query" @input="handleSearch" placeholder="search the menu" class="search-input" />
+        <input
+          type="text"
+          v-model="query"
+          @input="handleSearch"
+          placeholder="search the menu"
+          class="search-input"
+        />
         <div class="top-buttons">
-          <button class="action-btn" @click="handleInputClick"><i class="fa-solid fa-inbox icon"></i> Input</button>
-          <button class="action-btn" @click="handleScanClick"><i class="fa-solid fa-camera icon"></i> Scan</button>
+          <button class="action-btn" @click="handleInputClick">
+            <i class="fa-solid fa-inbox icon"></i> Input
+          </button>
+          <button class="action-btn" @click="handleScanClick">
+            <i class="fa-solid fa-camera icon"></i> Scan
+          </button>
         </div>
       </div>
 
       <!-- Carousel Section -->
       <section class="hero-carousel">
         <div class="carousel-slide">
-          <div class="carousel-item" v-for="(item, index) in carouselItems" :key="index" :class="{ active: currentIndex === index }">
-              <div class="hero-text">
-                <h2>{{ item.title }}</h2>
-                <p>{{ item.description }}</p>
-                <!-- Ingredients line removed as per user request -->
-              </div>
+          <div
+            class="carousel-item"
+            v-for="(item, index) in carouselItems"
+            :key="index"
+            :class="{ active: currentIndex === index }"
+          >
+            <div class="hero-text">
+              <h2>{{ item.title }}</h2>
+              <p>{{ item.description }}</p>
+              <!-- Ingredients line removed as per user request -->
+            </div>
             <img :src="item.image" alt="Dish Image" class="hero-img" />
           </div>
         </div>
@@ -30,8 +45,10 @@
       <!-- Recipe Recommendations with RecipeCard -->
       <section class="food-category-list">
         <h3>Recommendations</h3>
-        <div v-if="loadingRecommendations" class="loading-message">Loading recommendations...</div>
-      <div v-else class="food-category-grid">
+        <div v-if="loadingRecommendations" class="loading-message">
+          Loading recommendations...
+        </div>
+        <div v-else class="food-category-grid">
           <RecipeCard
             v-for="(item, index) in model.recommendations"
             :key="item.id || item.title_cleaned || item.name"
@@ -39,7 +56,11 @@
             :image="item.image || ''"
             :name="item.title_cleaned || item.name || ''"
             :duration="parseInt(item.duration) || 0"
-            :carbon="item.total_recipe_carbon ? item.total_recipe_carbon.toFixed(4) : 'N/A'"
+            :carbon="
+              item.total_recipe_carbon
+                ? item.total_recipe_carbon.toFixed(4)
+                : 'N/A'
+            "
             :rating="item.rating || 0"
             @open="openModal(index)"
             @favorite="handleFavorite(item)"
@@ -70,7 +91,7 @@ export default {
     return {
       model: new SearchModel(),
       presenter: null,
-      query: '',
+      query: "",
       carouselItems: [],
       loadingRecommendations: false,
       showModal: false,
@@ -81,8 +102,8 @@ export default {
   created() {
     this.presenter = new SearchPresenter(this.model, this);
     this.model.username = localStorage.getItem("username") || "";
-    this.presenter.fetchRecommendations('');
-    this.query = this.model.searchText;  // Use searchText instead of query
+    this.presenter.getRecommendations("");
+    this.query = this.model.searchText; // Use searchText instead of query
     this.carouselItems = this.model.carouselItems;
     this.loadingRecommendations = this.model.loadingRecommendations;
     this.showModal = this.model.showModal;
@@ -125,18 +146,56 @@ export default {
       this.model.setShowModal(false);
       this.update();
     },
-    handleFavorite(item) {
-      this.presenter.addFavorite(item.id || item._id || item.recipess_id || item.title_cleaned);
+    async handleFavorite(item) {
+      try {
+        await this.presenter.addFavorite(
+          item.id || item._id || item.recipess_id || item.title_cleaned
+        );
+        // No success alert here to avoid duplication with RecipeCard
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          // Show info alert on duplicate error
+          await import("sweetalert2").then(({ default: Swal }) => {
+            Swal.fire({
+              icon: "info",
+              title: "Info",
+              text:
+                error.response.data.message || "Recipe is already in favorites",
+            });
+          });
+          return; // Do not show any other alert
+        } else {
+          console.error("Failed to add favorite:", error);
+        }
+      }
     },
     async handleCook(recipess_id) {
       try {
         await this.presenter.addCook(recipess_id);
-        this.$toast.success("Recipe added to cooks");
+        // No success alert here to avoid duplication with RecipeCard
       } catch (error) {
-        this.$toast.error("Failed to add recipe to cooks");
+        if (error.response && error.response.status === 400) {
+          // Show info alert on duplicate error
+          await import("sweetalert2").then(({ default: Swal }) => {
+            Swal.fire({
+              icon: "info",
+              title: "Info",
+              text: error.response.data.message || "Recipe is already in cooks",
+            });
+          });
+          return; // Do not show any other alert
+        } else {
+          await import("sweetalert2").then(({ default: Swal }) => {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Failed to add recipe to cooks",
+            });
+          });
+        }
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -251,7 +310,11 @@ export default {
 }
 
 .action-btn:hover {
-  background: linear-gradient(to right, #1b5e20, #4caf50); /* Gradasi hijau lebih gelap saat hover */
+  background: linear-gradient(
+    to right,
+    #1b5e20,
+    #4caf50
+  ); /* Gradasi hijau lebih gelap saat hover */
 }
 
 /* ===== Carousel Styles ===== */

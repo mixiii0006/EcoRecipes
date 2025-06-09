@@ -76,8 +76,8 @@ export default {
     handleCook() {
       Swal.fire({
         icon: "success",
-        title: "Memasak...",
-        text: `Memasak: ${this.name}`,
+        title: "Cooking...",
+        text: `Cook: ${this.name}`,
         confirmButtonText: "OK",
       }).then((result) => {
         if (result.isConfirmed) {
@@ -90,8 +90,8 @@ toggleFavorite() {
   this.$emit("favorite", this.recipess_id);
   Swal.fire({
     icon: "success",
-    title: "Ditambahkan ke Favorit",
-    text: `Favorit: ${this.name}`,
+    title: "Added to favorites",
+    text: `Favorite: ${this.name}`,
     showConfirmButton: false,
     timer: 1500,
   });

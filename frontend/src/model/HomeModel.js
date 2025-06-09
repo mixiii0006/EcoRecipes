@@ -1,3 +1,4 @@
+import axios from "axios";
 export default class HomeModel {
   constructor() {
     this.username = "";
@@ -65,23 +66,18 @@ export default class HomeModel {
     this.favoriteFoods = favorites;
   }
 
-  async fetchRecipeById(recipeId) {
+  async getRecipeById(recipeId) {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:3000/api/recipes/${recipeId}`, {
-        method: "GET",
+      const response = await axios.get(`http://localhost:3000/api/recipes/${recipeId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) {
-        throw new Error("Failed to fetch recipe details");
-      }
-      const data = await response.json();
-      return data;
+      return response.data;
     } catch (error) {
-      console.error("Error fetching recipe by ID:", error);
+      console.error("Error get recipe by ID:", error);
       throw error;
     }
   }

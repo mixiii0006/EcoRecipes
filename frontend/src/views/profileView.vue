@@ -13,8 +13,12 @@
 
         <!-- Tombol Dashboard -->
         <div class="dashboard-controls">
-          <button @click="goToDashboard"><i class="fa-solid fa-house"></i> Dashboard</button>
-          <button @click="logout" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+          <button @click="goToDashboard">
+            <i class="fa-solid fa-house"></i> Dashboard
+          </button>
+          <button @click="logout" class="logout">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
         </div>
 
         <!-- Konten kiri bawah -->
@@ -135,7 +139,7 @@ export default {
     },
     async openModal(payload) {
       try {
-        await this.presenter.fetchRecipeDetails(payload.id);
+        await this.presenter.getRecipeDetails(payload.id);
       } catch (error) {
         console.error("Error opening modal:", error);
       }
@@ -158,10 +162,17 @@ export default {
           (fav) => fav.recipess_id === recipeId
         );
         if (isFavorite) {
-          await this.presenter.removeFavorite(recipeId);
-        } else {
-          await this.presenter.addFavorite(recipeId);
+          // Immediate alert and return without adding
+          await import("sweetalert2").then(({ default: Swal }) => {
+            Swal.fire({
+              icon: "info",
+              title: "Info",
+              text: "Recipe is already in favorites",
+            });
+          });
+          return;
         }
+        await this.presenter.addFavorite(recipeId);
       } catch (error) {
         console.error("Failed to toggle favorite:", error);
       }
@@ -172,10 +183,17 @@ export default {
           (cook) => cook.recipess_id === recipeId
         );
         if (isCook) {
-          await this.presenter.removeCook(recipeId);
-        } else {
-          await this.presenter.addCook(recipeId);
+          // Immediate alert "already" without showing "memasak" alert
+          await import("sweetalert2").then(({ default: Swal }) => {
+            Swal.fire({
+              icon: "info",
+              title: "Info",
+              text: "Recipe is already in cooks",
+            });
+          });
+          return;
         }
+        await this.presenter.addCook(recipeId);
       } catch (error) {
         console.error("Failed to toggle cook:", error);
       }
@@ -492,7 +510,6 @@ input[readonly] {
   margin-top: 0;
   user-select: none;
 }
-
 
 .food-list-grid {
   display: grid;

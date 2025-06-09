@@ -9,15 +9,15 @@ export default class ProfilePresenter {
   }
 
   async loadProfileData() {
-    await this.model.fetchUserProfile();
-    await this.model.fetchFavorites();
-    await this.model.fetchCooks();
+    await this.model.getUserProfile();
+    await this.model.getFavorites();
+    await this.model.getCooks();
     this.view.update();
   }
 
-  async fetchRecipeDetails(recipeId) {
+  async getRecipeDetails(recipeId) {
     try {
-      const recipe = await this.model.fetchRecipeById(recipeId);
+      const recipe = await this.model.getRecipeById(recipeId);
       this.view.selectedFood = recipe;
       this.view.showModal = true;
       this.view.$forceUpdate();
@@ -25,49 +25,45 @@ export default class ProfilePresenter {
       if (error.response && error.response.status === 404) {
         alert("Recipe not found.");
       } else {
-        alert("Failed to fetch recipe details.");
+        alert("Failed to get recipe details.");
       }
-      console.error("Failed to fetch recipe details:", error);
+      console.error("Failed to get recipe details:", error);
     }
   }
 
   async addCook(recipess_id) {
     try {
+      // Check if recipe is already in cooks
+      const isAlreadyCook = this.model.cooks.some(cook => cook.recipess_id === recipess_id);
+      if (isAlreadyCook) {
+        return false; // Indicate duplicate
+      }
+
       await this.model.addCook(recipess_id);
-      await this.model.fetchCooks();
+      await this.model.getCooks();
       this.view.update();
+      return true; // Indicate success
     } catch (error) {
       console.error("Failed to add cook:", error);
-    }
-  }
-
-  async removeCook(recipess_id) {
-    try {
-      await this.model.removeCook(recipess_id);
-      await this.model.fetchCooks();
-      this.view.update();
-    } catch (error) {
-      console.error("Failed to remove cook:", error);
+      return false;
     }
   }
 
   async addFavorite(recipess_id) {
     try {
+      // Check if recipe is already in favorites
+      const isAlreadyFavorite = this.model.favorites.some(fav => fav.recipess_id === recipess_id);
+      if (isAlreadyFavorite) {
+        return false; // Indicate duplicate
+      }
+
       await this.model.addFavorite(recipess_id);
-      await this.model.fetchFavorites();
+      await this.model.getFavorites();
       this.view.update();
+      return true; // Indicate success
     } catch (error) {
       console.error("Failed to add favorite:", error);
-    }
-  }
-
-  async removeFavorite(recipess_id) {
-    try {
-      await this.model.removeFavorite(recipess_id);
-      await this.model.fetchFavorites();
-      this.view.update();
-    } catch (error) {
-      console.error("Failed to remove favorite:", error);
+      return false;
     }
   }
 

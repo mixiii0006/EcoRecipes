@@ -2,15 +2,13 @@ const Recipe = require("../models/Recipe");
 
 exports.getAllRecipes = async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 50; // default 50
+    const limit = parseInt(req.query.limit) || 50;
     let nameQuery = req.query.name ? req.query.name.toLowerCase().trim() : null;
 
     console.log("Received name query:", nameQuery);
 
     let recipes;
     if (nameQuery) {
-      // Use flexible regex for partial match
-      // Replace spaces with .* to allow flexible matching of words separated by any chars
       const pattern = nameQuery.replace(/\s+/g, ".*");
       const regex = new RegExp(`.*${pattern}.*`, "i");
       recipes = await Recipe.find({
@@ -57,7 +55,7 @@ exports.getRecipeById = async (req, res) => {
     title_cleaned: recipe.title_cleaned,
     cleaned_ingredients: recipe.cleaned_ingredients,
     instructions_cleaned: recipe.instructions_cleaned,
-    image: recipe.image_name || "", // no url
+    image: recipe.image_name || "",
     quantity: recipe.quantity,
     unit: recipe.unit,
     pure_name: recipe.pure_name,
