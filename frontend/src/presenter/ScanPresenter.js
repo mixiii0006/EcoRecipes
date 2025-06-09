@@ -1,11 +1,11 @@
-// file: src/presenter/ScanPresenter.js
-
 import stringSimilarity from "string-similarity";
+import ProfileModel from "../model/ProfileModel";
 
 export default class ScanPresenter {
   constructor(model, view) {
     this.model = model;
     this.view = view;
+    this.profileModel = new ProfileModel();
 
     this.view.onFileChange = this.onFileChange.bind(this);
     this.view.openCamera = this.openCamera.bind(this);
@@ -17,7 +17,7 @@ export default class ScanPresenter {
     this.view.deleteRecentSearch = this.deleteRecentSearch.bind(this);
 
     this.cachedRecipeData = [];
-    // threshold untuk fuzzy matching: 0.6 (bisa disesuaikan)
+    // threshold for fuzzy matching: 0.6 (adjustable)
     this.SIMILARITY_THRESHOLD = 0.6;
   }
 
@@ -110,9 +110,7 @@ export default class ScanPresenter {
     if (!name) return "";
     // Remove trailing numbers and spaces
     let cleaned = name.replace(/\s*\d+$/, "");
-    return cleaned
-      .replace(/-/g, " ")
-      .replace(/\b\w/g, (c) => c.toUpperCase());
+    return cleaned.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   }
 
   async submitImages() {
@@ -249,5 +247,33 @@ export default class ScanPresenter {
   deleteRecentSearch(idx) {
     this.model.deleteRecentSearch(idx);
     this.view.update();
+  }
+
+  handleCook(recipeId) {
+    console.log("ScanPresenter.handleCook called with id:", recipeId);
+    try {
+      // Update backend via ProfileModel
+      this.profileModel.addCook(recipeId);
+      // Update local state for immediate UI feedback
+      this.model.addCook(recipeId);
+      this.view.update();
+    } catch (error) {
+      console.error("Error adding cook in ScanPresenter:", error);
+      alert("Gagal menambahkan cooked recipe: " + error.message);
+    }
+  }
+
+  handleFavorite(recipeId) {
+    console.log("ScanPresenter.handleFavorite called with id:", recipeId);
+    try {
+      // Update backend via ProfileModel
+      this.profileModel.addFavorite(recipeId);
+      // Update local state for immediate UI feedback
+      this.model.addFavorite(recipeId);
+      this.view.update();
+    } catch (error) {
+      console.error("Error adding favorite in ScanPresenter:", error);
+      alert("Gagal menambahkan favorite recipe: " + error.message);
+    }
   }
 }

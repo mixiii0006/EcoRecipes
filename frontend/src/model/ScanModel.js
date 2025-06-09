@@ -42,6 +42,17 @@ export default class ScanModel {
     return state.recentSearches;
   }
 
+  // New state for cooks and favorites
+  get cooks() {
+    if (!state.cooks) state.cooks = [];
+    return state.cooks;
+  }
+
+  get favorites() {
+    if (!state.favorites) state.favorites = [];
+    return state.favorites;
+  }
+
   setImage(idx, file, preview) {
     state.images[idx].file = file;
     state.images[idx].preview = preview;
@@ -82,5 +93,21 @@ export default class ScanModel {
 
   deleteRecentSearch(idx) {
     state.recentSearches.splice(idx, 1);
+  }
+
+  // Add cook method
+  addCook(recipess_id) {
+    if (!state.cooks) state.cooks = [];
+    if (!state.cooks.includes(recipess_id)) {
+      state.cooks.push(recipess_id);
+    }
+  }
+
+  // Add favorite method
+  addFavorite(recipess_id) {
+    if (!state.favorites) state.favorites = [];
+    if (!state.favorites.includes(recipess_id)) {
+      state.favorites.push(recipess_id);
+    }
   }
 }
