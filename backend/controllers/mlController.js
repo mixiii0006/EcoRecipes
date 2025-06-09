@@ -6,36 +6,6 @@ const stringSimilarity = require("string-similarity");
 const BASE_URL_NLP = "https://capstone-ml-production.up.railway.app";
 const BASE_URL_CNN = "https://capstone-ml-gambar.up.railway.app";
 
-// PREDICT CARBON
-exports.predictCarbon = async (req, res) => {
-  try {
-    const response = await axios.post(`${BASE_URL_NLP}/carbon`, req.body);
-    res.json(response.data);
-  } catch (err) {
-    res.status(500).json({ error: true, message: err.message });
-  }
-};
-
-// ANALYZE RECIPE
-exports.analyzeRecipe = async (req, res) => {
-  try {
-    console.log("analyzeRecipe req.body:", req.body);
-    const text = req.body.text || req.body.ingredients || "";
-    const payload = { text };
-    const response = await axios.post(`${BASE_URL_NLP}/recipes`, payload);
-    res.json(response.data);
-  } catch (err) {
-    console.error("analyzeRecipe error:", err.message);
-    console.error("analyzeRecipe error response data:", err.response ? err.response.data : "No response data");
-    res.status(500).json({ error: true, message: err.message });
-  }
-};
-
-// Cache for ML API responses to improve performance
-const mlApiCache = new Map();
-const ML_API_CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
-
-// RUN FULL PIPELINE (MAP RECOMMENDATION)
 exports.runFullPipeline = async (req, res) => {
   try {
     // 1) call your NLP full pipeline

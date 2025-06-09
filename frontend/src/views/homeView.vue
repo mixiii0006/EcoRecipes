@@ -13,7 +13,7 @@
                 <div class="hero-text">
                   <h2>{{ item.title }}</h2>
                   <p>{{ item.description }}</p>
-                  <p><strong>Main Ingredients:</strong> {{ item.ingredients }}</p>
+                <!-- Ingredients line removed as per user request -->
                 </div>
                 <img :src="item.image" alt="Dish Image" class="hero-img" />
               </div>
@@ -52,7 +52,7 @@
 
             <!-- Emisi Karbon Card -->
             <div class="carbon-card">
-              <p><strong>Total Amount of Carbon</strong><br />Successfully Reduced: {{ model.user ? model.user.totalKarmonReduced : 0 }}</p>
+              <p><strong>Total Amount of Carbon</strong><br />Successfully Reduced: {{ model.user ? model.user.totalCarbonReduced : 0 }}</p>
             </div>
 
             <section class="food-category-list">
@@ -75,7 +75,7 @@
                     style="cursor: pointer; min-width: 100px; max-width: 100px;"
                   >
                     <div class="food-category-icon">
-                      <img :src="favorite.image_url" alt="Food Image" />
+                      <img :src="`/foodImages/${favorite.image_name}.jpg `" alt="Food Image" />
                     </div>
                     <div class="food-category-label multi-line-ellipsis small-title">{{ favorite.title_cleaned }}</div>
                   </div>
@@ -89,9 +89,6 @@
                   ›
                 </button>
               </div>
-              <span>
-                <router-link to="/profile">See All</router-link>
-              </span>
             </section>
           </div>
         </aside>
@@ -118,8 +115,6 @@ export default {
     return {
       model: new HomeModel(),
       presenter: null,
-      carouselItems: [],
-      currentIndex: 0,
       isMobile: null,
       isMenuOpen: false,
       showRecipeModal: false,
@@ -129,6 +124,12 @@ export default {
     };
   },
   computed: {
+    carouselItems() {
+      return this.model.carouselItems;
+    },
+    currentIndex() {
+      return this.model.currentIndex;
+    },
     visibleFavorites() {
       return this.model.favoriteFoods.slice(
         this.favoriteSliderIndex,
@@ -141,8 +142,6 @@ export default {
     this.model.setUsername(localStorage.getItem("username") || "");
     await this.presenter.loadUserData();
     await this.presenter.loadFavoriteFoods();
-    this.carouselItems = this.model.carouselItems;
-    this.currentIndex = this.model.currentIndex;
     this.isMobile = this.model.isMobile === undefined ? false : this.model.isMobile;
     this.isMenuOpen = this.model.isMenuOpen;
     this.$forceUpdate();
@@ -158,8 +157,6 @@ export default {
   },
   methods: {
     update() {
-      this.carouselItems = this.model.carouselItems;
-      this.currentIndex = this.model.currentIndex;
       this.isMobile = this.model.isMobile;
       this.isMenuOpen = this.model.isMenuOpen;
       this.$forceUpdate();
@@ -260,7 +257,7 @@ export default {
 .main-layout {
   display: flex;
   gap: 1.5rem;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .main-content {
@@ -384,7 +381,7 @@ export default {
 }
 
 .hero-img {
-  width: 200px;
+  width: 300px;
   height: 200px;
   border-radius: 10px;
   object-fit: cover;
@@ -464,6 +461,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  height: 89%;
 }
 
 .profile-card {
@@ -584,7 +582,9 @@ export default {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
 
 .food-category-card:hover {
   transform: translateY(-3px);
@@ -621,4 +621,55 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.favorite-food-card {
+  min-width: 150px;
+  max-width: 150px;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.favorite-food-card:hover {
+  transform: translateY(-5px);
+}
+
+.favorite-food-image {
+  width: 100%;
+  height: 100px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.favorite-food-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.favorite-food-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2e7d32;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.favorite-food-details {
+  font-size: 12px;
+  color: #4caf50;
+  margin: 0;
+}
+
 </style>

@@ -1,5 +1,8 @@
 import axios from "axios";
 
+import ProfileModel from "../model/ProfileModel";
+import ProfilePresenter from "./ProfilePresenter";
+
 export default class InputPresenter {
   constructor(model, view) {
     this.model = model;
@@ -15,6 +18,16 @@ export default class InputPresenter {
     this.view.predictCarbon = this.predictCarbon.bind(this);
     this.view.analyzeRecipe = this.analyzeRecipe.bind(this);
     this.view.runFullPipeline = this.runFullPipeline.bind(this);
+
+    this.view.handleToggleFavorite = this.handleToggleFavorite.bind(this);
+    this.view.handleToggleCook = this.handleToggleCook.bind(this);
+
+    this.profileModel = new ProfileModel();
+    this.profilePresenter = new ProfilePresenter(this.profileModel, this.view);
+
+    // Fetch favorites and cooks on initialization to avoid undefined errors
+    this.fetchFavorites();
+    this.fetchCooks();
   }
 
   scanIngredients() {
@@ -107,6 +120,148 @@ export default class InputPresenter {
     }
   }
 
+  async handleToggleFavorite(recipeId) {
+    try {
+      const isFavorite = this.model.favorites.some(
+        (fav) => fav.recipess_id === recipeId
+      );
+      if (isFavorite) {
+        await this.removeFavorite(recipeId);
+      } else {
+        await this.addFavorite(recipeId);
+      }
+      await this.fetchFavorites();
+      this.view.update();
+      await this.profilePresenter.loadProfileData();
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
+    }
+  }
+
+  async handleToggleCook(recipeId) {
+    try {
+      const isCook = this.model.cooks.some(
+        (cook) => cook.recipess_id === recipeId
+      );
+      if (isCook) {
+        await this.removeCook(recipeId);
+      } else {
+        await this.addCook(recipeId);
+      }
+      await this.fetchCooks();
+      this.view.update();
+      await this.profilePresenter.loadProfileData();
+    } catch (error) {
+      console.error("Failed to toggle cook:", error);
+    }
+  }
+
+  async fetchFavorites() {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:3000/api/favorites", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error("Failed to fetch favorites");
+      const data = await response.json();
+      this.model.setFavorites(data);
+    } catch (error) {
+      console.error("Failed to fetch favorites:", error);
+    }
+  }
+
+  async fetchCooks() {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:3000/api/cooks", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error("Failed to fetch cooks");
+      const data = await response.json();
+      this.model.setCooks(data);
+    } catch (error) {
+      console.error("Failed to fetch cooks:", error);
+    }
+  }
+
+  async addFavorite(recipess_id) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:3000/api/favorites", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ recipess_id }),
+      });
+      if (!response.ok) throw new Error("Failed to add favorite");
+      const result = await response.json();
+      await this.profilePresenter.loadProfileData();
+      return result;
+    } catch (error) {
+      console.error("Failed to add favorite:", error);
+      throw error;
+    }
+  }
+
+  async removeFavorite(recipess_id) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:3000/api/favorites/${recipess_id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to remove favorite");
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to remove favorite:", error);
+      throw error;
+    }
+  }
+
+  async addCook(recipess_id) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:3000/api/cooks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ recipess_id }),
+      });
+      if (!response.ok) throw new Error("Failed to add cook");
+      const result = await response.json();
+      await this.profilePresenter.loadProfileData();
+      return result;
+    } catch (error) {
+      console.error("Failed to add cook:", error);
+      throw error;
+    }
+  }
+
+  async removeCook(recipess_id) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:3000/api/cooks/${recipess_id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to remove cook");
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to remove cook:", error);
+      throw error;
+    }
+  }
+
   addRecentSearch(search) {
     this.model.addRecentSearch(search);
     this.view.update();
@@ -118,16 +273,21 @@ export default class InputPresenter {
   }
 
   async goToRecipe(recipe) {
+    if (!recipe || (!recipe.id && !recipe._id)) {
+      alert("Detail resep tidak ditemukan di database.");
+      return;
+    }
     const recipeId = recipe.id || recipe._id;
     console.log("Fetching recipe details for ID:", recipeId);
-    if (recipeId) {
+    try {
       const resp = await axios.get(`http://localhost:3000/api/recipes/${recipeId}`);
       const detail = resp.data;
       this.model.setSelectedRecipe(detail);
       this.model.setShowModal(true);
       this.view.update();
-    } else {
-      alert("Detail resep tidak ditemukan di database.");
+    } catch (error) {
+      alert("Failed to fetch recipe details.");
+      console.error("Error fetching recipe details:", error);
     }
   }
 

@@ -15,8 +15,10 @@ exports.getFavorites = async (req, res) => {
       title_cleaned: f.recipess_id.title_cleaned,
       carbon_score: f.recipess_id.carbon_score,
       total_recipe_carbon: f.recipess_id.total_recipe_carbon,
-      image_url: f.recipess_id.url, // ✅ pakai url langsung
-      image_name: f.recipess_id.image_name // ✅ tetap sertakan image_name
+      image: f.recipess_id.image_name ? `/foodImages/${f.recipess_id.image_name}.jpg` : (f.recipess_id.url || ""),
+      image_name: f.recipess_id.image_name, // ✅ tetap sertakan image_name
+      instructions_cleaned: f.recipess_id.instructions_cleaned || f.recipess_id.instructions,
+      cleaned_ingredients: f.recipess_id.cleaned_ingredients || f.recipess_id.ingredients
     }));
   res.json(formatted);
 };

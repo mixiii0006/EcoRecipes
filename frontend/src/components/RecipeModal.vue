@@ -145,6 +145,7 @@ export default {
   font-size: 1rem;
   background: linear-gradient(to right, #235f3a, #73b06f);
   color: white;
+  margin-top: 25px;
   padding: 0.5rem 2rem;
   border-radius: 10px;
   margin-bottom: 1rem;

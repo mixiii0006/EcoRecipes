@@ -17,11 +17,11 @@
       <section class="hero-carousel">
         <div class="carousel-slide">
           <div class="carousel-item" v-for="(item, index) in carouselItems" :key="index" :class="{ active: currentIndex === index }">
-            <div class="hero-text">
-              <h2>{{ item.title }}</h2>
-              <p>{{ item.description }}</p>
-              <p><strong>Main Ingredients:</strong> {{ item.ingredients }}</p>
-            </div>
+              <div class="hero-text">
+                <h2>{{ item.title }}</h2>
+                <p>{{ item.description }}</p>
+                <!-- Ingredients line removed as per user request -->
+              </div>
             <img :src="item.image" alt="Dish Image" class="hero-img" />
           </div>
         </div>
@@ -292,7 +292,7 @@ export default {
 }
 
 .hero-img {
-  width: 200px;
+  width: 400px;
   height: 200px;
   border-radius: 10px;
   object-fit: cover;

@@ -26,6 +26,8 @@ export default {
     duration: { type: Number, default: 0 },
     carbon: { type: [Number, String], default: null },
     rating: { type: Number, default: 0 },
+    ingredients: { type: Array, default: () => [] },
+    instructions: { type: String, default: "" },
     matched: {
       type: Boolean,
       default: true,
@@ -37,6 +39,12 @@ export default {
       if (!this.image) return "";
       // If image is a full URL or starts with /, return as is
       if (this.image.startsWith("http") || this.image.startsWith("/")) {
+        // Append .jpg if missing extension
+        if (!this.image.match(/\.(jpg|jpeg|png|gif)$/i)) {
+          const imageWithExt = this.image + ".jpg";
+          console.log("RecipeCard imageUrl (full URL with appended .jpg):", imageWithExt);
+          return imageWithExt;
+        }
         console.log("RecipeCard imageUrl (full URL):", this.image);
         return this.image;
       }
@@ -52,11 +60,15 @@ export default {
     },
   },
   methods: {
-    onImageError(event) {
-      event.target.src = "/foodImages/default.jpg";
+    formatIngredients() {
+      if (!this.ingredients || this.ingredients.length === 0) return "No ingredients";
+      return this.ingredients.join(", ");
     },
   },
   methods: {
+    onImageError(event) {
+      event.target.src = "/foodImages/default.jpg";
+    },
     handleClick() {
       // Emit the open event with the recipe id
       this.$emit("open", { id: this.recipess_id });
@@ -70,7 +82,7 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           this.$emit("cook", this.recipess_id);
-          this.$emit("open"); // Buka modal jika user tekan OK
+          this.$emit("open", { id: this.recipess_id }); // Buka modal jika user tekan OK
         }
       });
     },

@@ -10,7 +10,7 @@ connectDB();
 
 const results = [];
 
-fs.createReadStream(path.join(__dirname, 'all_recipes.csv'), { encoding: 'utf8' }) // 🔧 pakai utf8
+fs.createReadStream(path.join(__dirname, 'all_recipes.csv'), { encoding: 'utf8' })
   .pipe(csv())
   .on('data', (data) => results.push(data))
   .on('end', async () => {
@@ -19,7 +19,7 @@ fs.createReadStream(path.join(__dirname, 'all_recipes.csv'), { encoding: 'utf8' 
       try {
         ingredients = vm.runInNewContext(item.Cleaned_Ingredients);
       } catch (parseErr) {
-        console.error(`⚠️  Failed to parse ingredients for: ${item.Title_Cleaned}`);
+        console.error(`Failed to parse ingredients for: ${item.Title_Cleaned}`);
         continue;
       }
 
@@ -29,7 +29,7 @@ fs.createReadStream(path.join(__dirname, 'all_recipes.csv'), { encoding: 'utf8' 
       try {
         await Recipe.create({
           image_name: item.Image_Name,
-          url: item.url, // ✅ Tambahkan kolom URL
+          url: item.url,
           cleaned_ingredients: ingredients,
           title_cleaned: item.Title_Cleaned,
           instructions_cleaned: item.Instructions_Cleaned,
@@ -40,10 +40,10 @@ fs.createReadStream(path.join(__dirname, 'all_recipes.csv'), { encoding: 'utf8' 
           total_recipe_carbon: isNaN(totalCarbon) ? null : totalCarbon
         });
       } catch (err) {
-        console.error('❌ Insert failed:', err.message);
+        console.error('Insert failed:', err.message);
       }
     }
 
-    console.log('✅ Recipe seeding complete');
+    console.log('Recipe seeding complete');
     process.exit();
   });
