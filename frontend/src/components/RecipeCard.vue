@@ -1,14 +1,21 @@
 <template>
-  <div class="food-category-card" @click="handleClick">
+   <div class="food-category-card" @click="handleClick">
     <div class="food-category-image">
-      <img :src="imageUrl" :alt="name" />
+      <img :src="imageUrl" :alt="name" @error="onImageError" />
     </div>
     <div class="food-category-info">
       <h4 class="food-name">{{ name }}</h4>
-      <p class="food-meta">Durasi: {{ duration }} min · Karbon: {{ carbon || "N/A" }} g</p>
+      <p class="food-meta">Carbon Footprint: {{ carbon ?? "N/A" }} Co2</p>
       <div class="food-actions">
-        <button class="btn cook-btn" :disabled="!matched" @click.stop="handleCook">Masak</button>
-        <i class="fa-regular fa-heart heart-icon" @click.stop="toggleFavorite"></i>
+        <button class="btn cook-btn" :disabled="!matched" @click.stop="handleCook">
+          <i class="fa-solid fa-utensils"></i>
+          Cook
+        </button>
+
+        <button class="btn favorite-btn" @click.stop="toggleFavorite">
+          <i class="fa-regular fa-heart"></i>
+          Favorite
+        </button>
       </div>
     </div>
   </div>
@@ -28,49 +35,22 @@ export default {
     rating: { type: Number, default: 0 },
     ingredients: { type: Array, default: () => [] },
     instructions: { type: String, default: "" },
-    matched: {
-      type: Boolean,
-      default: true,
-    },
+    matched: { type: Boolean, default: true },
   },
   computed: {
     imageUrl() {
-      console.log("RecipeCard image prop:", this.image);
       if (!this.image) return "";
-      // If image is a full URL or starts with /, return as is
       if (this.image.startsWith("http") || this.image.startsWith("/")) {
-        // Append .jpg if missing extension
-        if (!this.image.match(/\.(jpg|jpeg|png|gif)$/i)) {
-          const imageWithExt = this.image + ".jpg";
-          console.log("RecipeCard imageUrl (full URL with appended .jpg):", imageWithExt);
-          return imageWithExt;
-        }
-        console.log("RecipeCard imageUrl (full URL):", this.image);
-        return this.image;
+        return /\.(jpe?g|png|gif)$/i.test(this.image) ? this.image : this.image + ".jpg";
       }
-      // Append .jpg if no extension present
-      if (!/\.(jpg|jpeg|png|gif)$/i.test(this.image)) {
-        const url = `/foodImages/${this.image}.jpg`;
-        console.log("RecipeCard imageUrl (local with appended .jpg):", url);
-        return url;
-      }
-      const url = `/foodImages/${this.image}`;
-      console.log("RecipeCard imageUrl (local):", url);
-      return url;
+      return `/foodImages/${/\.(jpe?g|png|gif)$/i.test(this.image) ? this.image : this.image + ".jpg"}`;
     },
   },
   methods: {
-    formatIngredients() {
-      if (!this.ingredients || this.ingredients.length === 0) return "No ingredients";
-      return this.ingredients.join(", ");
-    },
-  },
-  methods: {
-    onImageError(event) {
-      event.target.src = "/foodImages/default.jpg";
+    onImageError(e) {
+      e.target.src = "/foodImages/default.jpg";
     },
     handleClick() {
-      // Emit the open event with the recipe id
       this.$emit("open", { id: this.recipess_id });
     },
     handleCook() {
@@ -79,135 +59,133 @@ export default {
         title: "Cooking...",
         text: `Cook: ${this.name}`,
         confirmButtonText: "OK",
-      }).then((result) => {
-        if (result.isConfirmed) {
+      }).then((res) => {
+        if (res.isConfirmed) {
           this.$emit("cook", this.recipess_id);
-          this.$emit("open", { id: this.recipess_id }); // Buka modal jika user tekan OK
+          this.$emit("open", { id: this.recipess_id });
         }
       });
     },
-toggleFavorite() {
-  this.$emit("favorite", this.recipess_id);
-  Swal.fire({
-    icon: "success",
-    title: "Added to favorites",
-    text: `Favorite: ${this.name}`,
-    showConfirmButton: false,
-    timer: 1500,
-  });
-},
+    toggleFavorite() {
+      this.$emit("favorite", this.recipess_id);
+      Swal.fire({
+        icon: "success",
+        title: "Ditambahkan ke Favorit",
+        text: `${this.name} telah menjadi favorit`,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    },
   },
 };
 </script>
 
 <style scoped>
-.card-list-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.2rem;
-  align-items: stretch;
-  padding-bottom: 2rem;
-}
-
-/* CARD STYLES */
 .food-category-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 0.75rem; /* Lebih kecil */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.3s;
-  text-align: left;
+  /* gradient border */
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background-image:
+    linear-gradient(#fff, #fff),                  /* isi putih */
+    linear-gradient(to right, #aac5b5, #94da8f);  /* border hijau gradasi */
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+
+  /* layout as before */
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-height: 270px; /* Ubah sesuai keinginan, 250px - 300px oke */
+  padding: 0.75rem;
   box-sizing: border-box;
-}
 
-/* Hover effect */
+  /* shadow & transisi */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 .food-category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-6px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* IMAGE */
 .food-category-image {
   width: 100%;
   aspect-ratio: 2 / 1;
   overflow: hidden;
   border-radius: 12px;
-  margin-bottom: 0.7rem; /* Lebih kecil */
+  margin-bottom: 0.7rem;
   flex-shrink: 0;
 }
-
 .food-category-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
-/* INFO & ACTIONS */
 .food-category-info {
-  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem; /* Lebih kecil */
-  min-height: 50px;
+  flex: 1;
+  gap: 0.3rem;
 }
-
 .food-name {
-  font-size: 1.1rem;
-  color: #2e7d32;
-  font-weight: bold;
-  margin: 0;
-  /* Batasi max 2 baris */
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.5rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-align: left;
 }
-
 .food-meta {
-  font-size: 0.85rem;
-  color: #555;
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 1rem;
 }
 
-/* Tombol dan Favorit */
 .food-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 0.5rem;
   margin-top: auto;
-  gap: 0.6rem;
 }
 
-.cook-btn {
+/* Base .btn untuk kedua tombol */
+.food-actions .btn {
   flex: 1;
-  padding: 0.4rem 1rem; /* Lebih ramping */
-  border-radius: 8px;
-  background: linear-gradient(to right, #2e7d32, #66bb6a);
-  color: white;
-  border: none;
-  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0;
   font-size: 0.9rem;
+  font-weight: bold;
+  border-radius: 24px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.3s, color 0.3s;
 }
 
-.cook-btn:hover {
-  background: linear-gradient(to right, #1b5e20, #4caf50);
+/* Cook button (gradient border) */
+.food-actions .cook-btn {
+  color: #2e7d32;
+  background-image: linear-gradient(#fff, #fff), linear-gradient(to right, #235f3a, #73b06f);
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+  border: 2px solid transparent;
+}
+.food-actions .cook-btn:not(:disabled):hover {
+  background: linear-gradient(to right, #235f3a, #73b06f);
+  color: #fff;
 }
 
-.heart-icon {
-  font-size: 1.4rem;
-  color: #ccc;
-  cursor: pointer;
-  transition: color 0.3s ease;
+/* Favorite button (solid border + fill) */
+.food-actions .favorite-btn {
+  color: #e74c3c;
+  border: 2px solid #e74c3c;
+  background: #fff;
 }
-
-.heart-icon:hover {
-  color: red;
+.food-actions .favorite-btn:hover {
+  background: #e74c3c;
+  color: #fff;
 }
 </style>

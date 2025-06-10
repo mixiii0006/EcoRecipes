@@ -112,22 +112,27 @@ export default {
 <style scoped>
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;                        
   background-color: rgba(0, 0, 0, 0.6);
   display: flex;
+  align-items: center;           
+  justify-content: center;      
+  padding: 0;                  
+  overflow-y: auto;            
   z-index: 2000;
 }
 
 .modal-content {
+  position: relative;
   background: #fff;
+  box-sizing: border-box;
   width: 100vw;
   height: 100vh;
-  padding: 2rem;
-  overflow-y: auto;
-  position: relative;
+  max-width: none;         
+  max-height: none;       
+  margin: auto;            
+  padding: 2rem;                 
+  overflow-y: auto;         
   border-radius: 0;
 }
 
@@ -175,6 +180,23 @@ export default {
   background-color: #f5f5f5;
   border-radius: 12px;
   padding: 1rem;
+}
+
+.instructions-card ul,
+.ingredients-card ul {
+  line-height: 1.4;      /* atau nilai sesuai selera */
+}
+
+/* Tambah margin antara tiap item */
+.instructions-card ul li,
+.ingredients-card ul li {
+  margin-bottom: 0.75rem;
+}
+
+/* (Opsional) Hapus margin-bottom pada item terakhir */
+.instructions-card ul li:last-child,
+.ingredients-card ul li:last-child {
+  margin-bottom: 0;
 }
 
 @media (max-width: 768px) {

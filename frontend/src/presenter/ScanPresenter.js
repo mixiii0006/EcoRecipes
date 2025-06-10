@@ -1,10 +1,11 @@
 import stringSimilarity from "string-similarity";
-import axios from "axios";
+import ProfileModel from "../model/ProfileModel";
 
 export default class ScanPresenter {
   constructor(model, view) {
     this.model = model;
     this.view = view;
+    this.profileModel = new ProfileModel();
 
     this.view.onFileChange = this.onFileChange.bind(this);
     this.view.openCamera = this.openCamera.bind(this);
@@ -16,7 +17,7 @@ export default class ScanPresenter {
     this.view.deleteRecentSearch = this.deleteRecentSearch.bind(this);
 
     this.cachedRecipeData = [];
-    // threshold untuk fuzzy matching: 0.6 (bisa disesuaikan)
+    // threshold for fuzzy matching: 0.6 (adjustable)
     this.SIMILARITY_THRESHOLD = 0.6;
   }
 
@@ -109,9 +110,7 @@ export default class ScanPresenter {
     if (!name) return "";
     // Remove trailing numbers and spaces
     let cleaned = name.replace(/\s*\d+$/, "");
-    return cleaned
-      .replace(/-/g, " ")
-      .replace(/\b\w/g, (c) => c.toUpperCase());
+    return cleaned.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   }
 
   async submitImages() {
@@ -246,67 +245,31 @@ export default class ScanPresenter {
     this.view.update();
   }
 
-  async handleToggleFavorite(recipeId) {
+  handleCook(recipeId) {
+    console.log("ScanPresenter.handleCook called with id:", recipeId);
     try {
-      const isFavorite = this.model.favorites.some(
-        (fav) => fav.recipess_id === recipeId
-      );
-      if (isFavorite) {
-        await import('sweetalert2').then(({ default: Swal }) => {
-          Swal.fire({
-            icon: 'info',
-            title: 'Info',
-            text: 'Recipe is already in favorites',
-          });
-        });
-        return;
-      }
-      const ProfileModel = (await import("../model/ProfileModel")).default;
-      const profileModel = new ProfileModel();
-      await profileModel.addFavorite(recipeId);
-      await import('sweetalert2').then(({ default: Swal }) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: 'Recipe added to favorites',
-        });
-      });
-      await this.profilePresenter?.loadProfileData?.();
+      // Update backend via ProfileModel
+      this.profileModel.addCook(recipeId);
+      // Update local state for immediate UI feedback
+      this.model.addCook(recipeId);
       this.view.update();
     } catch (error) {
-      console.error("Failed to toggle favorite:", error);
+      console.error("Error adding cook in ScanPresenter:", error);
+      alert("Gagal menambahkan cooked recipe: " + error.message);
     }
   }
 
-  async handleToggleCook(recipeId) {
+  handleFavorite(recipeId) {
+    console.log("ScanPresenter.handleFavorite called with id:", recipeId);
     try {
-      const isCook = this.model.cooks.some(
-        (cook) => cook.recipess_id === recipeId
-      );
-      if (isCook) {
-        await import('sweetalert2').then(({ default: Swal }) => {
-          Swal.fire({
-            icon: 'info',
-            title: 'Info',
-            text: 'Recipe is already in cooks',
-          });
-        });
-        return;
-      }
-      const ProfileModel = (await import("../model/ProfileModel")).default;
-      const profileModel = new ProfileModel();
-      await profileModel.addCook(recipeId);
-      await import('sweetalert2').then(({ default: Swal }) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: 'Recipe added to cooks',
-        });
-      });
-      await this.profilePresenter?.loadProfileData?.();
+      // Update backend via ProfileModel
+      this.profileModel.addFavorite(recipeId);
+      // Update local state for immediate UI feedback
+      this.model.addFavorite(recipeId);
       this.view.update();
     } catch (error) {
-      console.error("Failed to toggle cook:", error);
+      console.error("Error adding favorite in ScanPresenter:", error);
+      alert("Gagal menambahkan favorite recipe: " + error.message);
     }
   }
 }

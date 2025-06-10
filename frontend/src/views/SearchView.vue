@@ -45,9 +45,7 @@
       <!-- Recipe Recommendations with RecipeCard -->
       <section class="food-category-list">
         <h3>Recommendations</h3>
-        <div v-if="loadingRecommendations" class="loading-message">
-          Loading recommendations...
-        </div>
+        <div v-if="loadingRecommendations" class="loading-message">Loading recommendations...</div>
         <div v-else class="food-category-grid">
           <RecipeCard
             v-for="(item, index) in model.recommendations"
@@ -102,7 +100,7 @@ export default {
   created() {
     this.presenter = new SearchPresenter(this.model, this);
     this.model.username = localStorage.getItem("username") || "";
-    this.presenter.getRecommendations("");
+    this.presenter.fetchRecommendations("");
     this.query = this.model.searchText; // Use searchText instead of query
     this.carouselItems = this.model.carouselItems;
     this.loadingRecommendations = this.model.loadingRecommendations;
@@ -174,25 +172,7 @@ export default {
         await this.presenter.addCook(recipess_id);
         // No success alert here to avoid duplication with RecipeCard
       } catch (error) {
-        if (error.response && error.response.status === 400) {
-          // Show info alert on duplicate error
-          await import("sweetalert2").then(({ default: Swal }) => {
-            Swal.fire({
-              icon: "info",
-              title: "Info",
-              text: error.response.data.message || "Recipe is already in cooks",
-            });
-          });
-          return; // Do not show any other alert
-        } else {
-          await import("sweetalert2").then(({ default: Swal }) => {
-            Swal.fire({
-              icon: "error",
-              title: "Error",
-              text: "Failed to add recipe to cooks",
-            });
-          });
-        }
+        this.$toast.error("Failed to add recipe to cooks");
       }
     },
   },
@@ -436,7 +416,9 @@ export default {
 .food-category-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.5rem;
+  gap: 1.5rem;          
+  padding-bottom: 2rem;
+  align-items: start;  
 }
 
 .food-category-card {

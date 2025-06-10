@@ -14,7 +14,10 @@
       <!-- Ingredients Input Section -->
       <div class="input-section">
         <textarea v-model="ingredients" @input="onIngredientsInput" placeholder="ex : I have one and a half kilos of chicken, ... " rows="5" class="ingredients-input"></textarea>
-        <button class="submit-btn" @click="submitIngredients">Submit</button>
+        <button class="submit-btn" @click="submitIngredients">
+          <i class="fa-solid fa-paper-plane"></i>
+          Submit
+        </button>
       </div>
 
       <!-- Recommendations + Right Section -->
@@ -330,6 +333,9 @@ export default {
   margin-top: 1.5rem;
   font-family: "Poppins", sans-serif;
   font-weight: 600;
+}
+.submit-btn:hover {
+  opacity: 0.9;
 }
 
 .combined-section {
