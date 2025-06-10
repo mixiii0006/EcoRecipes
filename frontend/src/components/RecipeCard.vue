@@ -70,8 +70,8 @@ export default {
       this.$emit("favorite", this.recipess_id);
       Swal.fire({
         icon: "success",
-        title: "Ditambahkan ke Favorit",
-        text: `${this.name} telah menjadi favorit`,
+        title: "Added to favorites",
+        text: `${this.name} has been added to your favorites!`,
         showConfirmButton: false,
         timer: 1500,
       });

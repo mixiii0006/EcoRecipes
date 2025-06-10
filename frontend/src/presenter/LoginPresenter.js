@@ -13,7 +13,7 @@ export default class LoginPresenter {
   
   async handleLogin() {
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/login", {
+      const response = await axios.post("https://ecorecipes-production.up.railway.app/api/auth/login", {
         email: this.model.email,
         password: this.model.password,
       });

@@ -69,7 +69,7 @@ export default class HomeModel {
   async getRecipeById(recipeId) {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:3000/api/recipes/${recipeId}`, {
+const response = await axios.get(`https://ecorecipes-production.up.railway.app/api/recipes/${recipeId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

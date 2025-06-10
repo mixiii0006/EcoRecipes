@@ -42,7 +42,7 @@ exports.forgetPassword = async (req, res) => {
   user.reset_token_expired = Date.now() + 3600000;
   await user.save();
 
-  const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+  const resetLink = `https://ecorecipes-production.up.railway.app/reset-password?token=${token}`;
   await sendEmail(user.email, 'Reset Password', `<p>Click <a href="${resetLink}">here</a> to reset password</p>`);
 
   res.json({ error: false, message: 'Password reset link sent to email' });

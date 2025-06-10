@@ -16,13 +16,13 @@ export default class SearchPresenter {
   async getRecommendations(searchText) {
     try {
       this.model.setLoadingRecommendations(true);
-      const response = await axios.get("http://localhost:3000/api/recipes", {
-  params: { limit: 200 },
-  headers: {
-    "Content-Type": "application/json",
-  }
-});
-const data = response.data;
+const response = await axios.get("https://ecorecipes-production.up.railway.app/api/recipes", {
+        params: { limit: 200 },
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+      const data = response.data;
       console.log("Get recipes data:", data);
 
       // Filter recipes by searchText matching title_cleaned or name (case-insensitive)
@@ -81,7 +81,7 @@ const data = response.data;
     } catch (error) {
       console.error("Error get recommendations:", error);
       let errorMessage = "Error connecting to backend";
-      
+
       if (error.response) {
         // Server responded with error status
         errorMessage = error.response.data?.error || `Server error: ${error.response.status}`;
@@ -92,7 +92,7 @@ const data = response.data;
         // Something else happened
         errorMessage = error.message;
       }
-      
+
       alert(errorMessage);
       this.model.setRecommendations([]);
       this.model.setLoadingRecommendations(false);
@@ -136,7 +136,7 @@ const data = response.data;
         alert("Recipe data is invalid.");
         return;
       }
-      const response = await axios.get(`http://localhost:3000/api/recipes/${recipe.id}`, {
+      const response = await axios.get(`https://ecorecipes-production.up.railway.app/api/recipes/${recipe.id}`, {
         headers: {
           "Content-Type": "application/json",
         }
@@ -151,8 +151,8 @@ const data = response.data;
         image: data.image_name
           ? data.image_name.toLowerCase().replace(/\s+/g, "-")
           : data.Image_Name
-          ? data.Image_Name.toLowerCase().replace(/\s+/g, "-")
-          : data.image || "",
+            ? data.Image_Name.toLowerCase().replace(/\s+/g, "-")
+            : data.image || "",
         Instructions_Cleaned: data.instructions_cleaned || data.Instructions_Cleaned || data.instructions || '',
         Cleaned_Ingredients: data.cleaned_ingredients || data.Cleaned_Ingredients || data.ingredients || [],
         total_recipe_carbon: data.total_recipe_carbon || 0,
@@ -165,7 +165,7 @@ const data = response.data;
     } catch (error) {
       console.error("Error opening modal:", error);
       let errorMessage = "Error get recipe details";
-      
+
       if (error.response) {
         errorMessage = error.response.data?.error || `Failed to get recipe details: ${error.response.status}`;
       } else if (error.request) {
@@ -173,14 +173,14 @@ const data = response.data;
       } else {
         errorMessage = error.message;
       }
-      
+
       alert(errorMessage);
     }
   }
 
   async getRecipeById(id) {
     try {
-      const response = await axios.get(`http://localhost:3000/api/recipes/${id}`, {
+      const response = await axios.get(`https://ecorecipes-production.up.railway.app/api/recipes/${id}`, {
         headers: {
           "Content-Type": "application/json",
         }
@@ -193,7 +193,7 @@ const data = response.data;
     } catch (error) {
       console.error("Error get recipe by ID:", error);
       let errorMessage = "Error get recipe details";
-      
+
       if (error.response) {
         errorMessage = error.response.data?.error || `Failed to get recipe details: ${error.response.status}`;
       } else if (error.request) {
@@ -201,7 +201,7 @@ const data = response.data;
       } else {
         errorMessage = error.message;
       }
-      
+
       alert(errorMessage);
       return null;
     }

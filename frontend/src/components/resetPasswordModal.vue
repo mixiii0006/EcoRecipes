@@ -4,7 +4,7 @@
       <button class="close-btn" @click="close">×</button>
       <h3>Reset Password</h3>
       <form @submit.prevent="resetPassword">
-        <p>Email: <strong>{{ email }}</strong></p>
+        <p>Check your email: <strong>{{ email }}</strong> and find the token there.</p>
         <label for="token">Reset Token</label>
         <input
           id="token"
@@ -52,7 +52,7 @@ export default {
       this.message = "";
       this.isError = false;
       try {
-        const res = await axios.post("http://localhost:3000/api/auth/reset-password", {
+        const res = await axios.post("https://ecorecipes-production.up.railway.app/api/auth/reset-password", {
           email: this.email,
           token: this.token,
           newPassword: this.password,

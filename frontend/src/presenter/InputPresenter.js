@@ -31,7 +31,7 @@ export default class InputPresenter {
 
   async runFullPipeline(data) {
     try {
-      const response = await axios.post("http://localhost:3000/api/ml/full", data);
+const response = await axios.post("https://ecorecipes-production.up.railway.app/api/ml/full", data);
       return response.data;
     } catch (error) {
       alert("Failed to run full ML pipeline.");
@@ -136,7 +136,7 @@ export default class InputPresenter {
   async getFavorites() {
     try {
       const token = localStorage.getItem("token");
-      const { data } = await axios.get("http://localhost:3000/api/favorites", {
+const { data } = await axios.get("https://ecorecipes-production.up.railway.app/api/favorites", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -150,7 +150,7 @@ export default class InputPresenter {
   async getCooks() {
     try {
       const token = localStorage.getItem("token");
-      const { data } = await axios.get("http://localhost:3000/api/cooks", {
+const { data } = await axios.get("https://ecorecipes-production.up.railway.app/api/cooks", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -164,8 +164,8 @@ export default class InputPresenter {
   async addFavorite(recipess_id) {
     try {
       const token = localStorage.getItem("token");
-      const { data } = await axios.post(
-        "http://localhost:3000/api/favorites",
+const { data } = await axios.post(
+        "https://ecorecipes-production.up.railway.app/api/favorites",
         { recipess_id },
         {
           headers: {
@@ -185,8 +185,8 @@ export default class InputPresenter {
   async addCook(recipess_id) {
     try {
       const token = localStorage.getItem("token");
-      const { data } = await axios.post(
-        "http://localhost:3000/api/cooks",
+const { data } = await axios.post(
+        "https://ecorecipes-production.up.railway.app/api/cooks",
         { recipess_id },
         {
           headers: {
@@ -221,7 +221,7 @@ export default class InputPresenter {
     const recipeId = recipe.id || recipe._id;
     console.log("get recipe details for ID:", recipeId);
     try {
-      const resp = await axios.get(`http://localhost:3000/api/recipes/${recipeId}`);
+const resp = await axios.get(`https://ecorecipes-production.up.railway.app/api/recipes/${recipeId}`);
       const detail = resp.data;
       this.model.setSelectedRecipe(detail);
       this.model.setShowModal(true);

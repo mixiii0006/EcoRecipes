@@ -47,7 +47,7 @@ export default class RegisterPresenter {
     }
 
     try {
-      await axios.post("http://localhost:3000/api/auth/register", {
+      await axios.post("https://ecorecipes-production.up.railway.app/api/auth/register", {
         name: this.model.name.trim(),
         email: this.model.email.trim(),
         password: this.model.password,

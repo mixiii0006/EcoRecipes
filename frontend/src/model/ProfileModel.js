@@ -27,7 +27,7 @@ export default class ProfileModel {
   async getUserProfile() {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3000/api/users/profile", {
+const response = await axios.get("https://ecorecipes-production.up.railway.app/api/users/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const userData = response.data;
@@ -41,7 +41,7 @@ userData.totalCarbonReduced = userData.total_user_carbon ? Number(userData.total
   async getFavorites() {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3000/api/favorites", {
+const response = await axios.get("https://ecorecipes-production.up.railway.app/api/favorites", {
         headers: { Authorization: `Bearer ${token}` },
       });
       this.setFavorites(response.data);
@@ -53,7 +53,7 @@ userData.totalCarbonReduced = userData.total_user_carbon ? Number(userData.total
   async getCooks() {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3000/api/cooks", {
+const response = await axios.get("https://ecorecipes-production.up.railway.app/api/cooks", {
         headers: { Authorization: `Bearer ${token}` },
       });
       this.setCooks(response.data);
@@ -69,8 +69,8 @@ userData.totalCarbonReduced = userData.total_user_carbon ? Number(userData.total
         throw new Error("Recipe already in favorites list");
       }
       const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "http://localhost:3000/api/favorites",
+const response = await axios.post(
+        "https://ecorecipes-production.up.railway.app/api/favorites",
         { recipess_id },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -90,8 +90,8 @@ userData.totalCarbonReduced = userData.total_user_carbon ? Number(userData.total
         throw new Error("Recipe already in cooks list");
       }
       const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "http://localhost:3000/api/cooks",
+const response = await axios.post(
+        "https://ecorecipes-production.up.railway.app/api/cooks",
         { recipess_id },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -107,7 +107,7 @@ userData.totalCarbonReduced = userData.total_user_carbon ? Number(userData.total
   async getRecipeById(recipeId) {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:3000/api/recipes/${recipeId}`, {
+const response = await axios.get(`https://ecorecipes-production.up.railway.app/api/recipes/${recipeId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;

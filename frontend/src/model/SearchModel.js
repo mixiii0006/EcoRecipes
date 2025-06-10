@@ -85,7 +85,7 @@ export default class SearchModel {
   async getFavorites() {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3000/api/favorites", {
+const response = await axios.get("https://ecorecipes-production.up.railway.app/api/favorites", {
         headers: { Authorization: `Bearer ${token}` },
       });
       this.setFavorites(response.data);
@@ -97,7 +97,7 @@ export default class SearchModel {
   async getCooks() {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3000/api/cooks", {
+const response = await axios.get("https://ecorecipes-production.up.railway.app/api/cooks", {
         headers: { Authorization: `Bearer ${token}` },
       });
       this.setCooks(response.data);
@@ -109,7 +109,7 @@ export default class SearchModel {
   async addCook(recipess_id) {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post("http://localhost:3000/api/cooks",
+const response = await axios.post("https://ecorecipes-production.up.railway.app/api/cooks",
         { recipess_id },
         {
           headers: {

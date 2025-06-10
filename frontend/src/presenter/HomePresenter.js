@@ -27,7 +27,7 @@ export default class HomePresenter {
         return;
       }
 
-      const { data } = await axios.get("http://localhost:3000/api/users/profile", {
+const { data } = await axios.get("https://ecorecipes-production.up.railway.app/api/users/profile", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -66,7 +66,7 @@ export default class HomePresenter {
         return;
       }
 
-      const { data } = await axios.get("http://localhost:3000/api/favorites", {
+const { data } = await axios.get("https://ecorecipes-production.up.railway.app/api/favorites", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
