@@ -1,5 +1,5 @@
 const Cook = require('../models/Cook');
-const User = require('../models/User');
+const User = require('../models/user');
 const Recipe = require('../models/Recipe');
 
 exports.addCook = async (req, res) => {
