@@ -8,4 +8,4 @@ const UserSchema = new mongoose.Schema({
   reset_token_expired: Date,
   total_user_carbon: { type: Number, default: 0 }
 });
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.models.User || mongoose.model('User', UserSchema);
