@@ -10,7 +10,7 @@
               (typeof food.total_recipe_carbon === 'number' && !isNaN(food.total_recipe_carbon))
                 ? food.total_recipe_carbon.toFixed(4)
                 : 'N/A'
-            }} g
+            }} Co2
           </div>
       </div>
       <div class="recipe-body">

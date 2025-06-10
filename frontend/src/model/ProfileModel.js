@@ -31,7 +31,7 @@ export default class ProfileModel {
         headers: { Authorization: `Bearer ${token}` },
       });
       const userData = response.data;
-      userData.totalCarbonReduced = userData.total_user_carbon ? Number(userData.total_user_carbon.toFixed(3).replace(/(\d)(?=(\d{2})+\.)/g, '$1,')) : 0;
+userData.totalCarbonReduced = userData.total_user_carbon ? Number(userData.total_user_carbon.toFixed(3)) : 0 ; 
       this.setUser(userData);
     } catch (error) {
       console.error("Failed to get user profile:", error);

@@ -39,7 +39,7 @@
       <div class="information">
         <div class="highlighted-karmon">
           Total Amount of Carbon Successfully Reduced:
-          {{ user.totalCarbonReduced }}
+          {{ user.totalCarbonReduced }} Co2
         </div>
         <h3>Information</h3>
         <form class="info-form">

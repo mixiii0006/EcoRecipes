@@ -38,7 +38,7 @@ export default class HomePresenter {
       const user = {
         name: data.name,
         totalCarbonReduced: data.total_user_carbon
-          ? Number(data.total_user_carbon.toFixed(3).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
+          ? Number(data.total_user_carbon.toFixed(3))
           : 0,
       };
       if (this.model && typeof this.model.setUser === 'function') this.model.setUser(user);

@@ -40,8 +40,8 @@ exports.getCooks = async (req, res) => {
       title_cleaned: c.recipess_id.title_cleaned,
       carbon_score: c.recipess_id.carbon_score,
       total_recipe_carbon: c.recipess_id.total_recipe_carbon,
-      image_url: c.recipess_id.url, 
-      image_name: c.recipess_id.image_name, 
+      image_url: c.recipess_id.url,
+      image_name: c.recipess_id.image_name,
       cooked_at: c.cooked_at
     }));
   res.json(formatted);

@@ -62,7 +62,7 @@
             <div class="carbon-card">
               <p>
                 <strong>Total Amount of Carbon</strong><br />
-                Successfully Reduced: {{ model.user ? model.user.totalCarbonReduced : 0 }}
+                Successfully Reduced: {{ model.user ? model.user.totalCarbonReduced + ' Co2' : 0 }}
               </p>
             </div>
 

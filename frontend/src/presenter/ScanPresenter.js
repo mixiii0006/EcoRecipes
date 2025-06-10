@@ -1,5 +1,5 @@
-import stringSimilarity from "string-similarity";
 import ProfileModel from "../model/ProfileModel";
+import axios from "axios";
 
 export default class ScanPresenter {
   constructor(model, view) {

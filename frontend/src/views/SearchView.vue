@@ -100,7 +100,7 @@ export default {
   created() {
     this.presenter = new SearchPresenter(this.model, this);
     this.model.username = localStorage.getItem("username") || "";
-    this.presenter.fetchRecommendations("");
+    this.presenter.getRecommendations("");
     this.query = this.model.searchText; // Use searchText instead of query
     this.carouselItems = this.model.carouselItems;
     this.loadingRecommendations = this.model.loadingRecommendations;
