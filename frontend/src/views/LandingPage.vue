@@ -7,7 +7,8 @@
       <div class="hero-text">
         <h1>One Recipe, One step for the Earth.</h1>
         <p>
-           Input the ingredients you have and discover low-emission recipes that help protect the earth.
+          Input the ingredients you have and discover low-emission recipes that
+          help protect the earth.
         </p>
         <button class="btn btn-primary" @click="goToLogin">Input Here</button>
       </div>
@@ -21,10 +22,9 @@
             v-for="(item, index) in duplicatedItems"
             :key="index"
           >
-            <img :src="item.image" :alt="item.name" />
             <div class="item-info">
               <h3>{{ item.name }}</h3>
-              <p>1kg = {{ item.co2 }} CO<sub>2</sub>e</p>
+              <p>1kg = {{ item.co2 }} CO₂eq</p>
             </div>
           </div>
         </div>
@@ -35,19 +35,31 @@
       <h2>Current World Carbon Footprint</h2>
       <div class="carbon-content">
         <div class="carbon-text">
-          <h3>What is the Carbon Footprint? What is the current situation of the Earth?</h3>
+          <h3>
+            What is the Carbon Footprint? What is the current situation of the
+            Earth?
+          </h3>
           <p>
-            The carbon footprint is the total greenhouse gas emissions (mainly carbon dioxide and methane) produced by human activities. According to the European Union Joint Research Center in 2023, total global CO<sub>2</sub> emissions will reach 37.4 to 37.55 Mt (million metric tons).
+            The carbon footprint is the total greenhouse gas emissions (mainly
+            carbon dioxide and methane) produced by human activities. According
+            to the European Union Joint Research Center in 2023, total global
+            CO<sub>2</sub> emissions will reach 37.4 to 37.55 Mt (million metric
+            tons).
           </p>
           <h3>Why is this important?</h3>
           <p>
-            Greenhouse gases help keep the Earth warm, but an excess of these gases causes global warming. By choosing low-carbon foods, you are helping to protect our planet.
+            Greenhouse gases help keep the Earth warm, but an excess of these
+            gases causes global warming. By choosing low-carbon foods, you are
+            helping to protect our planet.
           </p>
           <h3>
-            Did you know that our food choices play a big role in the environment?
+            Did you know that our food choices play a big role in the
+            environment?
           </h3>
           <p>
-            Every food leaves a carbon footprint, which is the amount of greenhouse gases produced during its production, processing and transportation.
+            Every food leaves a carbon footprint, which is the amount of
+            greenhouse gases produced during its production, processing and
+            transportation.
           </p>
         </div>
         <div class="carbon-chart">
@@ -56,7 +68,11 @@
       </div>
       <div class="carbon-note">
         <p>
-          Therefore, we present a website that can calculate the carbon footprint of food ingredients that users have and provide recommendations for low carbon emission cooking recipes, with suggestions for substituting more environmentally friendly ingredients.
+          Therefore, we present a website that can calculate the carbon
+          footprint of food ingredients that users have and provide
+          recommendations for low carbon emission cooking recipes, with
+          suggestions for substituting more environmentally friendly
+          ingredients.
         </p>
       </div>
     </section>
@@ -69,7 +85,8 @@
           <img src="/images/rekomendasi-resep.png" alt="Resep Rendah Emisi" />
           <h3>Get Low Emission Recipe Recommendations</h3>
           <p>
-            We suggest delicious recipes with a lower carbon footprint, based on the ingredients you input.
+            We suggest delicious recipes with a lower carbon footprint, based on
+            the ingredients you input.
           </p>
         </div>
         <div class="step-card active">
@@ -81,7 +98,8 @@
           <img src="/images/belajar-memasak.png" alt="Belajar Sambil Memasak" />
           <h3>Learn While Cooking</h3>
           <p>
-            Check out the estimated emissions of each recipe and learn how small choices can make a big impact.
+            Check out the estimated emissions of each recipe and learn how small
+            choices can make a big impact.
           </p>
         </div>
       </div>
@@ -104,8 +122,8 @@
             <h3 class="choose-us-heading">Fast and Simple</h3>
             <p class="choose-us-desc">
               Just put the ingredients<br />
-              ↓ <br>Get recipes<br />
-              ↓ <br>See carbon emission estimates
+              ↓ <br />Get recipes<br />
+              ↓ <br />See carbon emission estimates
             </p>
           </div>
           <div class="choose-us-card">
@@ -116,7 +134,8 @@
             />
             <h3 class="choose-us-heading">Recommended</h3>
             <p class="choose-us-desc">
-              Get alternative ingredients and recipes that are lower in emissions.
+              Get alternative ingredients and recipes that are lower in
+              emissions.
             </p>
           </div>
           <div class="choose-us-card">
@@ -341,13 +360,13 @@ export default {
 }
 
 .item-info h3 {
-  margin: 0.5rem 0 0.25rem 0;
+  margin: 0.5rem 0 0.5rem 0;
   font-weight: 700;
   color: #235f3a;
 }
 
 .item-info p {
-  margin: 0;
+  margin-top: 1.5rem;
   font-weight: 600;
   color: #235f3a;
 }
@@ -362,7 +381,7 @@ export default {
 .carbon-content {
   display: flex;
   flex-wrap: wrap;
-  justify-content:space-around;
+  justify-content: space-around;
   align-items: flex-start;
   margin-top: 2.5rem;
   gap: 2rem;
@@ -583,7 +602,7 @@ export default {
   .choose-us-card {
     margin: 0 auto;
     width: 100%;
-    max-width: 350px;  /* sesuaikan agar card tidak terlalu lebar */
+    max-width: 350px; /* sesuaikan agar card tidak terlalu lebar */
     padding: 1rem 1.5rem;
     box-sizing: border-box;
   }
@@ -593,7 +612,7 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;  /* jarak antar card */
+    gap: 1rem; /* jarak antar card */
     margin: 1rem auto;
   }
 

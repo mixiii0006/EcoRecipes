@@ -1,18 +1,24 @@
 export default class LandingPageModel {
   constructor() {
     this.foodItems = [
-      { name: "Daging Sapi", image: "/images/beef.png", co2: "99,48 kg" },
-      { name: "Unggas", image: "/images/chicken.png", co2: "9,87 kg" },
-      { name: "Dark Chocolate", image: "/images/chocolate.png", co2: "46,65 kg" },
-      { name: "Keju", image: "/images/cheese.png", co2: "23,88 kg" },
-      { name: "Ikan", image: "/images/fish.png", co2: "13,63 kg" },
+      { name: "Beef (beef herd)", co2: "99.48 kg" },
+      { name: "Poultry Meat", co2: "9.87 kg" },
+      { name: "Dark Chocolate", co2: "46.65 kg" },
+      { name: "Cheese", co2: "23.88 kg" },
+      { name: "Fish (farmed)", co2: "13.63 kg" },
+      { name: "Eggs", co2: "4.67 kg" },
+      { name: "Prawns (farmed)", co2: "26.87 kg" },
     ];
     this.moreFoodItems = [
-      { name: "Sayur Bayam", image: "/images/spinach.png", co2: "2,0 kg" },
-      { name: "Kacang Merah", image: "/images/red-beans.png", co2: "1,5 kg" },
-      { name: "Beras", image: "/images/rice.png", co2: "3,2 kg" },
-      { name: "Apel", image: "/images/apple.png", co2: "0,4 kg" },
-      { name: "Pisang", image: "/images/banana.png", co2: "0,5 kg" },
+      { name: "Tomatoes",  co2: "2.09 kg" },
+      { name: "Cassava",  co2: "1.32 kg" },
+      { name: "Potatoes",  co2: "0.46 kg" },
+      { name: "Tofu",  co2: "3.16 kg" },
+      { name: "Rice", co2: "4.45 kg" },
+      { name: "Apples", co2: "0.43 kg" },
+      { name: "Bananas", co2: "0.86 kg" },
+      { name: "Coffee", co2: "28.53 kg" },
+      { name: "Milk", co2: "3.15 kg" },
     ];
     this.scrollInterval = null;
   }
