@@ -87,19 +87,6 @@ const response = await axios.post("https://ecorecipes-production.up.railway.app/
 
   async handleToggleFavorite(recipeId) {
     try {
-      const isFavorite = this.model.favorites.some(
-        (fav) => fav.recipess_id === recipeId
-      );
-      if (isFavorite) {
-        await import('sweetalert2').then(({ default: Swal }) => {
-          Swal.fire({
-            icon: 'info',
-            title: 'Info',
-            text: 'Recipe is already in favorites',
-          });
-        });
-        return;
-      }
       await this.addFavorite(recipeId);
       await this.getFavorites();
       this.view.update();
@@ -111,19 +98,6 @@ const response = await axios.post("https://ecorecipes-production.up.railway.app/
 
   async handleToggleCook(recipeId) {
     try {
-      const isCook = this.model.cooks.some(
-        (cook) => cook.recipess_id === recipeId
-      );
-      if (isCook) {
-        await import('sweetalert2').then(({ default: Swal }) => {
-          Swal.fire({
-            icon: 'info',
-            title: 'Info',
-            text: 'Recipe is already in cooks',
-          });
-        });
-        return;
-      }
       await this.addCook(recipeId);
       await this.getCooks();
       this.view.update();

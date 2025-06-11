@@ -4,6 +4,19 @@
     <div class="image-wrapper">
       <img :src="imageUrl" :alt="name" @error="onImageError" />
     </div>
+    <div class="food-category-info">
+      <h4 class="food-name">{{ name }}</h4>
+      <p class="food-meta">Carbon Footprint: {{ carbon ?? "N/A" }} Co2</p>
+      <div class="food-actions">
+        <button class="btn cook-btn" :disabled="!matched" @click.stop="handleToggleCook">
+          <i class="fa-solid fa-utensils"></i>
+          Cook
+        </button>
+
+        <button class="btn favorite-btn" @click.stop="handleToggleFavorite">
+          <i class="fa-regular fa-heart"></i>
+          Favorite
+        </button>
 
     <!-- Card Body -->
     <div class="card-body">
@@ -48,6 +61,17 @@ import Swal from "sweetalert2";
 export default {
   name: "RecipeCard",
   props: {
+    recipess_id: { type: String, required: true },
+    image: { type: String, default: "" },
+    name: { type: String, default: "" },
+    duration: { type: Number, default: 0 },
+    carbon: { type: [Number, String], default: null },
+    rating: { type: Number, default: 0 },
+    ingredients: { type: Array, default: () => [] },
+    instructions: { type: String, default: "" },
+    matched: { type: Boolean, default: true },
+    favorites: { type: Array, default: () => [] },
+    cooks: { type: Array, default: () => [] },
     recipess_id:       { type: String, required: true },
     image:             { type: String, default: "" },
     name:              { type: String, default: "" },
@@ -74,6 +98,42 @@ export default {
     },
     handleClick() {
       this.$emit("open", { id: this.recipess_id });
+    },
+    async handleToggleFavorite() {
+      try {
+        const isFavorite = this.favorites.some(
+          (fav) => fav.recipess_id === this.recipess_id
+        );
+        if (isFavorite) {
+          await Swal.fire({
+            icon: "info",
+            title: "Info",
+            text: "Recipe is already in favorites",
+          });
+          return;
+        }
+        this.toggleFavorite();
+      } catch (error) {
+        console.error("Failed to toggle favorite:", error);
+      }
+    },
+    async handleToggleCook() {
+      try {
+        const isCook = this.cooks.some(
+          (cook) => cook.recipess_id === this.recipess_id
+        );
+        if (isCook) {
+          await Swal.fire({
+            icon: "info",
+            title: "Info",
+            text: "Recipe is already in cooks",
+          });
+          return;
+        }
+        this.handleCook();
+      } catch (error) {
+        console.error("Failed to toggle cook:", error);
+      }
     },
     handleCook() {
       Swal.fire({

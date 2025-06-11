@@ -82,6 +82,8 @@
               :image="item.image_name"
               :duration="item.duration || 0"
               :carbon="item.total_recipe_carbon || 'N/A'"
+              :favorites="model.favorites"
+              :cooks="model.cooks"
               @open="openModal"
               @favorite="handleToggleFavorite"
               @cook="handleToggleCook"
@@ -158,20 +160,6 @@ export default {
     },
     async handleToggleFavorite(recipeId) {
       try {
-        const isFavorite = this.model.favorites.some(
-          (fav) => fav.recipess_id === recipeId
-        );
-        if (isFavorite) {
-          // Immediate alert and return without adding
-          await import("sweetalert2").then(({ default: Swal }) => {
-            Swal.fire({
-              icon: "info",
-              title: "Info",
-              text: "Recipe is already in favorites",
-            });
-          });
-          return;
-        }
         await this.presenter.addFavorite(recipeId);
       } catch (error) {
         console.error("Failed to toggle favorite:", error);
@@ -179,20 +167,6 @@ export default {
     },
     async handleToggleCook(recipeId) {
       try {
-        const isCook = this.model.cooks.some(
-          (cook) => cook.recipess_id === recipeId
-        );
-        if (isCook) {
-          // Immediate alert "already" without showing "memasak" alert
-          await import("sweetalert2").then(({ default: Swal }) => {
-            Swal.fire({
-              icon: "info",
-              title: "Info",
-              text: "Recipe is already in cooks",
-            });
-          });
-          return;
-        }
         await this.presenter.addCook(recipeId);
       } catch (error) {
         console.error("Failed to toggle cook:", error);

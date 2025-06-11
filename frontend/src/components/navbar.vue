@@ -95,7 +95,7 @@ export default {
   color: #2e7d32;
   padding: 8px 16px;
   font-size: 16px;
-  width: 120px;
+  width: 130px;
   box-sizing: border-box;
 }
 

@@ -13,7 +13,7 @@
 
       <!-- Ingredients Input Section -->
       <div class="input-section">
-        <textarea v-model="ingredients" @input="onIngredientsInput" placeholder="ex : I have one and a half kilos of chicken, ... " rows="5" class="ingredients-input"></textarea>
+        <textarea v-model="ingredients" @input="onIngredientsInput" placeholder="ex : i have 1 kg of chicken, ... " rows="5" class="ingredients-input"></textarea>
         <button class="submit-btn" @click="submitIngredients">
           <i class="fa-solid fa-paper-plane"></i>
           Submit
@@ -40,6 +40,8 @@
                   :recipess_id="rec.id || rec._id || ''"
                   :image="normalizeImagePath(rec.image || rec.Image_Name) || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?fit=crop&w=200&q=80'"
                   :name="rec.title || rec.title_cleaned || rec.name || 'No Title'"
+                  :favorites="model.favorites"
+                  :cooks="model.cooks"
                   :carbon="rec.carbon"
                   :total-recipe-carbon="rec.total_recipe_carbon"
                   :leftovers="rec.leftovers"

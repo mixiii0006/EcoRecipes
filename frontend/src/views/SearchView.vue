@@ -41,6 +41,9 @@
             :duration="parseInt(item.duration) || 0"
             :carbon="item.total_recipe_carbon ? item.total_recipe_carbon.toFixed(4) : 'N/A'"
             :compact="true"
+            :rating="item.rating || 0"
+            :favorites="model.favorites"
+            :cooks="model.cooks"
             @open="openModal(index)"
             @favorite="handleFavorite(item)"
             @cook="handleCook"
@@ -143,6 +146,7 @@ export default {
         } else {
           console.error("Failed to add favorite:", error);
         }
+        console.error("Failed to add favorite:", error);
       }
     },
     async handleCook(recipess_id) {
