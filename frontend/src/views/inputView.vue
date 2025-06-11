@@ -40,7 +40,10 @@
                   :recipess_id="rec.id || rec._id || ''"
                   :image="normalizeImagePath(rec.image || rec.Image_Name) || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?fit=crop&w=200&q=80'"
                   :name="rec.title || rec.title_cleaned || rec.name || 'No Title'"
-                  :carbon="rec.carbon || rec.carbon_score || rec.total_recipe_carbon || 25"
+                  :carbon="rec.carbon"
+                  :total-recipe-carbon="rec.total_recipe_carbon"
+                  :leftovers="rec.leftovers"
+                  :missing="rec.missing"
                   @open="goToRecipe"
                   @favorite="handleToggleFavorite"
                   @cook="handleToggleCook"
@@ -444,8 +447,8 @@ export default {
   }
   .scan-btn-bar {
     width: 90%;
-   margin-right: 30px;
-   margin-left: 30px;
+    margin-right: 30px;
+    margin-left: 30px;
   }
 
   .submit-btn {
@@ -490,6 +493,5 @@ export default {
   .card1 {
     padding: 0.7rem;
   }
- 
 }
 </style>

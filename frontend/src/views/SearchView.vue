@@ -6,32 +6,17 @@
     <main class="main-content">
       <!-- Top Search Bar & Buttons -->
       <div class="top-bar">
-        <input
-          type="text"
-          v-model="query"
-          @input="handleSearch"
-          placeholder="search the menu"
-          class="search-input"
-        />
+        <input type="text" v-model="query" @input="handleSearch" placeholder="search the menu" class="search-input" />
         <div class="top-buttons">
-          <button class="action-btn" @click="handleInputClick">
-            <i class="fa-solid fa-inbox icon"></i> Input
-          </button>
-          <button class="action-btn" @click="handleScanClick">
-            <i class="fa-solid fa-camera icon"></i> Scan
-          </button>
+          <button class="action-btn" @click="handleInputClick"><i class="fa-solid fa-inbox icon"></i> Input</button>
+          <button class="action-btn" @click="handleScanClick"><i class="fa-solid fa-camera icon"></i> Scan</button>
         </div>
       </div>
 
       <!-- Carousel Section -->
       <section class="hero-carousel">
         <div class="carousel-slide">
-          <div
-            class="carousel-item"
-            v-for="(item, index) in carouselItems"
-            :key="index"
-            :class="{ active: currentIndex === index }"
-          >
+          <div class="carousel-item" v-for="(item, index) in carouselItems" :key="index" :class="{ active: currentIndex === index }">
             <div class="hero-text">
               <h2>{{ item.title }}</h2>
               <p>{{ item.description }}</p>
@@ -54,12 +39,8 @@
             :image="item.image || ''"
             :name="item.title_cleaned || item.name || ''"
             :duration="parseInt(item.duration) || 0"
-            :carbon="
-              item.total_recipe_carbon
-                ? item.total_recipe_carbon.toFixed(4)
-                : 'N/A'
-            "
-            :rating="item.rating || 0"
+            :carbon="item.total_recipe_carbon ? item.total_recipe_carbon.toFixed(4) : 'N/A'"
+            :compact="true"
             @open="openModal(index)"
             @favorite="handleFavorite(item)"
             @cook="handleCook"
@@ -146,9 +127,7 @@ export default {
     },
     async handleFavorite(item) {
       try {
-        await this.presenter.addFavorite(
-          item.id || item._id || item.recipess_id || item.title_cleaned
-        );
+        await this.presenter.addFavorite(item.id || item._id || item.recipess_id || item.title_cleaned);
         // No success alert here to avoid duplication with RecipeCard
       } catch (error) {
         if (error.response && error.response.status === 400) {
@@ -157,8 +136,7 @@ export default {
             Swal.fire({
               icon: "info",
               title: "Info",
-              text:
-                error.response.data.message || "Recipe is already in favorites",
+              text: error.response.data.message || "Recipe is already in favorites",
             });
           });
           return; // Do not show any other alert
@@ -290,11 +268,7 @@ export default {
 }
 
 .action-btn:hover {
-  background: linear-gradient(
-    to right,
-    #1b5e20,
-    #4caf50
-  ); /* Gradasi hijau lebih gelap saat hover */
+  background: linear-gradient(to right, #1b5e20, #4caf50); /* Gradasi hijau lebih gelap saat hover */
 }
 
 /* ===== Carousel Styles ===== */
@@ -416,9 +390,9 @@ export default {
 .food-category-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.5rem;          
+  gap: 1.5rem;
   padding-bottom: 2rem;
-  align-items: start;  
+  align-items: start;
 }
 
 .food-category-card {

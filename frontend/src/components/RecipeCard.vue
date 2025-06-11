@@ -1,22 +1,43 @@
 <template>
-   <div class="food-category-card" @click="handleClick">
-    <div class="food-category-image">
+  <div :class="['recipe-card', { compact }]" @click="handleClick">
+    <!-- Recipe Image -->
+    <div class="image-wrapper">
       <img :src="imageUrl" :alt="name" @error="onImageError" />
     </div>
-    <div class="food-category-info">
-      <h4 class="food-name">{{ name }}</h4>
-      <p class="food-meta">Carbon Footprint: {{ carbon ?? "N/A" }} Co2</p>
-      <div class="food-actions">
-        <button class="btn cook-btn" :disabled="!matched" @click.stop="handleCook">
-          <i class="fa-solid fa-utensils"></i>
-          Cook
-        </button>
 
-        <button class="btn favorite-btn" @click.stop="toggleFavorite">
-          <i class="fa-regular fa-heart"></i>
-          Favorite
-        </button>
+    <!-- Card Body -->
+    <div class="card-body">
+      <h3 class="recipe-title">{{ name }}</h3>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-label">Carbon Footprint</span>
+          <span class="stat-value">{{ carbon }} CO₂e</span>
+        </div>
+        <div class="stat" v-if="!compact">
+          <span class="stat-label">Total Recipe</span>
+          <span class="stat-value">{{ totalRecipeCarbon }} CO₂e</span>
+        </div>
       </div>
+
+      <!-- Missing & Leftovers -->
+      <div class="badge-container" v-if="missing.length || leftovers.length">
+        <span v-for="(item, i) in missing" :key="`m${i}`" class="badge missing">
+          Missing: {{ item }}
+        </span>
+        <span v-for="(item, i) in leftovers" :key="`l${i}`" class="badge leftover">
+          Leftover: {{ item }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Card Footer: actions fixed at bottom -->
+    <div class="card-footer">
+      <button class="btn cook" :disabled="!matched" @click.stop="handleCook">
+        <i class="fa-solid fa-utensils"></i> Cook
+      </button>
+      <button class="btn fav" @click.stop="toggleFavorite">
+        <i class="fa-regular fa-heart"></i> Favorite
+      </button>
     </div>
   </div>
 </template>
@@ -27,23 +48,24 @@ import Swal from "sweetalert2";
 export default {
   name: "RecipeCard",
   props: {
-    recipess_id: { type: String, required: true },
-    image: { type: String, default: "" },
-    name: { type: String, default: "" },
-    duration: { type: Number, default: 0 },
-    carbon: { type: [Number, String], default: null },
-    rating: { type: Number, default: 0 },
-    ingredients: { type: Array, default: () => [] },
-    instructions: { type: String, default: "" },
-    matched: { type: Boolean, default: true },
+    recipess_id:       { type: String, required: true },
+    image:             { type: String, default: "" },
+    name:              { type: String, default: "" },
+    carbon:            { type: [Number, String], default: null },
+    totalRecipeCarbon: { type: [Number, String], default: null },
+    leftovers:         { type: Array, default: () => [] },
+    missing:           { type: Array, default: () => [] },
+    matched:           { type: Boolean, default: true },
+    compact:           { type: Boolean, default: false },
   },
   computed: {
     imageUrl() {
-      if (!this.image) return "";
-      if (this.image.startsWith("http") || this.image.startsWith("/")) {
-        return /\.(jpe?g|png|gif)$/i.test(this.image) ? this.image : this.image + ".jpg";
-      }
-      return `/foodImages/${/\.(jpe?g|png|gif)$/i.test(this.image) ? this.image : this.image + ".jpg"}`;
+      if (!this.image) return "/foodImages/default.jpg";
+      const hasExt = /\.(jpe?g|png|gif)$/i.test(this.image);
+      const path = this.image.startsWith("http") || this.image.startsWith("/")
+        ? this.image
+        : `/foodImages/${this.image}`;
+      return hasExt ? path : `${path}.jpg`;
     },
   },
   methods: {
@@ -81,110 +103,130 @@ export default {
 </script>
 
 <style scoped>
-.food-category-card {
-  /* gradient border */
-  border: 2px solid transparent;
-  border-radius: 12px;
-  background-image:
-    linear-gradient(#fff, #fff),                  /* isi putih */
-    linear-gradient(to right, #aac5b5, #94da8f);  /* border hijau gradasi */
-  background-origin: padding-box, border-box;
-  background-clip: padding-box, border-box;
-
-  /* layout as before */
+.recipe-card {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  padding: 0.75rem;
-  box-sizing: border-box;
-
-  /* shadow & transisi */
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.food-category-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-}
-
-.food-category-image {
-  width: 100%;
-  aspect-ratio: 2 / 1;
+  background: #fff;
+  border-radius: 16px;
   overflow: hidden;
-  border-radius: 12px;
-  margin-bottom: 0.7rem;
-  flex-shrink: 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  min-height: 392px;
 }
-.food-category-image img {
+.recipe-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+.image-wrapper {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-bottom: 2px solid #e0e0e0;
+  overflow: hidden;
+}
+.image-wrapper img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.food-category-info {
+.card-body {
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  gap: 0.3rem;
-}
-.food-name {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 0.5rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-align: left;
-}
-.food-meta {
-  font-size: 0.9rem;
-  color: #777;
-  margin-bottom: 1rem;
-}
-
-.food-actions {
-  display: flex;
   gap: 0.5rem;
-  margin-top: auto;
+  text-align: left;
+  flex: none; 
 }
 
-/* Base .btn untuk kedua tombol */
-.food-actions .btn {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
+.recipe-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #235f3a;
+  margin: 0;
+}
+
+.stats {
+  display: flex;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.6rem 0;
-  font-size: 0.9rem;
-  font-weight: bold;
-  border-radius: 24px;
-  cursor: pointer;
-  transition: background 0.3s, color 0.3s;
+}
+.stat {
+  text-align: center;
+  background: #eafaf2;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+}
+.stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #73b06f;
+  font-weight: 600;
+}
+.stat-value {
+  display: block;
+  font-size: 0.95rem;
+  color: #1f4b2b;
+  font-weight: 700;
+  margin-top: 0.25rem;
 }
 
-/* Cook button (gradient border) */
-.food-actions .cook-btn {
-  color: #2e7d32;
-  background-image: linear-gradient(#fff, #fff), linear-gradient(to right, #235f3a, #73b06f);
-  background-origin: padding-box, border-box;
-  background-clip: padding-box, border-box;
-  border: 2px solid transparent;
+.badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
-.food-actions .cook-btn:not(:disabled):hover {
-  background: linear-gradient(to right, #235f3a, #73b06f);
+.badge {
+  font-size: 0.75rem;
+  padding: 0.8rem 0.8rem;
+  border-radius: 10px;
+  font-weight: 500;
+}
+.badge.missing {
+  background: #fdecea;
+  color: #c0392b;
+}
+.badge.leftover {
+  background: #eafaf2;
+  color: #27ae60;
+}
+
+.card-footer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-top: 1px solid #e0e0e0;
+  flex-shrink: 0; /* ensure footer stays at bottom */
+}
+
+.btn {
+  flex: 1;
+  padding: 0.5rem 0;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.btn.cook {
+  background: linear-gradient(135deg, #94da8f 0%, #73b06f 100%);
   color: #fff;
 }
-
-/* Favorite button (solid border + fill) */
-.food-actions .favorite-btn {
-  color: #e74c3c;
-  border: 2px solid #e74c3c;
-  background: #fff;
+.btn.cook:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
 }
-.food-actions .favorite-btn:hover {
+.btn.cook:hover:not(:disabled) {
+  opacity: 0.9;
+}
+.btn.fav {
+  background: #fff;
+  border: 2px solid #e74c3c;
+  color: #e74c3c;
+}
+.btn.fav:hover {
   background: #e74c3c;
   color: #fff;
 }
