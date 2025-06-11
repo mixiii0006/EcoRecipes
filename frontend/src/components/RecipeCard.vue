@@ -4,20 +4,6 @@
     <div class="image-wrapper">
       <img :src="imageUrl" :alt="name" @error="onImageError" />
     </div>
-    <div class="food-category-info">
-      <h4 class="food-name">{{ name }}</h4>
-      <p class="food-meta">Carbon Footprint: {{ carbon ?? "N/A" }} Co2</p>
-      <div class="food-actions">
-        <button class="btn cook-btn" :disabled="!matched" @click.stop="handleToggleCook">
-          <i class="fa-solid fa-utensils"></i>
-          Cook
-        </button>
-
-        <button class="btn favorite-btn" @click.stop="handleToggleFavorite">
-          <i class="fa-regular fa-heart"></i>
-          Favorite
-        </button>
-
     <!-- Card Body -->
     <div class="card-body">
       <h3 class="recipe-title">{{ name }}</h3>
@@ -61,15 +47,6 @@ import Swal from "sweetalert2";
 export default {
   name: "RecipeCard",
   props: {
-    recipess_id: { type: String, required: true },
-    image: { type: String, default: "" },
-    name: { type: String, default: "" },
-    duration: { type: Number, default: 0 },
-    carbon: { type: [Number, String], default: null },
-    rating: { type: Number, default: 0 },
-    ingredients: { type: Array, default: () => [] },
-    instructions: { type: String, default: "" },
-    matched: { type: Boolean, default: true },
     favorites: { type: Array, default: () => [] },
     cooks: { type: Array, default: () => [] },
     recipess_id:       { type: String, required: true },
