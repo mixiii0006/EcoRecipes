@@ -10,6 +10,7 @@
 
     <!-- Sidebar -->
     <aside v-show="!isMobile || isMenuOpen" class="sidebar">
+      <button v-if="isMenuOpen && isMobile" class="close-btn" @click="toggleMenu" aria-label="Close sidebar">×</button>
       <h1 class="logo">EcoRecipes</h1>
 
       <nav class="menu">
@@ -170,6 +171,19 @@ export default {
 
   .overlay {
     display: block;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #2e7d32;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 1;
   }
 }
 </style>

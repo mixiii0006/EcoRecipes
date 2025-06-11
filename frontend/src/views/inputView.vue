@@ -13,7 +13,7 @@
 
       <!-- Ingredients Input Section -->
       <div class="input-section">
-        <textarea v-model="ingredients" @input="onIngredientsInput" placeholder="ex : I have one and a half kilos of chicken, ... " rows="5" class="ingredients-input"></textarea>
+        <textarea v-model="ingredients" @input="onIngredientsInput" placeholder="ex : i have 1 kg of chicken, ... " rows="5" class="ingredients-input"></textarea>
         <button class="submit-btn" @click="submitIngredients">
           <i class="fa-solid fa-paper-plane"></i>
           Submit
