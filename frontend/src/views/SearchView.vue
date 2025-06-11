@@ -60,6 +60,8 @@
                 : 'N/A'
             "
             :rating="item.rating || 0"
+            :favorites="model.favorites"
+            :cooks="model.cooks"
             @open="openModal(index)"
             @favorite="handleFavorite(item)"
             @cook="handleCook"
@@ -151,20 +153,7 @@ export default {
         );
         // No success alert here to avoid duplication with RecipeCard
       } catch (error) {
-        if (error.response && error.response.status === 400) {
-          // Show info alert on duplicate error
-          await import("sweetalert2").then(({ default: Swal }) => {
-            Swal.fire({
-              icon: "info",
-              title: "Info",
-              text:
-                error.response.data.message || "Recipe is already in favorites",
-            });
-          });
-          return; // Do not show any other alert
-        } else {
-          console.error("Failed to add favorite:", error);
-        }
+        console.error("Failed to add favorite:", error);
       }
     },
     async handleCook(recipess_id) {

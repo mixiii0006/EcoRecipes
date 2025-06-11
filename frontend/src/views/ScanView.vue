@@ -60,6 +60,8 @@
                   :carbon="rec.carbon || rec.carbon_score || rec.total_recipe_carbon || 25"
                   :ingredients="rec.cleaned_ingredients || []"
                   :instructions="rec.instructions_cleaned || ''"
+                  :favorites="model.favorites"
+                  :cooks="model.cooks"
                   @open="
                     () => {
                       if (rec.id) goToRecipe(rec);
