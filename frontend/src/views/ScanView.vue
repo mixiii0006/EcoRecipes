@@ -38,14 +38,17 @@
       <!-- Recommendations + Right Section -->
       <section class="combined-section">
         <div class="recommendations-wrapper">
-          <section class="recommendations">
-            <h3>Recommendations</h3>
-            <div class="recipe-grid">
-              <!-- LOADING STATE -->
-              <div v-if="loading" class="loading-container">
-                <div class="spinner"></div>
-                <div>Loading recommendations, please wait...</div>
-              </div>
+      <section class="recommendations">
+        <h3>Recommendations</h3>
+        <div class="total-carbon" v-if="recommendations.length > 0" style="margin-bottom: 1rem; font-weight: 600; color: #2e7d32;">
+          Total Carbon Footprint: {{ totalCarbon.toFixed(2) }}
+        </div>
+        <div class="recipe-grid">
+          <!-- LOADING STATE -->
+          <div v-if="loading" class="loading-container">
+            <div class="spinner"></div>
+            <div>Loading recommendations, please wait...</div>
+          </div>
 
               <!-- EMPTY STATE -->
               <div v-else-if="recommendations.length === 0">No recommendations yet.</div>
@@ -57,12 +60,11 @@
                   :image="normalizeImagePath(rec.image || rec.Image_Name) || 'default'"
                   :name="rec.name || rec.title || rec.title_cleaned || 'No Title'"
                   :duration="rec.duration || 15"
-                  :carbon="rec.carbon || rec.carbon_score || rec.total_recipe_carbon || 25"
+                  :totalRecipeCarbon="rec.carbon || rec.carbon_score || rec.total_recipe_carbon || 0"
                   :ingredients="rec.cleaned_ingredients || []"
                   :instructions="rec.instructions_cleaned || ''"
                   :favorites="model.favorites"
                   :cooks="model.cooks"
-                  :compact="true"
                   @open="
                     () => {
                       if (rec.id) goToRecipe(rec);
@@ -104,6 +106,7 @@ export default {
       showModal: false,
       selectedRecipe: null,
       recentSearches: [],
+      totalCarbon: 0,
     };
   },
   created() {
@@ -111,6 +114,7 @@ export default {
     // sync initial state
     this.images = this.model.images;
     this.recommendations = this.model.recommendations;
+    this.totalCarbon = this.model.totalCarbon;
     console.log("Initial recommendations:", this.recommendations);
     this.showModal = this.model.showModal;
     this.selectedRecipe = this.model.selectedRecipe;
@@ -127,6 +131,7 @@ export default {
     update() {
       this.images = this.model.images;
       this.recommendations = this.model.recommendations;
+      this.totalCarbon = this.model.totalCarbon;
       this.loading = this.model.loading;
       this.showModal = this.model.showModal;
       this.selectedRecipe = this.model.selectedRecipe ? JSON.parse(JSON.stringify(this.model.selectedRecipe)) : null;

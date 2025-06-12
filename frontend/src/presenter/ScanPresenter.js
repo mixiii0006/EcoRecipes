@@ -166,6 +166,11 @@ const response = await axios.post("https://ecorecipes-production.up.railway.app/
       this.model.setLoading(false);
       this.view.update();
       this.model.setRecommendations(recommendations);
+
+      // Calculate total carbon footprint from recommendations
+      const totalCarbon = recommendations.reduce((sum, rec) => sum + (rec.carbon || 0), 0);
+      this.model.totalCarbon = totalCarbon;
+
       this.view.update();
     } catch (error) {
       console.error("Error di submitImages():", error);

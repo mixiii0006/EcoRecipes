@@ -14,6 +14,7 @@ const state = reactive({
   showModal: false,
   selectedRecipe: null,
   recentSearches: [],
+  totalCarbon: 0,
 });
 
 export default class ScanModel {
@@ -40,6 +41,14 @@ export default class ScanModel {
   }
   get recentSearches() {
     return state.recentSearches;
+  }
+
+  get totalCarbon() {
+    return state.totalCarbon;
+  }
+
+  set totalCarbon(value) {
+    state.totalCarbon = value;
   }
 
   // New state for cooks and favorites
