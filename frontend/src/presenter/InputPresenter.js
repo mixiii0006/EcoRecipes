@@ -31,7 +31,7 @@ export default class InputPresenter {
 
   async runFullPipeline(data) {
     try {
-      const response = await axios.post("http://localhost:3000/api/ml/full", data);
+      const response = await axios.post("https://ecorecipes-production.up.railway.app/api/ml/full", data);
       return response.data;
     } catch (error) {
       alert("Failed to run full ML pipeline.");
