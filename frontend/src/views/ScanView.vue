@@ -400,4 +400,90 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1.5rem;
 }
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+  .image-grid {
+    max-width: 670px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 1100px) {
+  .main-content {
+    margin-left: 0 !important;
+    margin-top: 75px;
+    padding: 1rem;
+  }
+  .input-ingredients {
+    flex-direction: column;
+  }
+  .scan-btn-bar {
+    width: 85%;
+    
+  }
+  .submit-btn {
+    width: 94%;
+  }
+  .scan-ingredients {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 900px) {
+  .recipe-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.7rem;
+  }
+  .section-title {
+    font-size: 1.22rem;
+    text-align: center;
+  }
+  .scan-btn-bar {
+    width: 100%;
+    font-size: 1.12rem;
+  }
+  .main-content {
+    padding: 0.5rem;
+  }
+  .scan-section {
+    padding: 0.5rem;
+    gap: 1rem;
+    border-radius: 10px;
+  }
+  .image-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+    max-width: 360px;
+  }
+  .recipe-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.1rem;
+  }
+  .image-card {
+    width: 120px;
+    height: 130px;
+    border-radius: 10px;
+  }
+  .choose-file-btn {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.88rem;
+    border-radius: 8px;
+    margin-top: 32%;
+  }
+  .submit-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 12px;
+  }
+}
+
 </style>

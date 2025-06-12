@@ -10,8 +10,15 @@ export default class ProfilePresenter {
 
   async loadProfileData() {
     await this.model.getUserProfile();
+
     await this.model.getFavorites();
+    // Directly use favorites data as returned by API
+    this.model.setFavorites(this.model.favorites);
+
     await this.model.getCooks();
+    // Directly use cooks data as returned by API
+    this.model.setCooks(this.model.cooks);
+
     this.view.update();
   }
 

@@ -1,4 +1,4 @@
-<template>
+se<template>
   <div class="profile-container">
     <!-- Header Section with Background and Profile Picture -->
     <div class="profile-header">
@@ -82,12 +82,14 @@
               :image="item.image_name"
               :duration="item.duration || 0"
               :carbon="item.total_recipe_carbon || 'N/A'"
+              :totalRecipeCarbon="item.total_recipe_carbon"
               :favorites="model.favorites"
               :cooks="model.cooks"
-              :compact="true"
+              :compact="false"
               @open="openModal"
               @favorite="handleToggleFavorite"
               @cook="handleToggleCook"
+              v-on:mounted="console.log('RecipeCard total_recipe_carbon:', item.total_recipe_carbon)"
             />
           </div>
         </section>
