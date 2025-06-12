@@ -4,39 +4,44 @@
     <div class="image-wrapper">
       <img :src="imageUrl" :alt="name" @error="onImageError" />
     </div>
+
     <!-- Card Body -->
     <div class="card-body">
       <h3 class="recipe-title">{{ name }}</h3>
-      <div class="stats">
-        <div class="stat">
-          <span class="stat-label">Carbon Footprint</span>
-          <span class="stat-value">{{ carbon }} CO₂e</span>
-        </div>
-        <div class="stat" v-if="!compact">
-          <span class="stat-label">Total Recipe</span>
-          <span class="stat-value">{{ totalRecipeCarbon }} CO₂e</span>
-        </div>
+
+      <!-- Stats Box -->
+      <div class="stat" v-if="!compact && totalRecipeCarbon !== null">
+        <span class="stat-label">Recipe Carbon Footprint</span>
+        <span class="stat-value">{{ totalRecipeCarbon }} CO₂eq/kg</span>
       </div>
 
-      <!-- Missing & Leftovers -->
-      <div class="badge-container" v-if="missing.length || leftovers.length">
-        <span v-for="(item, i) in missing" :key="`m${i}`" class="badge missing">
-          Missing: {{ item }}
-        </span>
-        <span v-for="(item, i) in leftovers" :key="`l${i}`" class="badge leftover">
-          Leftover: {{ item }}
-        </span>
+      <div class="stat" v-if="!compact && totalUsedCarbon !== null">
+        <span class="stat-label">Carbon Avoided</span>
+        <span class="stat-value">{{ totalUsedCarbon }} CO₂eq/kg</span>
+      </div>
+
+      <div class="stat" v-if="!compact && totalMissingCarbon !== null">
+        <span class="stat-label">Carbon to Emit</span>
+        <span class="stat-value">{{ totalMissingCarbon }} CO₂eq/kg</span>
+      </div>
+
+      <div class="stat" v-if="!compact && efficiency !== null">
+        <span class="stat-label">Efficiency</span>
+        <span class="stat-value"> {{ (efficiency * 100).toFixed(1) }}% </span>
+      </div>
+
+      <!-- Used / Missing / Leftovers -->
+      <div class="badge-container" v-if="used.length || missing.length || leftovers.length">
+        <span v-for="(item, i) in used" :key="`u${i}`" class="badge used">Used: {{ item }}</span>
+        <span v-for="(item, i) in missing" :key="`m${i}`" class="badge missing">Missing: {{ item }}</span>
+        <span v-for="(item, i) in leftovers" :key="`l${i}`" class="badge leftover">Leftover: {{ item }}</span>
       </div>
     </div>
 
-    <!-- Card Footer: actions fixed at bottom -->
+    <!-- Footer -->
     <div class="card-footer">
-      <button class="btn cook" :disabled="!matched" @click.stop="handleCook">
-        <i class="fa-solid fa-utensils"></i> Cook
-      </button>
-      <button class="btn fav" @click.stop="toggleFavorite">
-        <i class="fa-regular fa-heart"></i> Favorite
-      </button>
+      <button class="btn cook" :disabled="!matched" @click.stop="handleCook"><i class="fa-solid fa-utensils"></i> Cook</button>
+      <button class="btn fav" @click.stop="toggleFavorite"><i class="fa-regular fa-heart"></i> Favorite</button>
     </div>
   </div>
 </template>
@@ -49,23 +54,25 @@ export default {
   props: {
     favorites: { type: Array, default: () => [] },
     cooks: { type: Array, default: () => [] },
-    recipess_id:       { type: String, required: true },
-    image:             { type: String, default: "" },
-    name:              { type: String, default: "" },
-    carbon:            { type: [Number, String], default: null },
+    recipess_id: { type: String, required: true },
+    image: { type: String, default: "" },
+    name: { type: String, default: "" },
+    carbon: { type: [Number, String], default: null },
     totalRecipeCarbon: { type: [Number, String], default: null },
-    leftovers:         { type: Array, default: () => [] },
-    missing:           { type: Array, default: () => [] },
-    matched:           { type: Boolean, default: true },
-    compact:           { type: Boolean, default: false },
+    totalUsedCarbon: { type: [Number, String], default: null },
+    totalMissingCarbon: { type: [Number, String], default: null },
+    efficiency: { type: [Number, String], default: null },
+    used: { type: Array, default: () => [] },
+    leftovers: { type: Array, default: () => [] },
+    missing: { type: Array, default: () => [] },
+    matched: { type: Boolean, default: true },
+    compact: { type: Boolean, default: false },
   },
   computed: {
     imageUrl() {
       if (!this.image) return "/foodImages/default.jpg";
       const hasExt = /\.(jpe?g|png|gif)$/i.test(this.image);
-      const path = this.image.startsWith("http") || this.image.startsWith("/")
-        ? this.image
-        : `/foodImages/${this.image}`;
+      const path = this.image.startsWith("http") || this.image.startsWith("/") ? this.image : `/foodImages/${this.image}`;
       return hasExt ? path : `${path}.jpg`;
     },
   },
@@ -75,42 +82,6 @@ export default {
     },
     handleClick() {
       this.$emit("open", { id: this.recipess_id });
-    },
-    async handleToggleFavorite() {
-      try {
-        const isFavorite = this.favorites.some(
-          (fav) => fav.recipess_id === this.recipess_id
-        );
-        if (isFavorite) {
-          await Swal.fire({
-            icon: "info",
-            title: "Info",
-            text: "Recipe is already in favorites",
-          });
-          return;
-        }
-        this.toggleFavorite();
-      } catch (error) {
-        console.error("Failed to toggle favorite:", error);
-      }
-    },
-    async handleToggleCook() {
-      try {
-        const isCook = this.cooks.some(
-          (cook) => cook.recipess_id === this.recipess_id
-        );
-        if (isCook) {
-          await Swal.fire({
-            icon: "info",
-            title: "Info",
-            text: "Recipe is already in cooks",
-          });
-          return;
-        }
-        this.handleCook();
-      } catch (error) {
-        console.error("Failed to toggle cook:", error);
-      }
     },
     handleCook() {
       Swal.fire({
@@ -148,7 +119,7 @@ export default {
   overflow: hidden;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  min-height: 392px;
+  min-height: 350px;
 }
 .recipe-card:hover {
   transform: translateY(-8px);
@@ -173,7 +144,7 @@ export default {
   flex-direction: column;
   gap: 0.5rem;
   text-align: left;
-  flex: none; 
+  flex: none;
 }
 
 .recipe-title {
@@ -185,6 +156,7 @@ export default {
 
 .stats {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
 }
@@ -228,13 +200,17 @@ export default {
   background: #eafaf2;
   color: #27ae60;
 }
+.badge.used {
+  background: #e0f7ea;
+  color: #2e7d32;
+}
 
 .card-footer {
   display: flex;
   gap: 0.5rem;
   padding: 1rem;
   border-top: 1px solid #e0e0e0;
-  flex-shrink: 0; /* ensure footer stays at bottom */
+  flex-shrink: 0;
 }
 
 .btn {

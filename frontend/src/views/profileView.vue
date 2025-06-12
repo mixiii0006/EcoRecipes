@@ -84,6 +84,7 @@
               :carbon="item.total_recipe_carbon || 'N/A'"
               :favorites="model.favorites"
               :cooks="model.cooks"
+              :compact="true"
               @open="openModal"
               @favorite="handleToggleFavorite"
               @cook="handleToggleCook"

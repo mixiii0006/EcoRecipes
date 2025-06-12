@@ -6,13 +6,17 @@ export default class InputModel {
     this.loading = false;
     this.showModal = false;
     this.selectedRecipe = null;
-    this.totalCarbon = 0;  // Add totalCarbon property
+    this.totalCarbon = 0; // Add totalCarbon property
     this.leftovers = [];
     this.missing = [];
     this.parsedIngredients = [];
 
     this.favorites = [];
     this.cooks = [];
+
+    this.used = [];
+    this.totalUsedCarbon = 0;
+    this.efficiency = 0;
   }
 
   setIngredients(ingredients) {
@@ -61,6 +65,18 @@ export default class InputModel {
 
   setCooks(cooks) {
     this.cooks = Array.isArray(cooks) ? cooks : [];
+  }
+
+  setUsed(used) {
+    this.used = Array.isArray(used) ? used : [];
+  }
+
+  setTotalUsedCarbon(totalUsedCarbon) {
+    this.totalUsedCarbon = totalUsedCarbon || 0;
+  }
+
+  setEfficiency(efficiency) {
+    this.efficiency = efficiency || 0;
   }
 
   addRecentSearch(search) {

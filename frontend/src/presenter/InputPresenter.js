@@ -31,7 +31,7 @@ export default class InputPresenter {
 
   async runFullPipeline(data) {
     try {
-const response = await axios.post("https://ecorecipes-production.up.railway.app/api/ml/full", data);
+      const response = await axios.post("http://localhost:3000/api/ml/full", data);
       return response.data;
     } catch (error) {
       alert("Failed to run full ML pipeline.");
@@ -52,26 +52,39 @@ const response = await axios.post("https://ecorecipes-production.up.railway.app/
 
     try {
       const response = await this.runFullPipeline({ text: this.model.ingredients });
-      console.log("runFullPipeline response:", response);
-      if (response && response.recommended_recipes) {
-        console.log("Recommended recipes images:");
-        response.recommended_recipes.forEach((rec, idx) => {
-          console.log(`Recipe ${idx}: image = ${rec.image}`);
+      console.log("Full pipeline response:", response);
+      console.log("Recommended recipes detail:");
+      response.recommended_recipes.forEach((r, idx) => {
+        console.log(`Recipe ${idx}:`, {
+          title: r.title,
+          used: r.used,
+          total_used_carbon: r.total_used_carbon,
+          total_missing_carbon: r.total_missing_carbon,
+          efficiency: r.efficiency,
         });
-      }
+      });
 
-      if (response) {
-        this.model.setRecommendations(response.recommended_recipes || []);
+      if (response && response.recommended_recipes) {
+        const mappedRecommendations = response.recommended_recipes.map((r) => ({
+          id: r.id,
+          name: r.title,
+          image: r.image,
+          carbon: r.carbon,
+          totalRecipeCarbon: r.total_recipe_carbon,
+          totalUsedCarbon: r.total_used_carbon,
+          totalMissingCarbon: r.total_missing_carbon,
+          used: r.used || [],
+          missing: r.missing || [],
+          leftovers: r.leftovers || [],
+          efficiency: r.efficiency,
+        }));
+
+        this.model.setRecommendations(mappedRecommendations);
         this.model.setTotalCarbon(response.total_carbon || 0);
-        this.model.setLeftovers(response.leftovers || []);
-        this.model.setMissing(response.missing || []);
         this.model.setParsedIngredients(response.parsed_ingredients || []);
-        this.model.setSelectedRecipe(response.selected_recipe || null);
       } else {
         this.model.setRecommendations([]);
         this.model.setTotalCarbon(0);
-        this.model.setLeftovers([]);
-        this.model.setMissing([]);
         this.model.setParsedIngredients([]);
         this.model.setSelectedRecipe(null);
       }
@@ -110,7 +123,7 @@ const response = await axios.post("https://ecorecipes-production.up.railway.app/
   async getFavorites() {
     try {
       const token = localStorage.getItem("token");
-const { data } = await axios.get("https://ecorecipes-production.up.railway.app/api/favorites", {
+      const { data } = await axios.get("https://ecorecipes-production.up.railway.app/api/favorites", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -124,7 +137,7 @@ const { data } = await axios.get("https://ecorecipes-production.up.railway.app/a
   async getCooks() {
     try {
       const token = localStorage.getItem("token");
-const { data } = await axios.get("https://ecorecipes-production.up.railway.app/api/cooks", {
+      const { data } = await axios.get("https://ecorecipes-production.up.railway.app/api/cooks", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -138,7 +151,7 @@ const { data } = await axios.get("https://ecorecipes-production.up.railway.app/a
   async addFavorite(recipess_id) {
     try {
       const token = localStorage.getItem("token");
-const { data } = await axios.post(
+      const { data } = await axios.post(
         "https://ecorecipes-production.up.railway.app/api/favorites",
         { recipess_id },
         {
@@ -159,7 +172,7 @@ const { data } = await axios.post(
   async addCook(recipess_id) {
     try {
       const token = localStorage.getItem("token");
-const { data } = await axios.post(
+      const { data } = await axios.post(
         "https://ecorecipes-production.up.railway.app/api/cooks",
         { recipess_id },
         {
@@ -195,7 +208,7 @@ const { data } = await axios.post(
     const recipeId = recipe.id || recipe._id;
     console.log("get recipe details for ID:", recipeId);
     try {
-const resp = await axios.get(`https://ecorecipes-production.up.railway.app/api/recipes/${recipeId}`);
+      const resp = await axios.get(`https://ecorecipes-production.up.railway.app/api/recipes/${recipeId}`);
       const detail = resp.data;
       this.model.setSelectedRecipe(detail);
       this.model.setShowModal(true);
