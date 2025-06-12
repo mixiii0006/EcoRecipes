@@ -275,7 +275,8 @@ export default {
 .carousel-overlay {
   position: absolute;
   bottom: 20px;
-  left: 20px;
+  left: 10px;
+  right: 10px;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
   padding: 1rem 1.5rem;
@@ -344,9 +345,10 @@ export default {
   justify-content: space-between;
   gap: 1.5rem;
   margin: 2rem 0;
+  flex-wrap: wrap;
 }
 .feature-card {
-  flex: 1;
+  flex: 1 1 45%;
   background: linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%);
   border-radius: 16px;
   padding: 2rem 1.5rem;
@@ -358,6 +360,8 @@ export default {
   align-items: center;
   text-decoration: none;
   color: inherit;
+  min-width: 280px;
+  box-sizing: border-box;
 }
 .feature-card:hover {
   transform: translateY(-8px) scale(1.02);
@@ -492,7 +496,7 @@ export default {
   display: flex;
   gap: 10px;
   overflow: hidden;
-  width: 220px; /* 2 items * 100px + gap */
+  width: 100%;
 }
 
 .slider-btn {
