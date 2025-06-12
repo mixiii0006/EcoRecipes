@@ -11,6 +11,7 @@ export default class SearchPresenter {
     this.view.startCarousel = this.startCarousel.bind(this);
     this.view.checkMobile = this.checkMobile.bind(this);
     this.view.openModal = this.openModal.bind(this);
+    this.view.handleToggleFavorite = this.handleToggleFavorite.bind(this);
   }
 
   async getRecommendations(searchText) {
@@ -246,10 +247,24 @@ const response = await axios.get("https://ecorecipes-production.up.railway.app/a
     } catch (error) {
       // If duplicate error, do not update model or return success
       if (error.response && error.response.status === 400) {
+        this.view.$toast.error("Failed to add recipe to cooks");
         throw error;
       }
       this.view.$toast.error("Failed to add recipe to cooks");
       throw error;
+    }
+  }
+
+  async handleToggleFavorite(recipeId) {
+    try {
+      await this.addFavorite(recipeId);
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        this.view.$toast.info("Recipe is already in favorites");
+        return;
+      }
+      this.view.$toast.error("Failed to add recipe to favorites");
+      console.error("Error in handleToggleFavorite:", error);
     }
   }
 }

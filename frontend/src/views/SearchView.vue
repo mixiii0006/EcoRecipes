@@ -87,6 +87,7 @@ export default {
     this.presenter = new SearchPresenter(this.model, this);
     this.model.username = localStorage.getItem("username") || "";
     this.presenter.getRecommendations("");
+    console.log("Favorites in SearchView model:", this.model.favorites);
     this.query = this.model.searchText; // Use searchText instead of query
     this.carouselItems = this.model.carouselItems;
     this.loadingRecommendations = this.model.loadingRecommendations;
@@ -130,25 +131,11 @@ export default {
       this.model.setShowModal(false);
       this.update();
     },
-    async handleFavorite(item) {
+    async handleToggleFavorite(recipeId) {
       try {
-        await this.presenter.addFavorite(item.id || item._id || item.recipess_id || item.title_cleaned);
-        // No success alert here to avoid duplication with RecipeCard
+        await this.presenter.handleToggleFavorite(recipeId);
       } catch (error) {
-        if (error.response && error.response.status === 400) {
-          // Show info alert on duplicate error
-          await import("sweetalert2").then(({ default: Swal }) => {
-            Swal.fire({
-              icon: "info",
-              title: "Info",
-              text: error.response.data.message || "Recipe is already in favorites",
-            });
-          });
-          return; // Do not show any other alert
-        } else {
-          console.error("Failed to add favorite:", error);
-        }
-        console.error("Failed to add favorite:", error);
+        console.error("Failed to toggle favorite:", error);
       }
     },
     async handleCook(recipess_id) {

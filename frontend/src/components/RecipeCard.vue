@@ -41,8 +41,8 @@
 
     <!-- Footer -->
     <div class="card-footer">
-      <button class="btn cook" :disabled="!matched" @click.stop="handleCook"><i class="fa-solid fa-utensils"></i> Cook</button>
-      <button class="btn fav" @click.stop="toggleFavorite"><i class="fa-regular fa-heart"></i> Favorite</button>
+      <button class="btn cook" :disabled="!matched" @click.stop="handleToggleCook"><i class="fa-solid fa-utensils"></i> Cook</button>
+      <button class="btn fav" @click.stop="handleToggleFavorite"><i class="fa-regular fa-heart"></i> Favorite</button>
     </div>
   </div>
 </template>
@@ -79,11 +79,45 @@ export default {
     },
   },
   methods: {
-    onImageError(e) {
-      e.target.src = "/foodImages/default.jpg";
+    async handleToggleFavorite() {
+      try {
+        console.log("Favorites array in RecipeCard:", this.favorites);
+        console.log("Current recipess_id:", this.recipess_id);
+        const isFavorite = this.favorites.some(
+          (fav) => fav.recipess_id === this.recipess_id
+        );
+        if (isFavorite) {
+          await import("sweetalert2").then(({ default: Swal }) => {
+            Swal.fire({
+              icon: "info",
+              title: "Info",
+              text: "Recipe is already in favorites",
+            });
+          });
+          return;
+        }
+        this.toggleFavorite();
+      } catch (error) {
+        console.error("Failed to toggle favorite:", error);
+      }
     },
-    handleClick() {
-      this.$emit("open", { id: this.recipess_id });
+    async handleToggleCook() {
+      try {
+        const isCook = this.cooks.some(
+          (cook) => cook.recipess_id === this.recipess_id
+        );
+        if (isCook) {
+          await Swal.fire({
+            icon: "info",
+            title: "Info",
+            text: "Recipe is already in cooks",
+          });
+          return;
+        }
+        this.handleCook();
+      } catch (error) {
+        console.error("Failed to toggle cook:", error);
+      }
     },
     handleCook() {
       Swal.fire({
@@ -107,6 +141,12 @@ export default {
         showConfirmButton: false,
         timer: 1500,
       });
+    },
+    onImageError(e) {
+      e.target.src = "/foodImages/default.jpg";
+    },
+    handleClick() {
+      this.$emit("open", { id: this.recipess_id });
     },
   },
 };

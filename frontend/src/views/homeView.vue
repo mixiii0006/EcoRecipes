@@ -207,6 +207,7 @@ export default {
   .main-section {
     margin-left: 0 !important;
     padding: 1rem;
+    margin-top: 75px;;
   }
   .main-layout {
     flex-direction: column;
