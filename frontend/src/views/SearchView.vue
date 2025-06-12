@@ -47,7 +47,7 @@
             :cooks="model.cooks"
             :fixedTitleHeight="true"
             @open="openModal(index)"
-            @favorite="handleFavorite(item)"
+            @favorite="handleFavorite"
             @cook="handleCook"
           />
         </div>
@@ -137,6 +137,9 @@ export default {
       } catch (error) {
         console.error("Failed to toggle favorite:", error);
       }
+    },
+    handleFavorite(recipeId) {
+      this.handleToggleFavorite(recipeId);
     },
     async handleCook(recipess_id) {
       try {

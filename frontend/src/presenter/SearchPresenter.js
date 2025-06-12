@@ -210,19 +210,13 @@ const response = await axios.get("https://ecorecipes-production.up.railway.app/a
 
   async addFavorite(recipess_id) {
     try {
-      // Call backend to add favorite
-      const ProfileModel = (await import("../model/ProfileModel")).default;
-      const profileModel = new ProfileModel();
-      await profileModel.addFavorite(recipess_id);
-      // Refresh favorites list in profileModel
-      await profileModel.getFavorites();
-      // Update this.model.favorites to keep duplicate check accurate
-      this.model.favorites = profileModel.favorites;
+      // Use SearchModel's addFavorite instead of ProfileModel
+      await this.model.addFavorite(recipess_id);
+      // Refresh favorites list in SearchModel
+      await this.model.getFavorites();
       this.view.update();
-      // Return true only if added successfully (not duplicate)
       return true;
     } catch (error) {
-      // If duplicate error, do not update model or return success
       if (error.response && error.response.status === 400) {
         throw error;
       }
@@ -233,20 +227,14 @@ const response = await axios.get("https://ecorecipes-production.up.railway.app/a
 
   async addCook(recipess_id) {
     try {
-      // Call backend to add cook
-      const ProfileModel = (await import("../model/ProfileModel")).default;
-      const profileModel = new ProfileModel();
-      await profileModel.addCook(recipess_id);
-      // Refresh cooks list in profileModel
-      await profileModel.getCooks();
-      // Update this.model.cooks to keep duplicate check accurate
-      this.model.cooks = profileModel.cooks;
+      // Use SearchModel's addCook instead of ProfileModel
+      await this.model.addCook(recipess_id);
+      // Refresh cooks list in SearchModel
+      await this.model.getCooks();
       this.view.update();
-      // Return true only if added successfully (not duplicate)
       return true;
     } catch (error) {
-      // If duplicate error, do not update model or return success
-      if (error.response && error.response.status === 400) {
+      if (error && error.response && error.response.status === 400) {
         this.view.$toast.error("Failed to add recipe to cooks");
         throw error;
       }
@@ -259,7 +247,7 @@ const response = await axios.get("https://ecorecipes-production.up.railway.app/a
     try {
       await this.addFavorite(recipeId);
     } catch (error) {
-      if (error.response && error.response.status === 400) {
+      if (error && error.response && error.response.status === 400) {
         this.view.$toast.info("Recipe is already in favorites");
         return;
       }

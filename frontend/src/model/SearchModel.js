@@ -138,4 +138,34 @@ const response = await axios.post("https://ecorecipes-production.up.railway.app/
       throw new Error(errorMessage);
     }
   }
+
+  async addFavorite(recipess_id) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post("https://ecorecipes-production.up.railway.app/api/favorites",
+        { recipess_id },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to add favorite:", error);
+
+      let errorMessage = "Failed to add favorite";
+
+      if (error.response) {
+        errorMessage = error.response.data?.message || error.response.data?.error || `Server error: ${error.response.status}`;
+      } else if (error.request) {
+        errorMessage = "No response from server. Please check your connection.";
+      } else {
+        errorMessage = error.message;
+      }
+
+      throw new Error(errorMessage);
+    }
+  }
 }
