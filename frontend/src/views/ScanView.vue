@@ -244,13 +244,16 @@ export default {
   flex: 1;
 }
 .scan-btn-bar {
+ align-self: center;
   background: linear-gradient(to right, #235f3a, #73b06f);
-  color: #fff;
+  color: white;
   border: none;
   padding: 0.8rem 2.5rem;
   border-radius: 18px;
   cursor: pointer;
   font-size: 1.2rem;
+  margin-top: 1.5rem;
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
 }
 .scan-btn-bar:hover {
@@ -370,13 +373,15 @@ export default {
 
 /* Submit Button */
 .submit-btn {
+  align-self: center;
   background: linear-gradient(to right, #235f3a, #73b06f);
-  color: #fff;
+  color: white;
   border: none;
   padding: 0.8rem 2.5rem;
   border-radius: 18px;
   cursor: pointer;
   font-size: 1.2rem;
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
 }
 .submit-btn:hover {
@@ -422,10 +427,12 @@ export default {
   .input-ingredients {
     flex-direction: column;
   }
-  .scan-btn-bar {
-    width: 85%;
-    
+   .scan-btn-bar {
+    width: 90%;
+    margin-right: 30px;
+    margin-left: 30px;
   }
+
   .submit-btn {
     width: 94%;
   }
@@ -451,7 +458,8 @@ export default {
     text-align: center;
   }
   .scan-btn-bar {
-    width: 100%;
+    width: 90%;
+    justify-content: center;
     font-size: 1.12rem;
   }
   .main-content {
@@ -482,11 +490,7 @@ export default {
     border-radius: 8px;
     margin-top: 32%;
   }
-  .submit-btn {
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
-    border-radius: 12px;
-  }
+ 
 }
 
 </style>
