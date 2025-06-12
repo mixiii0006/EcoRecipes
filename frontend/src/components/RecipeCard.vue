@@ -112,6 +112,7 @@ export default {
 
 <style scoped>
 .recipe-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -120,6 +121,7 @@ export default {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   min-height: 350px;
+  padding-bottom: 60px; /* space for footer */
 }
 .recipe-card:hover {
   transform: translateY(-8px);
@@ -206,11 +208,17 @@ export default {
 }
 
 .card-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
   display: flex;
   gap: 0.5rem;
   padding: 1rem;
   border-top: 1px solid #e0e0e0;
   flex-shrink: 0;
+  width: 100%;
+  background: #fff;
+  box-sizing: border-box;
 }
 
 .btn {
