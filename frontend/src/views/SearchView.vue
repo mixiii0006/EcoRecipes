@@ -45,6 +45,7 @@
             :rating="item.rating || 0"
             :favorites="model.favorites"
             :cooks="model.cooks"
+            :fixedTitleHeight="true"
             @open="openModal(index)"
             @favorite="handleFavorite(item)"
             @cook="handleCook"

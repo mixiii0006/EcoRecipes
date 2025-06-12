@@ -404,7 +404,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-bottom: 2rem;
   box-sizing: border-box;
 }
 
@@ -427,7 +426,6 @@ export default {
   border-radius: 18px;
   cursor: pointer;
   font-size: 1.2rem;
-  margin-top: 1.5rem;
   font-family: "Poppins", sans-serif;
   font-weight: 600;
 }
@@ -569,7 +567,6 @@ export default {
   .input-section {
     padding: 1rem;
     gap: 0.7rem;
-    margin-bottom: 1rem;
   }
   .ingredients-input {
     font-size: 0.95rem;

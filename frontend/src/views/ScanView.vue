@@ -256,7 +256,7 @@ export default {
 .scan-section {
   width: 100%;
   max-width: 700px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1rem;
   padding: 1.5rem;
   background: #fff;
   border-radius: 24px;
@@ -274,7 +274,7 @@ export default {
   grid-template-columns: 1fr;
   justify-items: center;
   width: 100%;
-  max-width: 400px;
+  max-width: 1000px;
 }
 
 .image-card {
@@ -288,7 +288,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  
   box-shadow: 0 2px 6px rgba(80,120,80,0.03);
 }
 .image-card:hover {
@@ -308,9 +308,7 @@ export default {
 }
 
 /* ===== IMAGE CONTROLS (Choose / Change) ===== */
-.image-controls {
-  margin-bottom: 1.5rem;
-}
+
 
 .upload-btn {
   display: inline-flex;

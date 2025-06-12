@@ -7,34 +7,35 @@
 
     <!-- Card Body -->
     <div class="card-body">
-      <h3 class="recipe-title">{{ name }}</h3>
+      <h3 :class="['recipe-title', { 'fixed-height': fixedTitleHeight }]">{{ name }}</h3>
+      <div class="scrollable-content">
+        <!-- Stats Box -->
+        <div class="stat total-recipe-carbon" v-if="!compact && totalRecipeCarbon !== null">
+          <span class="stat-label">Recipe Carbon Footprint</span>
+          <span class="stat-value">{{ totalRecipeCarbon }} CO₂eq/kg</span>
+        </div>
 
-      <!-- Stats Box -->
-      <div class="stat" v-if="!compact && totalRecipeCarbon !== null">
-        <span class="stat-label">Recipe Carbon Footprint</span>
-        <span class="stat-value">{{ totalRecipeCarbon }} CO₂eq/kg</span>
-      </div>
+        <div class="stat" v-if="!compact && totalUsedCarbon !== null">
+          <span class="stat-label">Carbon Avoided</span>
+          <span class="stat-value">{{ totalUsedCarbon }} CO₂eq/kg</span>
+        </div>
 
-      <div class="stat" v-if="!compact && totalUsedCarbon !== null">
-        <span class="stat-label">Carbon Avoided</span>
-        <span class="stat-value">{{ totalUsedCarbon }} CO₂eq/kg</span>
-      </div>
+        <div class="stat" v-if="!compact && totalMissingCarbon !== null">
+          <span class="stat-label">Carbon to Emit</span>
+          <span class="stat-value">{{ totalMissingCarbon }} CO₂eq/kg</span>
+        </div>
 
-      <div class="stat" v-if="!compact && totalMissingCarbon !== null">
-        <span class="stat-label">Carbon to Emit</span>
-        <span class="stat-value">{{ totalMissingCarbon }} CO₂eq/kg</span>
-      </div>
+        <div class="stat" v-if="!compact && efficiency !== null">
+          <span class="stat-label">Efficiency</span>
+          <span class="stat-value"> {{ (efficiency * 100).toFixed(1) }}% </span>
+        </div>
 
-      <div class="stat" v-if="!compact && efficiency !== null">
-        <span class="stat-label">Efficiency</span>
-        <span class="stat-value"> {{ (efficiency * 100).toFixed(1) }}% </span>
-      </div>
-
-      <!-- Used / Missing / Leftovers -->
-      <div class="badge-container" v-if="used.length || missing.length || leftovers.length">
-        <span v-for="(item, i) in used" :key="`u${i}`" class="badge used">Used: {{ item }}</span>
-        <span v-for="(item, i) in missing" :key="`m${i}`" class="badge missing">Missing: {{ item }}</span>
-        <span v-for="(item, i) in leftovers" :key="`l${i}`" class="badge leftover">Leftover: {{ item }}</span>
+        <!-- Used / Missing / Leftovers -->
+        <div class="badge-container" v-if="used.length || missing.length || leftovers.length">
+          <span v-for="(item, i) in used" :key="`u${i}`" class="badge used">Used: {{ item }}</span>
+          <span v-for="(item, i) in missing" :key="`m${i}`" class="badge missing">Missing: {{ item }}</span>
+          <span v-for="(item, i) in leftovers" :key="`l${i}`" class="badge leftover">Leftover: {{ item }}</span>
+        </div>
       </div>
     </div>
 
@@ -67,6 +68,7 @@ export default {
     missing: { type: Array, default: () => [] },
     matched: { type: Boolean, default: true },
     compact: { type: Boolean, default: false },
+    fixedTitleHeight: { type: Boolean, default: false }
   },
   computed: {
     imageUrl() {
@@ -120,7 +122,7 @@ export default {
   overflow: hidden;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  min-height: 350px;
+  min-height: 400px;
   padding-bottom: 60px; /* space for footer */
 }
 .recipe-card:hover {
@@ -148,12 +150,51 @@ export default {
   text-align: left;
   flex: none;
 }
+.scrollable-content {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-bottom: 30px; /* prevent footer overlap */
+}
+
+.scrollable-content.no-scroll {
+  max-height: none;
+  overflow-y: visible;
+}
+
+.scrollable-content.scrollable {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+  .scrollable-content {
+    max-height: none;
+    overflow-y: visible;
+  }
+  .recipe-card {
+    min-height: auto;
+    padding-bottom: 60px;
+  }
+  .card-footer {
+    position: relative;
+  }
+}
 
 .recipe-title {
   font-size: 1rem;
   font-weight: 700;
   color: #235f3a;
-  margin: 0;
+  margin: 0 0 0.5rem 0;
+  padding: 0.8rem 0;
+  height: 40px;
+}
+.recipe-title.fixed-height {
+  height: 50px;
+  overflow: hidden;
+}
+.recipe-title.search-view-height {
+  height: 35px;
+  overflow: hidden;
 }
 
 .stats {
@@ -165,12 +206,15 @@ export default {
 .stat {
   text-align: center;
   background: #eafaf2;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.7rem;
   border-radius: 12px;
+  margin-bottom: 0.7rem;
 }
+
+
 .stat-label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #73b06f;
   font-weight: 600;
 }
@@ -187,12 +231,14 @@ export default {
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.5rem;
+ 
 }
 .badge {
   font-size: 0.75rem;
   padding: 0.8rem 0.8rem;
   border-radius: 10px;
   font-weight: 500;
+
 }
 .badge.missing {
   background: #fdecea;
