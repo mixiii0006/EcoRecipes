@@ -17,7 +17,7 @@ export default class SearchPresenter {
   async getRecommendations(searchText) {
     try {
       this.model.setLoadingRecommendations(true);
-const response = await axios.get("https://ecorecipes-production.up.railway.app/api/recipes", {
+const response = await axios.get("https://ecorecipes-production-e306.up.railway.app/api/recipes", {
         params: { limit: 200 },
         headers: {
           "Content-Type": "application/json",
@@ -137,7 +137,7 @@ const response = await axios.get("https://ecorecipes-production.up.railway.app/a
         alert("Recipe data is invalid.");
         return;
       }
-      const response = await axios.get(`https://ecorecipes-production.up.railway.app/api/recipes/${recipe.id}`, {
+      const response = await axios.get(`https://ecorecipes-production-e306.up.railway.app/api/recipes/${recipe.id}`, {
         headers: {
           "Content-Type": "application/json",
         }
@@ -181,7 +181,7 @@ const response = await axios.get("https://ecorecipes-production.up.railway.app/a
 
   async getRecipeById(id) {
     try {
-      const response = await axios.get(`https://ecorecipes-production.up.railway.app/api/recipes/${id}`, {
+      const response = await axios.get(`https://ecorecipes-production-e306.up.railway.app/api/recipes/${id}`, {
         headers: {
           "Content-Type": "application/json",
         }

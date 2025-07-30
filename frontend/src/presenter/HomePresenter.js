@@ -27,7 +27,7 @@ export default class HomePresenter {
         return;
       }
 
-const { data } = await axios.get("https://ecorecipes-production.up.railway.app/api/users/profile", {
+const { data } = await axios.get("https://ecorecipes-production-e306.up.railway.app/api/users/profile", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -66,7 +66,7 @@ const { data } = await axios.get("https://ecorecipes-production.up.railway.app/a
         return;
       }
 
-const { data } = await axios.get("https://ecorecipes-production.up.railway.app/api/favorites", {
+const { data } = await axios.get("https://ecorecipes-production-e306.up.railway.app/api/favorites", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

@@ -27,11 +27,11 @@ export default class ProfileModel {
   async getUserProfile() {
     try {
       const token = localStorage.getItem("token");
-const response = await axios.get("https://ecorecipes-production.up.railway.app/api/users/profile", {
+      const response = await axios.get("https://ecorecipes-production-e306.up.railway.app/api/users/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const userData = response.data;
-userData.totalCarbonReduced = userData.total_user_carbon ? Number(userData.total_user_carbon.toFixed(3)) : 0 ; 
+      userData.totalCarbonReduced = userData.total_user_carbon ? Number(userData.total_user_carbon.toFixed(3)) : 0;
       this.setUser(userData);
     } catch (error) {
       console.error("Failed to get user profile:", error);
@@ -41,7 +41,7 @@ userData.totalCarbonReduced = userData.total_user_carbon ? Number(userData.total
   async getFavorites() {
     try {
       const token = localStorage.getItem("token");
-const response = await axios.get("https://ecorecipes-production.up.railway.app/api/favorites", {
+      const response = await axios.get("https://ecorecipes-production-e306.up.railway.app/api/favorites", {
         headers: { Authorization: `Bearer ${token}` },
       });
       this.setFavorites(response.data);
@@ -53,7 +53,7 @@ const response = await axios.get("https://ecorecipes-production.up.railway.app/a
   async getCooks() {
     try {
       const token = localStorage.getItem("token");
-const response = await axios.get("https://ecorecipes-production.up.railway.app/api/cooks", {
+      const response = await axios.get("https://ecorecipes-production-e306.up.railway.app/api/cooks", {
         headers: { Authorization: `Bearer ${token}` },
       });
       this.setCooks(response.data);
@@ -65,12 +65,12 @@ const response = await axios.get("https://ecorecipes-production.up.railway.app/a
   async addFavorite(recipess_id) {
     try {
       // Check if favorite already exists
-      if (this.favorites.some(fav => fav.recipess_id === recipess_id)) {
+      if (this.favorites.some((fav) => fav.recipess_id === recipess_id)) {
         throw new Error("Recipe already in favorites list");
       }
       const token = localStorage.getItem("token");
-const response = await axios.post(
-        "https://ecorecipes-production.up.railway.app/api/favorites",
+      const response = await axios.post(
+        "https://ecorecipes-production-e306.up.railway.app/api/favorites",
         { recipess_id },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -86,12 +86,12 @@ const response = await axios.post(
   async addCook(recipess_id) {
     try {
       // Check if cook already exists
-      if (this.cooks.some(cook => cook.recipess_id === recipess_id)) {
+      if (this.cooks.some((cook) => cook.recipess_id === recipess_id)) {
         throw new Error("Recipe already in cooks list");
       }
       const token = localStorage.getItem("token");
-const response = await axios.post(
-        "https://ecorecipes-production.up.railway.app/api/cooks",
+      const response = await axios.post(
+        "https://ecorecipes-production-e306.up.railway.appp/api/cooks",
         { recipess_id },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -107,7 +107,7 @@ const response = await axios.post(
   async getRecipeById(recipeId) {
     try {
       const token = localStorage.getItem("token");
-const response = await axios.get(`https://ecorecipes-production.up.railway.app/api/recipes/${recipeId}`, {
+      const response = await axios.get(`https://ecorecipes-production-e306.up.railway.app/api/recipes/${recipeId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;

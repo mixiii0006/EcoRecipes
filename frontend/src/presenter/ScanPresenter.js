@@ -131,7 +131,7 @@ export default class ScanPresenter {
     formData.append("file", imagesToSubmit[0].file);
 
     try {
-const response = await axios.post("https://ecorecipes-production.up.railway.app/api/ml/findSimilarImages", formData, {
+const response = await axios.post("https://ecorecipes-production-e306.up.railway.app/api/ml/findSimilarImages", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       const data = response.data;
@@ -205,7 +205,7 @@ const response = await axios.post("https://ecorecipes-production.up.railway.app/
         return;
       }
 
-const response = await axios.get(`https://ecorecipes-production.up.railway.app/api/recipes/${recipe.id}`);
+const response = await axios.get(`https://ecorecipes-production-e306.up.railway.app/api/recipes/${recipe.id}`);
       const data = response.data;
       console.log("Get recipe details:", data);
 

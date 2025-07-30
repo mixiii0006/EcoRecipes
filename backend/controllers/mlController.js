@@ -3,8 +3,8 @@ const axios = require("axios");
 const FormData = require("form-data");
 const stringSimilarity = require("string-similarity");
 
-const BASE_URL_NLP = "https://capstone-ml-production.up.railway.app";
-const BASE_URL_CNN = "https://capstone-ml-gambar.up.railway.app";
+const BASE_URL_NLP = "https://capstone-ml-nlp.up.railway.app";
+const BASE_URL_CNN = "https://capstone-ml-Image.up.railway.app";
 
 exports.runFullPipeline = async (req, res) => {
   console.log("runFullPipeline DIPANGGIL");

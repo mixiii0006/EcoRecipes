@@ -11,12 +11,7 @@ export default class RegisterPresenter {
 
   async handleRegister() {
     // Validasi kosong
-    if (
-      !this.model.name.trim() ||
-      !this.model.email.trim() ||
-      !this.model.password ||
-      !this.model.confirmPassword
-    ) {
+    if (!this.model.name.trim() || !this.model.email.trim() || !this.model.password || !this.model.confirmPassword) {
       Swal.fire({
         icon: "warning",
         title: "Incomplete Form",
@@ -47,7 +42,7 @@ export default class RegisterPresenter {
     }
 
     try {
-      await axios.post("https://ecorecipes-production.up.railway.app/api/auth/register", {
+      await axios.post("https://ecorecipes-production-e306.up.railway.app/api/auth/register", {
         name: this.model.name.trim(),
         email: this.model.email.trim(),
         password: this.model.password,
@@ -62,8 +57,7 @@ export default class RegisterPresenter {
         this.view.$router.push("/login");
       });
     } catch (error) {
-      const message =
-        error.response?.data?.message || "Registration failed. Please try again.";
+      const message = error.response?.data?.message || "Registration failed. Please try again.";
 
       Swal.fire({
         icon: "error",

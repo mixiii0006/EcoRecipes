@@ -41,7 +41,7 @@ export default {
       this.message = "";
       this.isError = false;
       try {
-const res = await axios.post("https://ecorecipes-production.up.railway.app/api/auth/forget-password", {
+const res = await axios.post("https://ecorecipes-production-e306.up.railway.app/api/auth/forget-password", {
           email: this.email,
         });
         this.message = res.data.message || "Reset link sent to your email";
