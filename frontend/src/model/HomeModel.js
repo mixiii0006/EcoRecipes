@@ -6,33 +6,33 @@ export default class HomeModel {
     this.currentIndex = 0;
     this.carouselItems = [
       {
-        title: "Makan Apa Hari Ini??",
-        description: "Pilih makanan lokal, kurangi jejak karbon! Menggunakan bahan dari sekitar membantu mengurangi emisi transportasi.",
-        ingredients: "Ayam Lokal, Sayur Organik, Cabai, Bawang",
+        title: "What’s for Lunch Today??",
+        description: "Choose local food, reduce carbon footprint! Using ingredients from nearby helps lower transportation emissions.",
+        ingredients: "Local Chicken, Organic Vegetables, Chili, Onion",
         image: "/foodImages/-candy-corn-pumpkin-blondies-51254510.jpg",
       },
       {
-        title: "Jejak Karbon di Meja Makan",
-        description: "Tahukah kamu? Daging merah punya jejak karbon lebih tinggi dari sayuran dan biji-bijian. Kurangi sedikit, bantu selamatkan bumi!",
-        ingredients: "Daging Sapi, Kentang, Bayam, Tomat",
+        title: "Carbon Footprint on the Dining Table",
+        description: "Did you know? Red meat has a higher carbon footprint than vegetables and grains. Cut back a little, help save the Earth!",
+        ingredients: "Beef, Potatoes, Spinach, Tomato",
         image: "/foodImages/-carbonnade-a-la-flamande-short-ribs-358557.jpg",
       },
       {
-        title: "Masak Bijak, Bumi Terjaga",
-        description: "Gunakan bahan musiman dan minim olahan. Selain sehat, ini juga mengurangi energi produksi dan distribusi.",
-        ingredients: "Tempe, Labu Siam, Jagung, Kemangi",
+        title: "Cook Smart, Save the Earth",
+        description: "Use seasonal and minimally processed ingredients. Not only healthier, this also reduces energy for production and distribution.",
+        ingredients: "Tempeh, Chayote, Corn, Basil",
         image: "/foodImages/-fried-chicken-51238060.jpg",
       },
       {
-        title: "Piringmu, Pilihanmu",
-        description: "Makanan nabati meninggalkan jejak karbon lebih rendah. Ganti satu porsi dagingmu dengan alternatif nabati, yuk!",
-        ingredients: "Tahu, Jamur, Kacang Merah, Paprika",
+        title: "Your Plate, Your Choice",
+        description: "Plant-based foods leave a lower carbon footprint. Replace one meat portion with a plant-based alternative, let’s go!",
+        ingredients: "Tofu, Mushrooms, Kidney Beans, Bell Peppers",
         image: "/foodImages/-hazelnut-butter-and-coffee-meringues-51260360.jpg",
       },
       {
-        title: "Masakan Hemat Emisi",
-        description: "Kurangi makanan terbuang! Sisa bahan bisa jadi sup, tumisan, atau kaldu—hemat uang dan bantu bumi.",
-        ingredients: "Sisa Sayur, Nasi, Daun Bawang, Telur",
+        title: "Low-Emission Cooking",
+        description: "Reduce food waste! Leftover ingredients can be made into soup, stir-fry, or broth—save money and help the planet.",
+        ingredients: "Leftover Veggies, Rice, Green Onion, Egg",
         image: "/foodImages/-pumpkin-gruyere-gratin-with-thyme-51252910.jpg",
       },
     ];
@@ -69,7 +69,7 @@ export default class HomeModel {
   async getRecipeById(recipeId) {
     try {
       const token = localStorage.getItem("token");
-const response = await axios.get(`https://ecorecipes-production-e306.up.railway.app/api/recipes/${recipeId}`, {
+      const response = await axios.get(`https://ecorecipes-production-e306.up.railway.app/api/recipes/${recipeId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
